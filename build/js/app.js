@@ -1,13 +1,13 @@
 /* =============================================================
    APPLICATION — kiosk state machine
-   attract → sector → explore → diagnostic(18) → wrapped(5) → delivery → done
+   attract → explore → diagnostic(18) → identify → results(5) → done
    ============================================================= */
 
 import { HiveScene } from './scene.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
-  classifyArchetype, SECTORS, BENCHMARK_STATUS, ROLES, ROLE_DEFAULT, CASES,
-  forecast, FORECAST_LINES
+  classifyArchetype, PEER_MEDIAN, BENCHMARK_STATUS, ROLES, ROLE_DEFAULT,
+  TILES, forecast, FORECAST_LINES
 } from './data.js';
 
 const $ = id => document.getElementById(id);
@@ -28,7 +28,6 @@ ORDER.forEach(pid => QUESTIONS[pid].forEach((q, i) => FLAT.push({ ...q, pool: pi
 
 const S = {
   view: 'attract',
-  sector: SECTORS[0],
   read: new Set(),
   qi: 0,
   answers: {},
@@ -50,17 +49,14 @@ window.__kiosk = { scene, state: S };
    ROUTER
    ============================================================= */
 
-const VIEWS = { attract: 'v-attract', sector: 'v-sector', explore: 'v-explore', diag: 'v-diag', wrap: 'v-wrap', deliver: 'v-deliver', done: 'v-done' };
-const SCENE_STATE = { attract: 'attract', sector: 'sector', explore: 'explore', diag: 'diagnostic', wrap: 'results', deliver: 'delivery', done: 'delivery' };
+const VIEWS = { attract: 'v-attract', explore: 'v-explore', diag: 'v-diag', identify: 'v-identify', wrap: 'v-wrap', done: 'v-done' };
+const SCENE_STATE = { attract: 'attract', explore: 'explore', diag: 'diagnostic', identify: 'delivery', wrap: 'results', done: 'delivery' };
 const BEAT_SCENE = i => (i === 0 ? 'results' : 'resultsQuiet');
 
 function show(view) {
   S.view = view;
   Object.values(VIEWS).forEach(id => $(id).classList.remove('on'));
   $(VIEWS[view]).classList.add('on');
-
-  if (view === 'sector') scene.setSlots(SECTORS.map(s => s.id));
-  else scene.clearSlots();
 
   scene.setState(SCENE_STATE[view]);
 }
@@ -71,7 +67,7 @@ function show(view) {
 
 $('v-attract').addEventListener('pointerdown', () => start());
 
-function start() { reset(false); show('sector'); }
+function start() { reset(false); show('explore'); renderPool(POOLS[scene.face].id); }
 
 function reset(toAttract = true) {
   S.read = new Set();
@@ -89,41 +85,6 @@ function reset(toAttract = true) {
   if (toAttract) show('attract');
 }
 
-/* =============================================================
-   SECTOR — labels ride on the 3D faces
-   ============================================================= */
-
-function buildSectorLabels() {
-  const host = $('sectorLabels');
-  host.innerHTML = '';
-  SECTORS.forEach((s, i) => {
-    const n = el('button', 'sector-label');
-    n.dataset.slot = s.id;
-    n.innerHTML = `<div class="idx">0${i + 1}</div><div class="nm">${s.name}</div><div class="sb">${s.sub}</div>`;
-    n.onclick = () => chooseSector(s.id);
-    host.appendChild(n);
-  });
-}
-
-function positionSectorLabels() {
-  const host = $('sectorLabels');
-  SECTORS.forEach((s, i) => {
-    const p = scene.project(i);
-    const n = host.children[i];
-    if (!n) return;
-    n.style.left = `${p.x}px`;
-    n.style.top = `${p.y}px`;
-    n.style.opacity = p.ok ? '1' : '0';
-  });
-}
-
-function chooseSector(id) {
-  S.sector = SECTORS.find(x => x.id === id) || SECTORS[0];
-  show('explore');
-  renderPool(POOLS[scene.face].id);
-}
-
-scene.onPick = key => { if (S.view === 'sector') chooseSector(key); };
 
 /* =============================================================
    EXPLORE — drag the wheel, read on the right
@@ -152,11 +113,7 @@ function renderPool(poolId) {
   $('prVerb').style.color = p.hex;
   $('prName').textContent = p.name;
   $('prBlurb').textContent = p.blurb;
-  $('prChallenge').textContent = p.challenge;
-  $('prApproach').textContent = p.approach;
-  const ul = $('prValue');
-  ul.innerHTML = '';
-  p.value.forEach(v => ul.appendChild(el('li', null, v)));
+  renderTiles(p);
 
   $('seenCount').textContent = S.read.size;
   [...$('wheelPips').children].forEach((n, i) => n.classList.toggle('on', i === p.index));
@@ -167,8 +124,50 @@ function renderPool(poolId) {
   card.classList.add('swap');
 }
 
-scene.onFace = (i, poolId) => { if (S.view === 'explore') renderPool(poolId); };
-scene.onFrame = () => { if (S.view === 'sector') positionSectorLabels(); };
+/* Three proof tiles per pool. Pending ones stay visible and say so. */
+function renderTiles(p) {
+  const host = $('prTiles');
+  host.innerHTML = '';
+  (TILES[p.id] || []).forEach((t, i) => {
+    const b = el('button', 'tile' + (t.pending ? ' pending' : ''));
+    b.innerHTML = `
+      <span class="t-n">0${i + 1}</span>
+      <span class="t-client">${t.client || 'Pending'}</span>
+      <span class="t-title">${t.title}</span>
+      <span class="t-metric">${t.metric}</span>`;
+    b.style.setProperty('--tile-accent', p.hex);
+    b.onclick = () => openTile(p, t);
+    host.appendChild(b);
+  });
+}
+
+function openTile(p, t) {
+  $('tsRule').style.background = p.hex;
+  $('tsClient').textContent = `${p.name} · ${t.client || 'Content pending'}`;
+  $('tsTitle').textContent = t.title;
+  $('tsMetric').textContent = t.metric;
+  $('tsMetric').style.color = t.pending ? 'var(--fg-3)' : p.hex;
+  $('tsDetail').textContent = t.detail;
+  const flag = $('tsFlag');
+  if (t.pending) {
+    flag.hidden = false;
+    flag.innerHTML = '<b>Content pending</b><br>Not in the playbook or the use case register. Infosys to supply before the event.';
+  } else if (t.substitute) {
+    flag.hidden = false;
+    flag.innerHTML = '<b>Substituted</b><br>Drawn from the use case register; this pillar has no dedicated case study in the playbook.';
+  } else {
+    flag.hidden = true;
+  }
+  $('tileSheet').classList.add('on');
+}
+
+$('tileClose').onclick = () => $('tileSheet').classList.remove('on');
+
+scene.onFace = (i, poolId) => {
+  if (S.view !== 'explore') return;
+  $('tileSheet').classList.remove('on');
+  renderPool(poolId);
+};
 
 $('beginDiag').onclick = () => { S.qi = 0; show('diag'); renderQuestion(); };
 
@@ -269,7 +268,14 @@ function answer(optIndex) {
    RESULTS
    ============================================================= */
 
+/* The 18th answer sends them to identify, not to the results. Capturing the
+   badge first means nobody walks away without a report, and the role beat is
+   written from their actual job title rather than a guess. */
 function finish() {
+  show('identify');
+}
+
+function revealResults() {
   ORDER.forEach(id => scene.setScore(id, S.scores[id] / MAX_POOL_SCORE));
   scene.focus(null);
   scene.flare(1);
@@ -305,11 +311,11 @@ function buildWrapped() {
   document.querySelectorAll('.beat-pips').forEach(n => { n.innerHTML = pips; });
 
   /* peer benchmark */
-  $('benchNote').innerHTML = `${S.sector.name}<br>${BENCHMARK_STATUS}`;
+  $('benchNote').textContent = BENCHMARK_STATUS;
   const list = $('benchList');
   list.innerHTML = '';
   [...ORDER].sort((a, b) => S.scores[b] - S.scores[a]).forEach(id => {
-    const p = POOL[id], sc = S.scores[id], med = S.sector.median[id], d = sc - med;
+    const p = POOL[id], sc = S.scores[id], med = PEER_MEDIAN[id], d = sc - med;
     const row = el('div', 'bench-row');
     row.innerHTML = `
       <div><div class="nm">${p.name}</div><div class="bd">${BANDS[bandOf(sc)]}</div></div>
@@ -346,22 +352,7 @@ function buildWrapped() {
 
 /* ---- beat 4: pick your role, see it transform ---- */
 
-function buildRoleBeat() {
-  const host = $('roleChips');
-  host.innerHTML = '';
-  ROLES.forEach((r, i) => {
-    const b = el('button', 'role-chip', r.from);
-    b.onclick = () => selectRole(i);
-    host.appendChild(b);
-  });
-  paintRole(S.role);
-}
-
-function selectRole(i) {
-  S.role = i;
-  [...$('roleChips').children].forEach((n, k) => n.classList.toggle('on', k === i));
-  paintRole(i);
-}
+function buildRoleBeat() { paintRole(S.role); }
 
 function paintRole(i) {
   const r = (i == null) ? ROLE_DEFAULT : ROLES[i];
@@ -372,45 +363,43 @@ function paintRole(i) {
 
 /* ---- beat 5: proof ---- */
 
+/* Proof is shown for the pool they scored lowest on — that is the one
+   they need convincing about. Pending tiles stay in, labelled. */
 function pickCase() {
   const ranked = [...ORDER].sort((a, b) => S.scores[a] - S.scores[b]);
-  const weakest = ranked[0];
-  let pendingFor = null, chosen = weakest;
-  if (CASES[weakest].pending) {
-    pendingFor = weakest;
-    chosen = ranked.find(id => !CASES[id].pending) || weakest;
-  }
-  return { poolId: chosen, c: CASES[chosen], pendingFor };
+  return ranked[0];
 }
 
 function buildCase() {
-  const { poolId, c, pendingFor } = pickCase();
+  const poolId = pickCase();
   const p = POOL[poolId];
+  const tiles = TILES[poolId] || [];
+
   $('caseFor').textContent = p.name;
   $('caseFor').style.color = p.hex;
 
   const g = $('caseGrid');
   g.innerHTML = '';
+  tiles.forEach((t, i) => {
+    const b = el('button', 'tile' + (t.pending ? ' pending' : ''));
+    b.innerHTML = `
+      <span class="t-n">0${i + 1}</span>
+      <span class="t-client">${t.client || 'Pending'}</span>
+      <span class="t-title">${t.title}</span>
+      <span class="t-metric">${t.metric}</span>`;
+    b.style.setProperty('--tile-accent', p.hex);
+    b.onclick = () => openTile(p, t);
+    g.appendChild(b);
+  });
 
-  const left = el('div', 'case-meta');
-  left.innerHTML = `
-    <div class="client">${c.client}</div>
-    <div class="detail">${c.detail}</div>
-    <div class="ttl">${c.title}</div>
-    <div class="case-block"><h4>The challenge</h4><p>${c.challenge}</p></div>
-    <div class="case-block"><h4>The approach</h4><p>${c.approach}</p></div>`;
-  g.appendChild(left);
-
-  const right = el('div');
-  right.innerHTML = `
-    <h4 style="font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--fg-3);margin-bottom:6px;">The results</h4>
-    <ul class="results-list">${c.results.map((r, i) => `<li><span class="rk">0${i + 1}</span>${r}</li>`).join('')}</ul>`;
-
-  const flags = [];
-  if (c.substitute) flags.push(`<b>Content flag</b><br>${c.note}`);
-  if (pendingFor) flags.push(`<b>Content pending · ${POOL[pendingFor].name}</b><br>${CASES[pendingFor].note}`);
-  if (flags.length) right.appendChild(el('div', 'pending-note', flags.join('<br><br>')));
-  g.appendChild(right);
+  const allPending = tiles.every(t => t.pending);
+  const note = $('caseNote');
+  if (allPending) {
+    note.hidden = false;
+    note.innerHTML = `<b>Content pending · ${p.name}</b><br>Neither the playbook nor the use case register contains a proof point for this pool. Infosys to supply before the event.`;
+  } else {
+    note.hidden = true;
+  }
 }
 
 /* ---- beats ---- */
@@ -426,7 +415,7 @@ function setBeat(i) {
 }
 
 document.querySelectorAll('[data-next]').forEach(b => {
-  b.onclick = () => { if (S.beat < 4) setBeat(S.beat + 1); else show('deliver'); };
+  b.onclick = () => { if (S.beat < 4) setBeat(S.beat + 1); else showDone(); };
 });
 
 /* =============================================================
@@ -434,6 +423,7 @@ document.querySelectorAll('[data-next]').forEach(b => {
    ============================================================= */
 
 function resetDelivery() {
+  $('tileSheet').classList.remove('on');
   $('socket').classList.remove('locked');
   $('cradle').textContent = 'NFC';
   $('scanState').textContent = 'Waiting for badge…';
@@ -458,13 +448,7 @@ $('manualForm').addEventListener('submit', e => {
     $('mfError').textContent = 'Enter a valid email address.';
     return;
   }
-  const name = $('mfName').value.trim();
-  const title = $('mfTitle').value.trim();
-  if (title) {
-    const i = ROLES.findIndex(r => r.match.some(m => title.toLowerCase().includes(m)));
-    if (i >= 0) S.role = i;
-  }
-  dispatch({ name, email });
+  identified({ name: $('mfName').value.trim(), title: $('mfTitle').value.trim(), email });
 });
 
 /* Stands in for the NFC read. On the kiosk the reader fires this. */
@@ -473,13 +457,24 @@ $('simulateTap').onclick = () => {
   $('cradle').textContent = '✓';
   $('scanState').textContent = 'Badge read · profile matched';
   scene.flare(1);
-  setTimeout(() => dispatch({ name: '', email: 'the address on your badge' }), 1000);
+  // a real badge carries name, job title and email; the sim supplies a title
+  setTimeout(() => identified({ name: '', title: 'Head of Underwriting', email: 'the address on your badge' }), 900);
 };
 
-function dispatch({ name, email }) {
-  S.recipient = { name, email };
-  $('doneName').textContent = name ? `, ${name.split(/\s+/)[0]}` : '';
-  $('doneEmail').textContent = email;
+/* Identity in hand: build the report, then show it. */
+function identified({ name, email, title }) {
+  S.recipient = { name, email, title };
+  if (title) {
+    const i = ROLES.findIndex(r => r.match.some(m => title.toLowerCase().includes(m)));
+    S.role = i >= 0 ? i : null;
+  }
+  revealResults();
+}
+
+function showDone() {
+  const r = S.recipient || {};
+  $('doneName').textContent = r.name ? `, ${r.name.split(/\s+/)[0]}` : '';
+  $('doneEmail').textContent = r.email || 'the address on your badge';
   show('done');
   countdown();
 }
@@ -503,8 +498,8 @@ function countdown() {
 const typing = () => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
 
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') return $('tileSheet').classList.remove('on');
   if (S.view === 'attract' && (e.key === 'Enter' || e.key === ' ')) return start();
-  if (S.view === 'sector' && /^[1-4]$/.test(e.key)) return chooseSector(SECTORS[Number(e.key) - 1].id);
   if (S.view === 'explore') {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') return scene.nextFace(1);
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') return scene.nextFace(-1);
@@ -512,7 +507,7 @@ document.addEventListener('keydown', e => {
   if (S.view === 'diag' && /^[1-5]$/.test(e.key) && !typing()) return answer(Number(e.key) - 1);
   if (S.view === 'wrap' && (e.key === 'Enter' || e.key === ' ')) {
     e.preventDefault();
-    if (S.beat < 4) setBeat(S.beat + 1); else show('deliver');
+    if (S.beat < 4) setBeat(S.beat + 1); else showDone();
   }
 });
 
@@ -527,7 +522,6 @@ function bumpIdle() {
    BOOT
    ============================================================= */
 
-buildSectorLabels();
 buildWheelPips();
 renderProgress();
 renderPool(POOLS[0].id);

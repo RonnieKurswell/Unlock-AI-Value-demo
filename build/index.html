@@ -38,15 +38,6 @@
       </div>
     </section>
 
-    <!-- SECTOR — centred head, four prisms across -->
-    <section class="view" id="v-sector">
-      <div class="head">
-        <span class="label cool">Step 01 · Calibration</span>
-        <h2 class="d-m">Which book are we reading against?</h2>
-        <p class="lede">Read against the peer median for your segment.</p>
-      </div>
-      <div id="sectorLabels"></div>
-    </section>
 
     <!-- EXPLORE — wheel left, reading right -->
     <section class="view" id="v-explore">
@@ -61,9 +52,8 @@
           <div class="pr-verb" id="prVerb">—</div>
           <h2 class="pr-name" id="prName">—</h2>
           <p class="pr-blurb" id="prBlurb">—</p>
-          <div class="pr-sect"><h4>The challenge</h4><p id="prChallenge">—</p></div>
-          <div class="pr-sect"><h4>What Infosys does</h4><p id="prApproach">—</p></div>
-          <div class="pr-sect"><h4>Value delivered</h4><ul id="prValue"></ul></div>
+          <div class="pr-tiles-head"><span class="label cool">Proof points</span></div>
+          <div class="pr-tiles" id="prTiles"></div>
         </div>
         <div class="foot">
           <span class="hint"><span id="seenCount">0</span> of 6 read</span>
@@ -88,6 +78,41 @@
         </div>
       </div>
       <div class="prog" id="progClusters"></div>
+    </section>
+
+
+    <!-- IDENTIFY — before results, so nobody leaves without tapping -->
+    <section class="view" id="v-identify">
+      <div class="deliver-wrap">
+        <span class="label">Almost there</span>
+        <h2 class="d-l" style="margin-top:var(--s3)">Tap your badge<br>to see your results</h2>
+        <p class="lede">Your badge tells us your role, so the blueprint is written for your job — and your report is sent without you typing anything.</p>
+
+        <div class="socket" id="socket">
+          <div class="ring"></div>
+          <div class="cradle" id="cradle">NFC</div>
+        </div>
+        <div class="scan-state" id="scanState">Waiting for badge</div>
+
+        <div class="deliver-actions">
+          <button class="btn" id="manualBtn">Enter email manually</button>
+        </div>
+
+        <form class="manual-form" id="manualForm" novalidate>
+          <div class="mf-row">
+            <label>Name<input type="text" id="mfName" autocomplete="off" placeholder="Full name"></label>
+            <label>Job title<input type="text" id="mfTitle" autocomplete="off" placeholder="Head of Underwriting"></label>
+          </div>
+          <label>Email<input type="email" id="mfEmail" autocomplete="off" placeholder="name@company.com"></label>
+          <div class="mf-actions">
+            <button class="btn primary" type="submit">See my results</button>
+            <button class="btn quiet" type="button" id="manualCancel">Cancel</button>
+          </div>
+          <p class="mf-error" id="mfError"></p>
+        </form>
+
+        <button class="demo-trigger" id="simulateTap">Demo · simulate badge tap</button>
+      </div>
     </section>
 
     <!-- RESULTS -->
@@ -139,13 +164,12 @@
         <div class="role-wrap">
           <div>
             <span class="label">And your role</span>
-            <div class="role-chips" id="roleChips"></div>
             <div class="role-morph">
               <div class="from" id="roleFrom">—</div>
               <div class="to" id="roleTo">—</div>
             </div>
             <p class="role-change" id="roleChange">—</p>
-            <div class="role-src">Source · Playbook workforce transformation table</div>
+            <div class="role-src">Matched from your badge · playbook workforce transformation table</div>
           </div>
           <div class="role-aside">
             <span class="label cool">The human constraint</span>
@@ -165,47 +189,15 @@
           <h2 class="d-m">It has been done before</h2>
         </div>
         <div class="case-grid" id="caseGrid"></div>
+        <div class="pending-note" id="caseNote" hidden></div>
         <div class="beat-nav">
           <div class="beat-pips"></div>
-          <button class="btn primary" data-next>Get my report <span class="arrow">→</span></button>
+          <button class="btn primary" data-next>Finish <span class="arrow">→</span></button>
         </div>
       </div>
 
     </section>
 
-    <!-- DELIVERY -->
-    <section class="view" id="v-deliver">
-      <div class="deliver-wrap">
-        <span class="label">Step 04 · Delivery</span>
-        <h2 class="d-l" style="margin-top:var(--s3)">Tap your badge</h2>
-        <p class="lede">Hold your badge against the reader. Your report is sent automatically — nothing to type.</p>
-
-        <div class="socket" id="socket">
-          <div class="ring"></div>
-          <div class="cradle" id="cradle">NFC</div>
-        </div>
-        <div class="scan-state" id="scanState">Waiting for badge</div>
-
-        <div class="deliver-actions">
-          <button class="btn" id="manualBtn">Enter email manually</button>
-        </div>
-
-        <form class="manual-form" id="manualForm" novalidate>
-          <div class="mf-row">
-            <label>Name<input type="text" id="mfName" autocomplete="off" placeholder="Full name"></label>
-            <label>Job title<input type="text" id="mfTitle" autocomplete="off" placeholder="Head of Underwriting"></label>
-          </div>
-          <label>Email<input type="email" id="mfEmail" autocomplete="off" placeholder="name@company.com"></label>
-          <div class="mf-actions">
-            <button class="btn primary" type="submit">Send my report</button>
-            <button class="btn quiet" type="button" id="manualCancel">Cancel</button>
-          </div>
-          <p class="mf-error" id="mfError"></p>
-        </form>
-
-        <button class="demo-trigger" id="simulateTap">Demo · simulate badge tap</button>
-      </div>
-    </section>
 
     <!-- DONE -->
     <section class="view" id="v-done">
@@ -219,6 +211,17 @@
     </section>
 
   </div>
+
+  <!-- proof tile detail -->
+  <aside id="tileSheet">
+    <button id="tileClose">Close ✕</button>
+    <div class="ts-rule" id="tsRule"></div>
+    <span class="label cool" id="tsClient">—</span>
+    <h3 class="ts-title" id="tsTitle">—</h3>
+    <div class="ts-metric" id="tsMetric">—</div>
+    <p class="body" id="tsDetail">—</p>
+    <div class="pending-note" id="tsFlag" hidden></div>
+  </aside>
 
 </div>
 </div>

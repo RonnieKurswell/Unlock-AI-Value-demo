@@ -1,9 +1,8 @@
 /* =============================================================
    THREE.JS SCENE — the hexagon is the interface, not decoration.
 
-   One object, three postures:
+   One object, two postures:
      flat ring      → attract, diagnostic, results, delivery
-     quad menu      → sector choice (the prisms ARE the options)
      upright wheel  → framework explore (drag to rotate and read)
 
    `rig` carries posture and offset; `hive` carries the spin, so
@@ -34,7 +33,6 @@ export class HiveScene {
     this.onPick = null;
     this.onFace = null;
     this.onFrame = null;
-    this.slots = null;
     this.layout = 'ring';
     this.wheel = false;
     this.face = 0;
@@ -164,7 +162,7 @@ export class HiveScene {
 
       this.hive.add(group);
       return {
-        pool: p, group, body, edges, halo, ping, slotKey: null,
+        pool: p, group, body, edges, halo, ping,
         h: BASE_H, hTarget: BASE_H,
         glow: 0.05, glowTarget: 0.05,
         lift: 0, liftTarget: 0,
@@ -287,7 +285,7 @@ export class HiveScene {
     const hits = this.raycaster.intersectObjects(targets, false);
     if (!hits.length) return null;
     const d = hits[0].object.userData;
-    return this.slots ? d.slotKey : d.poolId;
+    return d.poolId;
   }
 
   resize() {
@@ -343,34 +341,10 @@ export class HiveScene {
     t.ping.material.color.copy(c);
   }
 
-  /** Repurpose the prisms as a labelled choice set. */
-  setSlots(keys, tint = 0x5FA0D6) {
-    this.slots = keys;
-    this.layout = 'row';
-    this.tiles.forEach((t, i) => {
-      const on = i < keys.length;
-      t.group.visible = on;
-      t.slotKey = on ? keys[i] : null;
-      t.body.userData.slotKey = t.slotKey;
-      if (on) { this._tint(t, tint); t.hTarget = BASE_H + 1.05; t.glowTarget = 0.17; t.liftTarget = 0; }
-    });
-  }
-
-  clearSlots() {
-    this.slots = null;
-    this.layout = 'ring';
-    this.tiles.forEach(t => {
-      t.group.visible = true;
-      t.slotKey = null;
-      t.body.userData.slotKey = null;
-      this._tint(t, t.pool.color);
-    });
-  }
-
   /** Screen-space position of a tile cap, for HTML labels. */
   project(i) {
     const t = this.tiles[i];
-    const v = new THREE.Vector3(0, t.h + (this.slots ? 0.42 : 0.1), 0);
+    const v = new THREE.Vector3(0, t.h + 0.1, 0);
     t.group.localToWorld(v);
     v.project(this.camera);
     const r = this.canvas.getBoundingClientRect();
@@ -427,7 +401,6 @@ export class HiveScene {
     this.state = name;
     const ST = {
       attract:     { focus: [0, 0, 0],   radius: 2.90, elev: 14, margin: 1.55, bias: [0,    0.86], spin: 0.055, spread: 1.00, fade: 0.90, tilt: 0,             off: [0, 0, 0] },
-      sector:      { focus: [0, 0.4, 0], extent: [4.75, 1.70], elev: 20, margin: 1.26, bias: [0, 0.10], spin: 0, spread: 1.00, fade: 0.28, tilt: 0, off: [0, 0, 0], rot: 0 },
       explore:     { focus: [0, 0, 0],   radius: 2.85, elev: 2,  margin: 1.55, bias: [0.50, 0.02], spin: 0,     spread: 1.02, fade: 0.18, tilt: -Math.PI / 2,  off: [0, 0, 0] },
       diagnostic:  { focus: [0, 0.6, 0], radius: 3.20, elev: 32, margin: 1.70, bias: [0.52, 0.10], spin: 0.030, spread: 1.00, fade: 0.42, tilt: 0,             off: [0, 0, 0] },
       results:     { focus: [0, 0.9, 0], radius: 3.50, elev: 24, margin: 1.50, bias: [0,    0.22], spin: 0.045, spread: 1.04, fade: 0.80, tilt: 0,             off: [0, 0, 0] },
@@ -446,12 +419,12 @@ export class HiveScene {
     this.rotTarget = (S.rot === undefined) ? null : S.rot;
 
     this.wheel = (name === 'explore');
-    this.pickEnabled = (name === 'sector');
-    this.setCoreVisible(!this.wheel && name !== 'sector');
+    this.pickEnabled = false;
+    this.setCoreVisible(!this.wheel);
     this.ground.visible = !this.wheel;
     this.canvas.style.cursor = this.wheel ? 'grab' : 'default';
 
-    if ((name === 'attract' || name === 'delivery') && !this.slots) {
+    if (name === 'attract' || name === 'delivery') {
       this.tiles.forEach(t => { t.hTarget = BASE_H + 0.34; t.glowTarget = 0.10; t.liftTarget = 0; });
     }
     if (this.wheel) this.setFace(this.face);
@@ -522,16 +495,9 @@ export class HiveScene {
       tile.lift = damp(tile.lift, tile.liftTarget, 5, dt);
       tile.glow = damp(tile.glow, tile.glowTarget, 4, dt);
 
-      if (this.layout === 'row') {
-        const n = this.slots ? this.slots.length : 4;
-        const i = tile.pool.index;
-        const k = i - (n - 1) / 2;
-        tile.group.position.set(k * 2.42, tile.lift + bob, Math.abs(k) * 0.46);
-      } else {
-        const a = tile.group.userData.baseAngle;
-        const R = RING * this.spread;
-        tile.group.position.set(Math.cos(a) * R, tile.lift + bob, Math.sin(a) * R);
-      }
+      const a = tile.group.userData.baseAngle;
+      const R = RING * this.spread;
+      tile.group.position.set(Math.cos(a) * R, tile.lift + bob, Math.sin(a) * R);
 
       tile.body.scale.y = tile.h;
       tile.body.position.y = tile.h / 2;
@@ -573,10 +539,7 @@ export class HiveScene {
         this.hoverId = id;
         this.canvas.style.cursor = id ? 'pointer' : 'default';
         this.tiles.forEach(x => {
-          const key = this.slots ? x.slotKey : x.pool.id;
-          const on = key && key === id;
-          x.glowTarget = on ? 0.46 : (this.slots ? 0.22 : 0.09);
-          if (this.slots) x.liftTarget = on ? 0.42 : 0;
+          x.glowTarget = (x.pool.id === id) ? 0.46 : 0.09;
         });
       }
     }
