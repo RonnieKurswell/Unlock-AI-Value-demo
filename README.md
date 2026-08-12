@@ -2,7 +2,7 @@
 
 Infosys AI maturity diagnostic for event kiosks. Three.js, 16:9 touchscreen, runs fully offline.
 
-**Live demo:** _(add the Pages URL here once it deploys)_
+**Live demo:** https://ronniekurswell.github.io/Unlock-AI-Value-demo/
 
 Built by Charleselena for the Infosys Insurance technology department. Due 29 September 2026.
 
