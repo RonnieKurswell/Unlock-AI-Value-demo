@@ -1,0 +1,67 @@
+/* =============================================================
+   Brand faces, served locally from the client's own licensed
+   library (~720KB total). Kiosk runs offline, so nothing is fetched.
+
+   Tungsten — Hoefler condensed display. Tall, narrow, high impact.
+   Gellix   — geometric-humanist sans. Body and UI.
+   Gotham   — geometric sans. Small caps labels in place of a
+              monospace, since this library contains none.
+   ============================================================= */
+
+@font-face {
+  font-family: 'Tungsten';
+  src: url('../fonts/brand/Tungsten-Light.otf') format('opentype');
+  font-weight: 300; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Tungsten';
+  src: url('../fonts/brand/Tungsten-Medium.otf') format('opentype');
+  font-weight: 500; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Tungsten';
+  src: url('../fonts/brand/Tungsten-Semibold.otf') format('opentype');
+  font-weight: 600; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Tungsten';
+  src: url('../fonts/brand/Tungsten-Bold.otf') format('opentype');
+  font-weight: 700; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Tungsten';
+  src: url('../fonts/brand/Tungsten-Black.otf') format('opentype');
+  font-weight: 900; font-style: normal; font-display: block;
+}
+
+@font-face {
+  font-family: 'Gellix';
+  src: url('../fonts/brand/Gellix-Light_R.otf') format('opentype');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Gellix';
+  src: url('../fonts/brand/Gellix-Regular_R.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Gellix';
+  src: url('../fonts/brand/Gellix-SemiBold_R.otf') format('opentype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('../fonts/brand/GOTHAM-BOOK.TTF') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Gotham';
+  src: url('../fonts/brand/GOTHAM-MEDIUM.TTF') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Gotham';
+  src: url('../fonts/brand/GOTHAM-BOLD.TTF') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}

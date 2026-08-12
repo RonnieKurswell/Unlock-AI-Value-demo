@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+._*
+
+# local tool state (keep launch.json, it documents how to run the dev server)
+.claude/settings.local.json
+
+# scratch
+*.log
+node_modules/
