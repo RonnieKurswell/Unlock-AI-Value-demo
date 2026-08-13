@@ -1,7 +1,8 @@
 /* =============================================================
    UNLOCK AI VALUE — Infosys kiosk
 
-   Type   Tungsten (condensed display) / Gellix (body) / Gotham (caps labels)
+   Type   Geist Light for display, Inter for text and labels — the pairing
+          infosys.com itself serves (their h1 is Geist 300, tracked -1px)
    Colour Infosys blue on a deep ground; cool six-hue pool family
    Layout centred statements, no boxes, air instead of borders
 
@@ -11,12 +12,12 @@
    - One hairline maximum per list. No corner ticks, no chrome ornament.
    ============================================================= */
 
-@import url('brand-fonts.css');
+@import url('fonts.css');
 
 :root {
-  --display: 'Tungsten', 'Oswald', 'Haettenschweiler', sans-serif;
-  --body: 'Gellix', 'Helvetica Neue', Helvetica, sans-serif;
-  --label: 'Gotham', 'Gellix', 'Helvetica Neue', sans-serif;
+  --display: 'Geist', 'Inter', 'Helvetica Neue', sans-serif;
+  --body: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
+  --label: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
 
   /* ground — deep, cool, never pure black so the 3D reads */
   --ink: #05080E;
@@ -65,7 +66,7 @@ html, body {
   background: var(--ink);
   color: var(--fg);
   font-family: var(--body);
-  font-weight: 300;
+  font-weight: 400;
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -141,14 +142,13 @@ input, textarea { font: inherit; }
 .label.cool { color: var(--fg-3); }
 
 .d-xl, .d-l, .d-m {
-  font-family: var(--display); font-weight: 600;
-  text-transform: uppercase; line-height: 0.9;
-  letter-spacing: 0.005em; color: var(--fg);
+  font-family: var(--display); font-weight: 300;
+  line-height: 1.02; letter-spacing: -0.022em; color: var(--fg);
   text-wrap: balance;
 }
-.d-xl { font-size: clamp(56px, 7.4vw, 142px); }
-.d-l  { font-size: clamp(40px, 4.8vw, 92px); }
-.d-m  { font-size: clamp(28px, 3.1vw, 60px); }
+.d-xl { font-size: clamp(40px, 4.6vw, 88px); }
+.d-l  { font-size: clamp(32px, 3.4vw, 64px); }
+.d-m  { font-size: clamp(24px, 2.4vw, 44px); }
 .d-xl em, .d-l em, .d-m em { font-style: normal; color: var(--blue-lift); }
 
 p.lede {
@@ -198,7 +198,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 #v-attract { display: none; place-items: center; padding-bottom: 16vh; }
 #v-attract.on { display: grid; }
 #v-attract .statement { max-width: none; }
-#v-attract .d-xl { max-width: 18ch; margin: var(--s3) auto 0; }
+#v-attract .d-xl { max-width: 21ch; margin: var(--s3) auto 0; }
 #v-attract .sub {
   margin-top: var(--s4); color: var(--fg-2);
   font-size: clamp(13px, 0.95vw, 19px); white-space: nowrap;
@@ -247,8 +247,9 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   letter-spacing: 0.24em; text-transform: uppercase;
 }
 .pr-name {
-  font-family: var(--display); font-weight: 600; text-transform: uppercase;
-  font-size: clamp(30px, 3.4vw, 66px); line-height: 0.9; margin-top: var(--s2); text-wrap: balance;
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(26px, 2.6vw, 48px); line-height: 1.04; letter-spacing: -0.022em;
+  margin-top: var(--s2); text-wrap: balance;
 }
 .pr-blurb { margin-top: var(--s3); font-size: clamp(13.5px, 0.96vw, 19px); line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
 .pr-tiles-head { margin-top: var(--s5); }
@@ -268,8 +269,8 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   letter-spacing: 0.2em; color: var(--fg-4);
 }
 .tile .t-client {
-  font-family: var(--display); font-weight: 600; text-transform: uppercase;
-  font-size: clamp(15px, 1.28vw, 25px); line-height: 0.96; color: var(--fg);
+  font-family: var(--display); font-weight: 500;
+  font-size: clamp(14px, 1.08vw, 20px); line-height: 1.15; letter-spacing: -0.014em; color: var(--fg);
 }
 .tile.pending .t-client { color: var(--fg-3); }
 .tile .t-title { font-size: clamp(11.5px, 0.78vw, 14px); color: var(--fg-2); line-height: 1.35; }
@@ -293,8 +294,9 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 #tileSheet.on { transform: none; }
 .ts-rule { height: 2px; width: 44px; margin-bottom: var(--s4); }
 .ts-title {
-  font-family: var(--display); font-weight: 600; text-transform: uppercase;
-  font-size: clamp(28px, 2.8vw, 54px); line-height: 0.92; margin-top: var(--s2);
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(24px, 2.4vw, 44px); line-height: 1.06; letter-spacing: -0.022em;
+  margin-top: var(--s2);
 }
 .ts-metric {
   font-family: var(--label); font-weight: 500; font-size: clamp(11px, 0.82vw, 15px);
@@ -351,9 +353,9 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
 }
 .qtext {
-  font-family: var(--display); font-weight: 600; text-transform: uppercase;
-  font-size: clamp(26px, 2.9vw, 56px); line-height: 0.92; letter-spacing: 0.005em;
-  margin: var(--s2) 0 var(--s4); max-width: 24ch; text-wrap: balance;
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(22px, 2.2vw, 40px); line-height: 1.1; letter-spacing: -0.02em;
+  margin: var(--s2) 0 var(--s4); max-width: 26ch; text-wrap: balance;
 }
 
 /* options: rows separated by one hairline, no boxes */
@@ -452,8 +454,8 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 /* beat 1 — the statement */
 #beat1 .b1 { text-align: center; max-width: min(1240px, 70vw); margin: 0 auto; }
 #beat1 .arch-name {
-  font-family: var(--display); font-weight: 600; text-transform: uppercase;
-  font-size: clamp(44px, 5.2vw, 104px); line-height: 0.86; letter-spacing: 0.004em;
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(38px, 4.4vw, 84px); line-height: 1.0; letter-spacing: -0.024em;
   text-wrap: balance;
 }
 #beat1 .arch-tag {
@@ -537,9 +539,9 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
 }
 .role-morph .to {
-  font-family: var(--display); font-weight: 600; text-transform: uppercase;
-  font-size: clamp(34px, 3.8vw, 74px); line-height: 0.9; color: var(--blue-lift);
-  margin-top: var(--s1);
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(26px, 2.8vw, 52px); line-height: 1.04; letter-spacing: -0.022em;
+  color: var(--blue-lift); margin-top: var(--s1);
 }
 .role-change { font-size: clamp(13px, 0.94vw, 18px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
 .role-src {
@@ -557,8 +559,8 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   width: min(1360px, 88vw); margin: 0 auto;
 }
 .case-meta .client {
-  font-family: var(--display); font-weight: 600; text-transform: uppercase;
-  font-size: clamp(34px, 3.6vw, 70px); line-height: 0.9;
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(26px, 2.6vw, 48px); line-height: 1.04; letter-spacing: -0.022em;
 }
 .case-meta .detail {
   font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58vw, 11px);
@@ -625,7 +627,15 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 
 .deliver-actions { margin-top: var(--s5); display: flex; justify-content: center; }
 
-.manual-form { display: none; margin: var(--s5) auto 0; max-width: 440px; text-align: left; }
+/* once they choose typing, the badge socket is decoration — shrink it so the
+   form fits without the screen overflowing */
+.deliver-wrap.form-open .socket { transform: scale(0.6); margin: var(--s3) auto 0; }
+.deliver-wrap.form-open .scan-state { opacity: 0; }
+.deliver-wrap.form-open .deliver-actions { display: none; }
+.deliver-wrap.form-open .demo-trigger { margin-top: var(--s4); }
+.socket, .scan-state { transition: transform 0.4s var(--ease), opacity 0.3s var(--ease), margin 0.4s var(--ease); }
+
+.manual-form { display: none; margin: var(--s4) auto 0; max-width: 440px; text-align: left; }
 .manual-form.on { display: block; animation: rise 0.44s var(--ease) both; }
 .manual-form label {
   display: block; font-family: var(--label); font-weight: 500;

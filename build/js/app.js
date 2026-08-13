@@ -428,16 +428,19 @@ function resetDelivery() {
   $('cradle').textContent = 'NFC';
   $('scanState').textContent = 'Waiting for badge…';
   $('manualForm').classList.remove('on');
+  document.querySelector('#v-identify .deliver-wrap')?.classList.remove('form-open');
   $('mfError').textContent = '';
   ['mfName', 'mfTitle', 'mfEmail'].forEach(id => { $(id).value = ''; });
 }
 
 $('manualBtn').onclick = () => {
   $('manualForm').classList.add('on');
+  document.querySelector('#v-identify .deliver-wrap').classList.add('form-open');
   $('mfName').focus();
 };
 $('manualCancel').onclick = () => {
   $('manualForm').classList.remove('on');
+  document.querySelector('#v-identify .deliver-wrap').classList.remove('form-open');
   $('mfError').textContent = '';
 };
 
