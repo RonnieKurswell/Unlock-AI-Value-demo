@@ -42,7 +42,6 @@ function openDetail(pool) {
     const li = document.createElement('li');
     const tick = document.createElement('span');
     tick.className = 'tick';
-    tick.textContent = '—';
     const text = document.createElement('span');
     text.textContent = f;
     li.append(tick, text);

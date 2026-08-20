@@ -179,7 +179,44 @@ html, body {
   color: var(--fg-2);
 }
 .d-facts li:last-child { border-bottom: 1px solid var(--hair); }
-.d-facts .tick { color: var(--accent); flex: none; }
+/* Pointy-top hexagon marker, matching the framework board's silhouette.
+   Pops in as the row renders, then pings out of itself on a slow loop. */
+.d-facts .tick {
+  position: relative;
+  flex: none;
+  width: 12px;
+  height: 13px;
+  margin-top: 4px;
+}
+.d-facts .tick::before,
+.d-facts .tick::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: var(--accent);
+}
+.d-facts .tick::before { animation: hexPop 0.52s var(--ease) both; }
+.d-facts .tick::after { opacity: 0; animation: hexPing 3.4s var(--ease) infinite; }
+.d-facts li:nth-child(2) .tick::before,
+.d-facts li:nth-child(2) .tick::after { animation-delay: 90ms; }
+.d-facts li:nth-child(3) .tick::before,
+.d-facts li:nth-child(3) .tick::after { animation-delay: 180ms; }
+
+@keyframes hexPop {
+  from { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes hexPing {
+  0%   { opacity: 0.55; transform: scale(1); }
+  55%  { opacity: 0;    transform: scale(2.1); }
+  100% { opacity: 0;    transform: scale(2.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d-facts .tick::before { animation: none; }
+  .d-facts .tick::after { display: none; }
+}
 
 .d-back {
   margin: 0;
