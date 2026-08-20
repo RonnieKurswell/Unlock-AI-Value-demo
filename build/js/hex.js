@@ -134,6 +134,9 @@ function labelMesh(text, theta, radiusFactor, planeW, planeH, texOpts) {
   const a = theta * DEG;
   mesh.position.set(Math.cos(a) * R * radiusFactor, Math.sin(a) * R * radiusFactor, 0);
   mesh.rotation.z = labelRotation(theta);
+  // Kept so the focus transform can counter-rotate the label against the extra
+  // half-turn of board roll, keeping the text upright as the geometry turns.
+  mesh.userData.baseRot = mesh.rotation.z;
   mesh.renderOrder = 5;
   return mesh;
 }
@@ -160,11 +163,13 @@ export function buildHexagon(pools) {
 
     const outerMat = new THREE.MeshStandardMaterial({
       color: PALETTE.outer, roughness: 0.30, metalness: 0.42,
-      emissive: new THREE.Color(pool.accent), emissiveIntensity: 0.16
+      emissive: new THREE.Color(pool.accent), emissiveIntensity: 0.16,
+      transparent: true
     });
     const innerMat = new THREE.MeshStandardMaterial({
       color: PALETTE.inner, roughness: 0.40, metalness: 0.52,
-      emissive: new THREE.Color(pool.accent), emissiveIntensity: 0.05
+      emissive: new THREE.Color(pool.accent), emissiveIntensity: 0.05,
+      transparent: true
     });
 
     const outerMesh = new THREE.Mesh(
@@ -207,6 +212,7 @@ export function buildHexagon(pools) {
       greyOuter: new THREE.Color(0x3E4859),
       greyInner: new THREE.Color(0x272F3C),
       fill: 0, fillTarget: 0, charge: 0,
+      fade: 1, targetFade: 1,
       holder, rimMesh,
       materials: [outerMat, innerMat],
       labels: [titleLabel, verbLabel],
@@ -226,10 +232,12 @@ export function buildHexagon(pools) {
   }
   coreShape.closePath();
 
-  const corePlate = new THREE.Mesh(extrude(coreShape, 0.18), new THREE.MeshStandardMaterial({
+  const coreMat = new THREE.MeshStandardMaterial({
     color: PALETTE.core, roughness: 0.25, metalness: 0.75,
-    emissive: new THREE.Color(0x0a1b45), emissiveIntensity: 0.5
-  }));
+    emissive: new THREE.Color(0x0a1b45), emissiveIntensity: 0.5,
+    transparent: true
+  });
+  const corePlate = new THREE.Mesh(extrude(coreShape, 0.18), coreMat);
   corePlate.position.z = -0.02;
 
   const coreTitle = new THREE.Mesh(
@@ -259,5 +267,5 @@ export function buildHexagon(pools) {
   core.add(corePlate, coreTitle, ripple);
   group.add(core);
 
-  return { group, segments, core, coreTitle, ripple };
+  return { group, segments, core, corePlate, coreMat, coreTitle, ripple };
 }

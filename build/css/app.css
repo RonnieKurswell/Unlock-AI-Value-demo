@@ -136,6 +136,10 @@ input, textarea { font: inherit; }
 }
 .view.on { display: block; }
 .view.on > * { animation: rise 0.7s var(--ease) both; }
+/* Explore drives its own two modes with opacity transitions. `rise` uses
+   fill-mode both, so its final opacity:1 would outrank those rules and both
+   modes would show at once. */
+#v-explore.on > * { animation: none; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
 /* ---------- type primitives --------------------------------- */
@@ -226,8 +230,8 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 /* hint sits centred under the board, with a pulsing touch cue.
    The board occupies the left min(44vw, 62vh) band, offset from --pad-x. */
 .hex-hint {
-  position: absolute; left: var(--pad-x); bottom: calc(var(--pad-b) + 4px);
-  width: min(44vw, 62vh);
+  position: absolute; left: 0; right: 0; bottom: calc(var(--pad-b) - 4px);
+  margin: 0 auto; width: max-content;
   display: flex; align-items: center; justify-content: center; gap: var(--s3);
   font-family: var(--label); font-weight: 600;
   font-size: clamp(9.5px, 0.62vw, 12px);
@@ -296,12 +300,66 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   .pr-facts li::after { display: none; }
 }
 
+/* ---------- explore: framework overview vs one open pool ----------
+   The board is one object doing two jobs. Overview shows the whole framework
+   centred with nothing beside it; opening a pool clears the other five, zooms
+   into that sector on the right, and brings the copy in on the left. The two
+   modes are a class on the view, so nothing has to be rebuilt between them. */
+
 #v-explore .col {
   pointer-events: auto;
-  position: absolute; top: var(--pad-t); right: var(--pad-x); bottom: var(--pad-b);
-  width: 40%; max-width: 620px;
+  position: absolute; top: var(--pad-t); left: var(--pad-x); bottom: var(--pad-b);
+  /* Keep in step with the 0.46 the scene solves the free width from. */
+  width: 42%; max-width: 620px;
   display: flex; flex-direction: column; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s var(--ease);
 }
+#v-explore.focus .col { opacity: 1; pointer-events: auto; }
+
+/* overview only */
+#v-explore .ov-foot {
+  position: absolute; right: var(--pad-x); bottom: var(--pad-b);
+  pointer-events: auto;
+  transition: opacity 0.4s var(--ease);
+}
+#v-explore.focus .ov-foot,
+#v-explore.focus .hex-hint { opacity: 0; pointer-events: none; }
+#v-explore .hex-hint { transition: opacity 0.4s var(--ease); }
+
+/* focus only */
+#v-explore .focus-foot {
+  position: absolute; right: var(--pad-x); bottom: var(--pad-b);
+  display: flex; align-items: center; gap: var(--s3);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s var(--ease);
+}
+#v-explore.focus .focus-foot { opacity: 1; pointer-events: auto; }
+
+.ff-hint, .ff-back {
+  display: inline-flex; align-items: center; gap: var(--s2);
+  font-family: var(--label); font-weight: 500;
+  font-size: clamp(9px, 0.6vw, 11.5px);
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
+}
+.ff-back { color: var(--fg-2); }
+.ff-back:hover { color: var(--fg); }
+.ff-back .touch-dot { width: 20px; height: 20px; }
+.ff-div { width: 1px; height: 13px; background: var(--hair); }
+.ff-arrow { color: var(--seg, var(--blue-lift)); }
+
+/* which of the six is open */
+.pool-dots {
+  position: absolute; left: var(--pad-x); bottom: var(--pad-b);
+  display: flex; gap: 7px;
+  opacity: 0; transition: opacity 0.5s var(--ease); pointer-events: none;
+}
+#v-explore.focus .pool-dots { opacity: 1; }
+.pool-dots i {
+  width: 16px; height: 2px; background: var(--fg-4);
+  transition: background 0.3s var(--ease), width 0.3s var(--ease);
+}
+.pool-dots i.on { background: var(--seg, var(--blue-lift)); width: 26px; }
 .pool-read.swap { animation: swapIn 0.46s var(--ease) both; }
 @keyframes swapIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 

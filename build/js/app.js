@@ -71,7 +71,8 @@ function start() {
   reset(false);
   show('explore');
   if (!scene.hex) scene.buildHex(hexOrder());
-  scene.selectHex(0);
+  // Opens on the whole framework. A pool is only opened by tapping one.
+  scene.clearHex();
 }
 
 function reset(toAttract = true) {
@@ -97,7 +98,30 @@ function reset(toAttract = true) {
 
 /* The framework hexagon lives in the 3D scene. Its labels are canvas
    textures, so it can only be built once the webfonts have loaded. */
-scene.onHexSelect = id => renderPool(id);
+scene.onHexSelect = (id, i) => {
+  renderPool(id);
+  const view = $('v-explore');
+  view.classList.add('focus');
+  // On the view, so the dots and the swipe hint pick up the pool's colour too.
+  view.style.setProperty('--seg', POOL[id].hex);
+  paintDots(i);
+};
+
+/* Back to the framework: the copy clears and the board reassembles. */
+scene.onHexClear = () => {
+  const view = $('v-explore');
+  view.classList.remove('focus');
+  view.style.removeProperty('--seg');
+  paintDots(-1);
+};
+
+function paintDots(active) {
+  const wrap = $('poolDots');
+  if (!wrap.children.length) {
+    hexOrder().forEach(() => wrap.appendChild(el('i')));
+  }
+  [...wrap.children].forEach((d, k) => d.classList.toggle('on', k === active));
+}
 
 /* The scene reports the room it is moving to; the stage gradient follows so
    the WebGL fog and the CSS backdrop agree. */
@@ -110,6 +134,9 @@ scene.onRoom = ([a, b]) => {
 /* Build it up front so a fast tap never lands on an empty explore screen,
    then re-rasterise once the webfonts are in. */
 scene.buildHex(hexOrder());
+// The diagnostic's fill indicator. Bands run bottom-up in the order the
+// questions are asked, so each pool owns one sixth of the column.
+scene.buildVial(ORDER.map(id => ({ id, color: POOL[id].color })));
 document.fonts.ready.then(() => {
   scene.rebuildHex(hexOrder());
   if (S.view === 'explore') scene.selectHex(Math.max(0, scene.hexSelected));
@@ -553,6 +580,9 @@ function bumpIdle() {
 
 renderProgress();
 renderPool(POOLS[0].id);
+paintDots(-1);
+$('backToFramework').addEventListener('click', () => scene.clearHex());
+$('beginDiagOv').addEventListener('click', () => show('diag'));
 S.read = new Set();
 $('seenCount').textContent = '0';
 show('attract');

@@ -41,7 +41,11 @@
 
     <!-- EXPLORE — framework hexagon left, reading right -->
     <section class="view" id="v-explore">
-      <div class="hex-hint"><span class="touch-dot"><i></i></span><span>Touch a value pool to explore</span></div>
+      <!-- Overview: the whole framework, nothing else competing with it. -->
+      <div class="hex-hint"><span class="touch-dot"><i></i></span><span>Tap a value pool to explore</span></div>
+      <div class="ov-foot">
+        <button class="btn quiet" id="beginDiagOv">Skip to diagnostic <span class="arrow">→</span></button>
+      </div>
 
       <div class="col">
         <div class="pool-read" id="poolRead">
@@ -56,6 +60,16 @@
           <button class="btn primary" id="beginDiag">Begin diagnostic <span class="arrow">→</span></button>
         </div>
       </div>
+
+      <!-- Focus: how to move between pools, and how to get back. -->
+      <div class="focus-foot">
+        <span class="ff-hint"><span class="ff-arrow" aria-hidden="true">→</span> Swipe to change pool</span>
+        <span class="ff-div" aria-hidden="true"></span>
+        <button class="ff-back" id="backToFramework">
+          <span class="touch-dot"><i></i></span> Tap here to see the framework
+        </button>
+      </div>
+      <div class="pool-dots" id="poolDots" aria-hidden="true"></div>
     </section>
 
     <!-- DIAGNOSTIC -->
