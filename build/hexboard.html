@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Unlock AI Value — value pool board</title>
+<link rel="stylesheet" href="css/hexboard.css">
+<!--
+  hex-carousel.js imports three by bare specifier. This build has no bundler
+  and has to keep running offline from Pages, so the import map points that
+  specifier at the copy of three already vendored in the repo. Verified: the
+  module's invariants hold on r160 as well as the r185 it was written against.
+-->
+<script type="importmap">
+  { "imports": { "three": "./vendor/three.module.js" } }
+</script>
+</head>
+<body>
+
+<canvas id="board"></canvas>
+
+<header class="brand">
+  <img class="brand-logo" src="images/infosys.svg" alt="Infosys">
+  <span class="brand-rule" aria-hidden="true"></span>
+  <span class="brand-line">Unlock AI Value in Insurance</span>
+</header>
+
+<!-- Overview affordance. Hidden while a pool is open. -->
+<div class="hint" id="hint">
+  <span class="touch-dot" aria-hidden="true"></span>
+  <span>Touch a value pool to explore</span>
+</div>
+
+<!--
+  The detail column sits on the LEFT. The module centres an open sector in the
+  free region that `freeWidth` leaves, and that region is measured from the
+  right edge — so the copy has to be on the left for the two to agree. Putting
+  it on the right would mean solving the position differently, which is exactly
+  what the module exists to keep in one place.
+-->
+<aside class="detail" id="detail" aria-hidden="true">
+  <span class="d-verb" id="dVerb"></span>
+  <h1 class="d-name" id="dName"></h1>
+  <p class="d-blurb" id="dBlurb"></p>
+  <ul class="d-facts" id="dFacts"></ul>
+  <p class="d-back">Tap anywhere off the board to go back</p>
+</aside>
+
+<script type="module" src="js/hexboard.js"></script>
+</body>
+</html>

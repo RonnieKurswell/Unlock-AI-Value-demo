@@ -1,0 +1,191 @@
+/* =============================================================
+   VALUE POOL BOARD — the touchable hexagon surface
+
+   Standalone page. It deliberately does not pull in app.css: that file
+   carries the kiosk's whole layout, and this surface only needs the type
+   and the ground. Same rules though — nothing in a rectangle, hierarchy
+   from type and space, one hairline maximum.
+   ============================================================= */
+
+@import url('fonts.css');
+
+:root {
+  --display: 'Geist', 'Inter', 'Helvetica Neue', sans-serif;
+  --body: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
+
+  --ink: #05080E;
+  --fg: #F3F7FB;
+  --fg-2: rgba(243, 247, 251, 0.74);
+  --fg-3: rgba(243, 247, 251, 0.46);
+  --hair: rgba(243, 247, 251, 0.085);
+
+  --pad-x: 64px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Set from the selected pool's colour. */
+  --accent: #4F9DFF;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(130% 95% at 30% 20%, #0D1A2B 0%, #04070C 62%, #02040A 100%);
+  color: var(--fg);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+#board {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;   /* the module handles its own swipes */
+}
+
+/* ---------- brand ---------- */
+.brand {
+  position: fixed;
+  top: 26px;
+  left: var(--pad-x);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+}
+.brand-logo { height: 15px; opacity: 0.92; }
+.brand-rule { width: 1px; height: 13px; background: var(--hair); }
+.brand-line {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* ---------- overview affordance ---------- */
+.hint {
+  position: fixed;
+  bottom: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  pointer-events: none;
+  transition: opacity 420ms var(--ease);
+}
+.hint[hidden] { display: flex; opacity: 0; }
+
+.touch-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fg-2);
+  flex: none;
+}
+.touch-dot::before,
+.touch-dot::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 1px solid var(--fg-3);
+  border-radius: 50%;
+  animation: touchPing 2.4s var(--ease) infinite;
+}
+.touch-dot::after { animation-delay: 1.2s; }
+
+@keyframes touchPing {
+  0%   { transform: scale(0.5); opacity: 0.75; }
+  70%  { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* ---------- detail column ---------- */
+.detail {
+  position: fixed;
+  left: var(--pad-x);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: min(30vw, 460px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms var(--ease);
+}
+.detail[data-open='1'] { opacity: 1; }
+
+.d-verb {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+/* The rule reads as the pool's colour picking up where the verb leaves off. */
+.d-verb::before {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 1px;
+  background: var(--accent);
+  margin-bottom: 20px;
+  opacity: 0.85;
+}
+
+.d-name {
+  margin: 0 0 22px;
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: clamp(30px, 2.6vw, 50px);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+}
+
+.d-blurb {
+  margin: 0 0 34px;
+  font-size: clamp(12.5px, 0.86vw, 15px);
+  line-height: 1.62;
+  color: var(--fg-2);
+}
+
+.d-facts {
+  margin: 0 0 34px;
+  padding: 0;
+  list-style: none;
+}
+.d-facts li {
+  display: flex;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--hair);
+  font-size: clamp(11px, 0.74vw, 13px);
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+.d-facts li:last-child { border-bottom: 1px solid var(--hair); }
+.d-facts .tick { color: var(--accent); flex: none; }
+
+.d-back {
+  margin: 0;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
