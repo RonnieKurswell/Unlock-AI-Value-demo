@@ -854,7 +854,16 @@ export class HiveScene {
         // Opening a pool clears the other five away entirely.
         p.fade = damp(p.fade, diag ? 1 : p.targetFade, 9, dt);
         p.holder.visible = p.fade > 0.01;
-        p.materials.forEach(m => { m.opacity = p.fade; });
+        /* Blend only while actually fading. A fully opaque band left in the
+           transparent pass gets depth-sorted against its neighbours instead of
+           depth-tested, and the idle bob keeps nudging the sort order — which
+           made abutting slabs take turns clipping each other, so the board
+           looked like it was cropping and un-cropping on a loop. */
+        const fading = p.fade < 0.995;
+        p.materials.forEach(m => {
+          m.opacity = p.fade;
+          if (m.transparent !== fading) { m.transparent = fading; m.needsUpdate = true; }
+        });
         p.rimMesh.material.opacity *= p.fade;
         p.labels.forEach(l => {
           l.material.opacity = (diag ? 0.44 + p.fill * 0.56 : 0.34 + p.dim * 0.66) * p.fade;
@@ -871,6 +880,11 @@ export class HiveScene {
       this.hex.coreTitle.visible = this.hex.coreTitle.material.opacity > 0.01;
       this.hex.coreMat.opacity = damp(this.hex.coreMat.opacity, diag ? 1 : showCore, 9, dt);
       this.hex.core.visible = this.hex.coreMat.opacity > 0.01;
+      const coreFading = this.hex.coreMat.opacity < 0.995;
+      if (this.hex.coreMat.transparent !== coreFading) {
+        this.hex.coreMat.transparent = coreFading;
+        this.hex.coreMat.needsUpdate = true;
+      }
 
       /* Entrance. Held for as long as the camera takes to travel in from the
          attract framing, then the board rises into place. Revealing it during
