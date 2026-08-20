@@ -43,17 +43,17 @@
   --p-trust: #14ADE0;
 
   /* spacing scales with the stage, which is always 16:9 and width-driven */
-  --s1: clamp(4px, 0.32vw, 7px);
-  --s2: clamp(8px, 0.62vw, 13px);
-  --s3: clamp(12px, 1.05vw, 22px);
-  --s4: clamp(18px, 1.70vw, 34px);
-  --s5: clamp(26px, 2.50vw, 50px);
-  --s6: clamp(34px, 3.60vw, 74px);
-  --s7: clamp(44px, 5.20vw, 106px);
+  --s1: clamp(4px, 0.32cqw, 7px);
+  --s2: clamp(8px, 0.62cqw, 13px);
+  --s3: clamp(12px, 1.05cqw, 22px);
+  --s4: clamp(18px, 1.70cqw, 34px);
+  --s5: clamp(26px, 2.50cqw, 50px);
+  --s6: clamp(34px, 3.60cqw, 74px);
+  --s7: clamp(44px, 5.20cqw, 106px);
 
-  --pad-x: clamp(26px, 4.20vw, 84px);
-  --pad-t: clamp(46px, 6.40vw, 116px);
-  --pad-b: clamp(26px, 4.20vw, 76px);
+  --pad-x: clamp(26px, 4.20cqw, 84px);
+  --pad-t: clamp(46px, 6.40cqw, 116px);
+  --pad-b: clamp(26px, 4.20cqw, 76px);
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-mech: cubic-bezier(0.65, 0, 0.35, 1);
@@ -97,6 +97,22 @@ input, textarea { font: inherit; }
 }
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
+/* The design surface. Fixed at 1920x1080 and scaled to whatever the stage is,
+   so the composition never reflows and the clamp floors never bite. --k is set
+   from JS on resize. It is the query container too, so every cqw inside
+   resolves against 1920 rather than the window — the two only agreed when the
+   window happened to be exactly 16:9. */
+#frame {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+  transform: scale(var(--k, 1));
+  container-type: size;
+  container-name: stage;
+}
+
 #grain {
   position: absolute; inset: 0; z-index: 3; pointer-events: none;
   opacity: 0.035; mix-blend-mode: overlay;
@@ -115,14 +131,14 @@ input, textarea { font: inherit; }
 #chrome { position: absolute; z-index: 6; inset: 0; pointer-events: none; }
 .bar.top {
   display: flex; align-items: center;
-  padding: clamp(26px, 2.4vw, 40px) var(--pad-x) 0;
+  padding: clamp(26px, 2.4cqw, 40px) var(--pad-x) 0;
 }
 .brand { display: flex; align-items: center; gap: var(--s2); }
-.brand img { height: clamp(15px, 1.15vw, 21px); width: auto; }
+.brand img { height: clamp(15px, 1.15cqw, 21px); width: auto; }
 .brand .div { width: 1px; height: 14px; background: var(--hair); }
 .brand span {
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(9.5px, 0.62vw, 12px);
+  font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
 }
 
@@ -146,7 +162,7 @@ input, textarea { font: inherit; }
 
 .label {
   font-family: var(--label); font-weight: 600;
-  font-size: clamp(9.5px, 0.62vw, 12px);
+  font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.24em; text-transform: uppercase;
   color: var(--blue-lift);
 }
@@ -157,19 +173,19 @@ input, textarea { font: inherit; }
   line-height: 1.02; letter-spacing: -0.022em; color: var(--fg);
   text-wrap: balance;
 }
-.d-xl { font-size: clamp(40px, 4.6vw, 88px); }
-.d-l  { font-size: clamp(32px, 3.4vw, 64px); }
-.d-m  { font-size: clamp(24px, 2.4vw, 44px); }
+.d-xl { font-size: clamp(40px, 4.6cqw, 88px); }
+.d-l  { font-size: clamp(32px, 3.4cqw, 64px); }
+.d-m  { font-size: clamp(24px, 2.4cqw, 44px); }
 .d-xl em, .d-l em, .d-m em { font-style: normal; color: var(--blue-lift); }
 
 p.lede {
   color: var(--fg-2); font-weight: 300;
-  font-size: clamp(14px, 1.02vw, 20px); line-height: 1.6;
+  font-size: clamp(14px, 1.02cqw, 20px); line-height: 1.6;
 }
-p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height: 1.62; }
+p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-height: 1.62; }
 
 /* centred statement block — the default composition */
-.statement { width: min(1120px, 64vw); margin: 0 auto; text-align: center; }
+.statement { width: min(1120px, 64cqw); margin: 0 auto; text-align: center; }
 .statement .label { display: block; margin-bottom: var(--s3); }
 .statement .lede { max-width: 48ch; margin: var(--s3) auto 0; }
 
@@ -177,7 +193,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 
 .btn {
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(10px, 0.68vw, 13px);
+  font-size: clamp(10px, 0.68cqw, 13px);
   letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--fg);
   display: inline-flex; align-items: center; gap: var(--s2);
@@ -206,18 +222,18 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 
 /* ---------- attract ----------------------------------------- */
 
-#v-attract { display: none; place-items: center; padding-bottom: 16vh; }
+#v-attract { display: none; place-items: center; padding-bottom: 16cqh; }
 #v-attract.on { display: grid; }
 #v-attract .statement { max-width: none; }
 #v-attract .d-xl { max-width: 21ch; margin: var(--s3) auto 0; }
 #v-attract .sub {
   margin-top: var(--s4); color: var(--fg-2);
-  font-size: clamp(13px, 0.95vw, 19px); white-space: nowrap;
+  font-size: clamp(13px, 0.95cqw, 19px); white-space: nowrap;
 }
 .touch-cue {
   margin-top: var(--s5); white-space: nowrap;
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(9.5px, 0.62vw, 12px);
+  font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.34em; text-transform: uppercase; color: var(--fg-3);
 }
 .touch-cue span { animation: breathe 3.4s var(--ease) infinite; }
@@ -228,13 +244,13 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 #v-explore { pointer-events: none; }
 
 /* hint sits centred under the board, with a pulsing touch cue.
-   The board occupies the left min(44vw, 62vh) band, offset from --pad-x. */
+   The board occupies the left min(44cqw, 62cqh) band, offset from --pad-x. */
 .hex-hint {
   position: absolute; left: 0; right: 0; bottom: calc(var(--pad-b) - 4px);
   margin: 0 auto; width: max-content;
   display: flex; align-items: center; justify-content: center; gap: var(--s3);
   font-family: var(--label); font-weight: 600;
-  font-size: clamp(9.5px, 0.62vw, 12px);
+  font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.26em; text-transform: uppercase; color: var(--fg-3);
   pointer-events: none;
 }
@@ -260,7 +276,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   --seg: var(--blue);
   position: relative; padding: var(--s2) 0 var(--s2) calc(var(--s3) + 8px);
   border-bottom: 1px solid var(--hair);
-  font-size: clamp(12.5px, 0.9vw, 16px); color: var(--fg-2);
+  font-size: clamp(12.5px, 0.9cqw, 16px); color: var(--fg-2);
 }
 .pr-facts li:first-child { border-top: 1px solid var(--hair); }
 /* Pointy-top hexagon marker, the same silhouette as the framework board.
@@ -339,7 +355,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .ff-hint, .ff-back {
   display: inline-flex; align-items: center; gap: var(--s2);
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(9px, 0.6vw, 11.5px);
+  font-size: clamp(9px, 0.6cqw, 11.5px);
   letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
 }
 .ff-back { color: var(--fg-2); }
@@ -365,15 +381,15 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 
 .pr-rule { height: 2px; width: 44px; margin-bottom: var(--s3); background: var(--blue); }
 .pr-verb {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62vw, 12px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.24em; text-transform: uppercase;
 }
 .pr-name {
   font-family: var(--display); font-weight: 300;
-  font-size: clamp(26px, 2.6vw, 48px); line-height: 1.04; letter-spacing: -0.022em;
+  font-size: clamp(26px, 2.6cqw, 48px); line-height: 1.04; letter-spacing: -0.022em;
   margin-top: var(--s2); text-wrap: balance;
 }
-.pr-blurb { margin-top: var(--s3); font-size: clamp(13.5px, 0.96vw, 19px); line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
+.pr-blurb { margin-top: var(--s3); font-size: clamp(13.5px, 0.96cqw, 19px); line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
 .pr-tiles-head { margin-top: var(--s5); }
 .pr-tiles { margin-top: var(--s3); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
 .tile {
@@ -387,18 +403,18 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .tile:hover { background: rgba(243, 247, 251, 0.075); transform: translateY(-3px); }
 .tile.pending { border-top-color: var(--fg-4); background: rgba(243, 247, 251, 0.014); }
 .tile .t-n {
-  font-family: var(--label); font-weight: 500; font-size: clamp(8.5px, 0.55vw, 10.5px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(8.5px, 0.55cqw, 10.5px);
   letter-spacing: 0.2em; color: var(--fg-4);
 }
 .tile .t-client {
   font-family: var(--display); font-weight: 500;
-  font-size: clamp(14px, 1.08vw, 20px); line-height: 1.15; letter-spacing: -0.014em; color: var(--fg);
+  font-size: clamp(14px, 1.08cqw, 20px); line-height: 1.15; letter-spacing: -0.014em; color: var(--fg);
 }
 .tile.pending .t-client { color: var(--fg-3); }
-.tile .t-title { font-size: clamp(11.5px, 0.78vw, 14px); color: var(--fg-2); line-height: 1.35; }
+.tile .t-title { font-size: clamp(11.5px, 0.78cqw, 14px); color: var(--fg-2); line-height: 1.35; }
 .tile .t-metric {
   margin-top: auto; padding-top: var(--s2);
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6vw, 11.5px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--tile-accent);
 }
 .tile.pending .t-metric { color: var(--fg-4); }
@@ -416,7 +432,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 #tileSheet.on { opacity: 1; pointer-events: auto; }
 .ts-card {
   position: relative;
-  width: min(760px, 62vw); max-height: 100%; overflow-y: auto;
+  width: min(760px, 62cqw); max-height: 100%; overflow-y: auto;
   padding: var(--s6) var(--s6) var(--s5);
   background: linear-gradient(200deg, #101B2E, #070C16);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55);
@@ -427,37 +443,37 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .ts-rule { height: 2px; width: 44px; margin-bottom: var(--s4); }
 .ts-title {
   font-family: var(--display); font-weight: 300;
-  font-size: clamp(24px, 2.4vw, 44px); line-height: 1.06; letter-spacing: -0.022em;
+  font-size: clamp(24px, 2.4cqw, 44px); line-height: 1.06; letter-spacing: -0.022em;
   margin-top: var(--s2);
 }
 .ts-metric {
-  font-family: var(--label); font-weight: 500; font-size: clamp(11px, 0.82vw, 15px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(11px, 0.82cqw, 15px);
   letter-spacing: 0.16em; text-transform: uppercase; margin-top: var(--s3);
 }
-#tileSheet .body { margin-top: var(--s4); font-size: clamp(13px, 0.92vw, 17px); }
+#tileSheet .body { margin-top: var(--s4); font-size: clamp(13px, 0.92cqw, 17px); }
 #tileClose {
   position: absolute; top: var(--s5); right: var(--s6);
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6vw, 11.5px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3);
 }
 #tileClose:hover { color: var(--fg); }
 
 .pr-sect { margin-top: var(--s4); }
 .pr-sect h4 {
-  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.24em; text-transform: uppercase; color: var(--fg-3);
   margin-bottom: var(--s2);
 }
-.pr-sect p { font-size: clamp(12px, 0.82vw, 15.5px); line-height: 1.62; color: var(--fg-2); max-width: 58ch; }
+.pr-sect p { font-size: clamp(12px, 0.82cqw, 15.5px); line-height: 1.62; color: var(--fg-2); max-width: 58ch; }
 .pr-sect ul { list-style: none; display: flex; flex-direction: column; gap: var(--s2); }
-.pr-sect li { font-size: clamp(12px, 0.82vw, 15.5px); color: var(--fg-2); }
+.pr-sect li { font-size: clamp(12px, 0.82cqw, 15.5px); color: var(--fg-2); }
 
 #v-explore .foot {
   flex: none; margin-top: var(--s5);
   display: flex; align-items: center; gap: var(--s5);
 }
 #v-explore .foot .hint {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6vw, 11.5px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
 }
 #seenCount { color: var(--blue-lift); }
@@ -473,20 +489,20 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 }
 .qmeta { display: flex; align-items: baseline; gap: var(--s3); margin-bottom: var(--s2); }
 .qmeta .pool-tag {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62vw, 12px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.24em; text-transform: uppercase;
 }
 .qmeta .count {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.18em; color: var(--fg-4); margin-left: auto;
 }
 .qkind {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
 }
 .qtext {
   font-family: var(--display); font-weight: 300;
-  font-size: clamp(22px, 2.2vw, 40px); line-height: 1.1; letter-spacing: -0.02em;
+  font-size: clamp(22px, 2.2cqw, 40px); line-height: 1.1; letter-spacing: -0.02em;
   margin: var(--s2) 0 var(--s4); max-width: 26ch; text-wrap: balance;
 }
 
@@ -509,16 +525,16 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .opt:hover { padding-left: var(--s3); }
 .opt:hover::before { transform: scaleY(1); }
 .opt .key {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.14em; color: var(--fg-4); transition: color 0.22s var(--ease);
 }
 .opt:hover .key { color: var(--blue-lift); }
-.opt .lab { font-size: clamp(14px, 1.02vw, 21px); font-weight: 400; color: var(--fg); }
-.opt .sub { font-size: clamp(11.5px, 0.76vw, 14px); color: var(--fg-3); margin-top: 4px; line-height: 1.45; }
+.opt .lab { font-size: clamp(14px, 1.02cqw, 21px); font-weight: 400; color: var(--fg); }
+.opt .sub { font-size: clamp(11.5px, 0.76cqw, 14px); color: var(--fg-3); margin-top: 4px; line-height: 1.45; }
 
 .qfoot { margin-top: var(--s4); display: flex; align-items: center; gap: var(--s5); }
 .link-quiet {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6vw, 11.5px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
   letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
   transition: color 0.2s var(--ease);
 }
@@ -530,7 +546,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   width: 100%; height: 76px; resize: none;
   background: transparent; border: none; border-bottom: 1px solid var(--hair);
   color: var(--fg); font-family: var(--body); font-weight: 300;
-  font-size: clamp(13px, 0.9vw, 16px); padding: var(--s2) 0; line-height: 1.5;
+  font-size: clamp(13px, 0.9cqw, 16px); padding: var(--s2) 0; line-height: 1.5;
 }
 #explainBox textarea::placeholder { color: var(--fg-4); }
 #explainBox textarea:focus { outline: none; border-bottom-color: var(--blue); }
@@ -543,7 +559,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .cluster .ticks { display: flex; gap: 3px; }
 .cluster .ticks i { width: 16px; height: 2px; background: var(--fg-4); display: block; transition: background 0.3s var(--ease); }
 .cluster .lb {
-  font-family: var(--label); font-weight: 400; font-size: clamp(8px, 0.52vw, 10px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(8px, 0.52cqw, 10px);
   letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg-4); white-space: nowrap;
   transition: color 0.3s var(--ease);
 }
@@ -555,7 +571,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 #v-wrap.on { display: block; }
 .beat {
   position: absolute; inset: var(--pad-t) var(--pad-x) var(--pad-b);
-  display: none; padding-bottom: clamp(34px, 3.4vw, 62px);
+  display: none; padding-bottom: clamp(34px, 3.4cqw, 62px);
 }
 /* content sits centred in the leftover height; the nav keeps its own band */
 .beat.on {
@@ -586,34 +602,34 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 /* beat 1 — the statement */
 /* lockup and body share one column so the eyebrow, name, tagline and first
    body paragraph all start on the same left edge */
-.arch-wrap { width: min(1320px, 88vw); margin: 0 auto; display: flex; flex-direction: column; gap: var(--s6); }
+.arch-wrap { width: min(1320px, 88cqw); margin: 0 auto; display: flex; flex-direction: column; gap: var(--s6); }
 #beat1 .b1 { text-align: left; }
 #beat1 .arch-name {
   font-family: var(--display); font-weight: 300;
-  font-size: clamp(38px, 4.4vw, 84px); line-height: 1.0; letter-spacing: -0.024em;
+  font-size: clamp(38px, 4.4cqw, 84px); line-height: 1.0; letter-spacing: -0.024em;
   text-wrap: balance;
 }
 #beat1 .arch-tag {
   font-family: var(--body); font-weight: 300; font-style: normal;
-  font-size: clamp(15px, 1.1vw, 22px); color: var(--blue-lift); margin-top: var(--s3);
+  font-size: clamp(15px, 1.1cqw, 22px); color: var(--blue-lift); margin-top: var(--s3);
 }
 #beat1 .arch-cols {
   display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--s5);
   align-items: start;
 }
-#beat1 .arch-body { font-size: clamp(12.5px, 0.84vw, 16px); }
+#beat1 .arch-body { font-size: clamp(12.5px, 0.84cqw, 16px); }
 #beat1 .arch-risk {
   padding-left: var(--s3); border-left: 2px solid var(--blue);
-  font-size: clamp(12.5px, 0.86vw, 16px); line-height: 1.6; color: var(--fg-2);
+  font-size: clamp(12.5px, 0.86cqw, 16px); line-height: 1.6; color: var(--fg-2);
 }
 
 /* beat 2 — benchmark */
 .bench-head { text-align: left; }
 .bench-head .d-m { margin-top: var(--s2); }
-.bench-praise { margin-top: var(--s3); font-size: clamp(13px, 0.94vw, 18px); max-width: 68ch; }
+.bench-praise { margin-top: var(--s3); font-size: clamp(13px, 0.94cqw, 18px); max-width: 68ch; }
 .bench-praise b { color: var(--blue-lift); font-weight: 500; }
 .bench-note {
-  font-family: var(--label); font-weight: 400; font-size: clamp(8.5px, 0.56vw, 10.5px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(8.5px, 0.56cqw, 10.5px);
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-4);
   margin-top: var(--s3);
 }
@@ -623,9 +639,9 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   padding: var(--s3) 0; border-bottom: 1px solid var(--hair);
 }
 .bench-row:first-child { border-top: 1px solid var(--hair); }
-.bench-row .nm { font-size: clamp(13px, 0.92vw, 17px); color: var(--fg); }
+.bench-row .nm { font-size: clamp(13px, 0.92cqw, 17px); color: var(--fg); }
 .bench-row .bd {
-  font-family: var(--label); font-weight: 400; font-size: clamp(8.5px, 0.56vw, 10.5px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(8.5px, 0.56cqw, 10.5px);
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-4); margin-top: 3px;
 }
 .track { position: relative; height: 6px; background: rgba(243, 247, 251, 0.07); }
@@ -637,7 +653,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   letter-spacing: 0.18em; color: var(--fg-3);
 }
 .bench-row .val {
-  font-family: var(--label); font-weight: 500; font-size: clamp(10px, 0.68vw, 13px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(10px, 0.68cqw, 13px);
   letter-spacing: 0.1em; text-align: right; color: var(--fg-2);
 }
 .delta-up { color: var(--blue-lift); }
@@ -647,7 +663,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 /* head and content share one column, left-aligned on the same edge.
    Scoped by class, not by beat id — the beats get reordered. */
 .fc-wrap, .bench-wrap {
-  width: min(1320px, 88vw); margin: 0 auto;
+  width: min(1320px, 88cqw); margin: 0 auto;
   display: flex; flex-direction: column; gap: var(--s6);
 }
 .fc-head { text-align: left; }
@@ -656,17 +672,17 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .fc-col { padding-left: var(--s4); border-left: 1px solid var(--hair); min-width: 0; }
 .fc-col:first-child { padding-left: 0; border-left: none; }
 .fc-col h4 {
-  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.24em; text-transform: uppercase; color: var(--fg-3);
 }
 .fc-col.hot h4 { color: var(--blue-lift); }
-.fc-col p { font-size: clamp(12px, 0.82vw, 15px); line-height: 1.6; color: var(--fg-3); margin: var(--s3) 0 var(--s4); }
+.fc-col p { font-size: clamp(12px, 0.82cqw, 15px); line-height: 1.6; color: var(--fg-3); margin: var(--s3) 0 var(--s4); }
 .fc-col ul { list-style: none; display: flex; flex-direction: column; gap: var(--s2); }
-.fc-col li { display: flex; align-items: center; gap: var(--s2); font-size: clamp(13px, 0.9vw, 16px); }
+.fc-col li { display: flex; align-items: center; gap: var(--s2); font-size: clamp(13px, 0.9cqw, 16px); }
 .fc-col li i { width: 7px; height: 7px; flex: none; }
 .fc-proof { margin-top: var(--s4); }
 .fc-proof-label {
-  font-family: var(--label); font-weight: 600; font-size: clamp(8.5px, 0.56vw, 10.5px);
+  font-family: var(--label); font-weight: 600; font-size: clamp(8.5px, 0.56cqw, 10.5px);
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
   margin-bottom: var(--s2);
 }
@@ -677,41 +693,41 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .retrieve li {
   display: grid; grid-template-columns: 2.4em 1fr; gap: var(--s2); align-items: baseline;
   padding: var(--s2) 0; border-bottom: 1px solid var(--hair);
-  font-size: clamp(13px, 0.9vw, 17px); color: var(--fg-2);
+  font-size: clamp(13px, 0.9cqw, 17px); color: var(--fg-2);
 }
 .retrieve li:first-child { border-top: 1px solid var(--hair); }
 .retrieve .r-n {
-  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.12em; color: var(--blue-lift);
 }
 .retrieve b { color: var(--fg); font-weight: 500; }
 
 .fc-empty {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-4);
 }
 
 /* beat 4 — role */
 .role-wrap {
   display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--s6);
-  align-items: center; width: min(1320px, 88vw); margin: 0 auto;
+  align-items: center; width: min(1320px, 88cqw); margin: 0 auto;
 }
 .role-morph { margin: var(--s4) 0 var(--s3); }
 .role-morph .from {
-  font-family: var(--label); font-weight: 400; font-size: clamp(10px, 0.68vw, 13px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(10px, 0.68cqw, 13px);
   letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
 }
 .role-morph .to {
   font-family: var(--display); font-weight: 300;
-  font-size: clamp(26px, 2.8vw, 52px); line-height: 1.04; letter-spacing: -0.022em;
+  font-size: clamp(26px, 2.8cqw, 52px); line-height: 1.04; letter-spacing: -0.022em;
   color: var(--blue-lift); margin-top: var(--s1);
 }
-.role-change { font-size: clamp(13px, 0.94vw, 18px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
-.role-focus { font-size: clamp(13px, 0.94vw, 18px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
+.role-change { font-size: clamp(13px, 0.94cqw, 18px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
+.role-focus { font-size: clamp(13px, 0.94cqw, 18px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
 .role-focus b { font-weight: 500; }
 .role-src {
   margin-top: var(--s4); font-family: var(--label); font-weight: 400;
-  font-size: clamp(8.5px, 0.56vw, 10.5px); letter-spacing: 0.2em;
+  font-size: clamp(8.5px, 0.56cqw, 10.5px); letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--fg-4);
 }
 .role-aside { border-left: 1px solid var(--hair); padding-left: var(--s5); }
@@ -720,7 +736,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 /* beat 5 — proof */
 .pending-note {
   margin-top: var(--s4); padding-left: var(--s3); border-left: 2px solid var(--blue-deep);
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.6vw, 11px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.6cqw, 11px);
   letter-spacing: 0.08em; line-height: 1.9; color: var(--fg-3);
 }
 .pending-note b { color: var(--blue-lift); letter-spacing: 0.18em; }
@@ -733,7 +749,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   content: ''; position: absolute; inset: 0; z-index: -1;
   background: radial-gradient(64% 58% at 50% 46%, rgba(5, 8, 14, 0.95) 0%, rgba(5, 8, 14, 0.8) 56%, rgba(5, 8, 14, 0.3) 100%);
 }
-.deliver-wrap { text-align: center; width: min(680px, 46vw); }
+.deliver-wrap { text-align: center; width: min(680px, 46cqw); }
 .deliver-wrap .lede { margin: var(--s3) auto 0; max-width: 46ch; }
 
 .socket { position: relative; width: 132px; height: 132px; margin: var(--s6) auto var(--s3); display: grid; place-items: center; }
@@ -755,7 +771,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 }
 .socket.locked .cradle { background: rgba(55, 166, 228, 0.5); color: var(--fg); }
 .scan-state {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62vw, 12px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.24em; text-transform: uppercase; color: var(--fg-3);
 }
 
@@ -773,7 +789,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 .manual-form.on { display: block; animation: rise 0.44s var(--ease) both; }
 .manual-form label {
   display: block; font-family: var(--label); font-weight: 500;
-  font-size: clamp(9px, 0.58vw, 11px); letter-spacing: 0.22em;
+  font-size: clamp(9px, 0.58cqw, 11px); letter-spacing: 0.22em;
   text-transform: uppercase; color: var(--fg-3); margin-bottom: var(--s4);
 }
 .manual-form .mf-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
@@ -781,20 +797,20 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
   display: block; width: 100%; margin-top: var(--s1);
   background: transparent; border: none; border-bottom: 1px solid var(--hair);
   color: var(--fg); font-family: var(--body); font-weight: 300;
-  font-size: clamp(14px, 1vw, 18px); letter-spacing: normal; text-transform: none;
+  font-size: clamp(14px, 1cqw, 18px); letter-spacing: normal; text-transform: none;
   padding: var(--s2) 0;
 }
 .manual-form input::placeholder { color: var(--fg-4); }
 .manual-form input:focus { outline: none; border-bottom-color: var(--blue); }
 .mf-actions { display: flex; gap: var(--s5); align-items: center; margin-top: var(--s3); }
 .mf-error {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58vw, 11px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
   letter-spacing: 0.12em; color: #E0736B; margin-top: var(--s2); min-height: 14px;
 }
 
 .demo-trigger {
   margin-top: var(--s6); font-family: var(--label); font-weight: 400;
-  font-size: clamp(8.5px, 0.56vw, 10.5px); letter-spacing: 0.22em;
+  font-size: clamp(8.5px, 0.56cqw, 10.5px); letter-spacing: 0.22em;
   text-transform: uppercase; color: var(--fg-4);
   transition: color 0.2s var(--ease);
 }
@@ -815,13 +831,13 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86vw, 16px); line-height
 }
 #v-done .reset-note {
   margin-top: var(--s5); font-family: var(--label); font-weight: 400;
-  font-size: clamp(9px, 0.58vw, 11px); letter-spacing: 0.24em;
+  font-size: clamp(9px, 0.58cqw, 11px); letter-spacing: 0.24em;
   text-transform: uppercase; color: var(--fg-4);
 }
 
 /* ---------- narrow preview windows -------------------------- */
 
-@media (max-width: 1100px) {
+@container stage (max-width: 1100px) {
   .fc-grid { grid-template-columns: 1fr; gap: var(--s4); }
   .fc-col { padding-left: 0; border-left: none; }
   .role-wrap, #beat1 .arch-cols { grid-template-columns: 1fr; gap: var(--s4); }

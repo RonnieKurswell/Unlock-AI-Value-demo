@@ -578,6 +578,29 @@ function bumpIdle() {
    BOOT
    ============================================================= */
 
+/* The overlay is authored at 1920x1080; this scales it to whatever the stage
+   actually is. Uniform, so the composition is identical at every size. */
+function fitFrame() {
+  const stage = $('stage');
+  const frame = $('frame');
+  if (!stage || !frame || !stage.clientWidth) return;
+  frame.style.setProperty('--k', stage.clientWidth / 1920);
+}
+/* Three triggers, deliberately redundant, because each one alone has a hole.
+   A window resize event can fire before the stage's new box is computed, so it
+   reads stale. A ResizeObserver reads the box accurately but is delivered as
+   part of the rendering steps, so a backgrounded tab that is not painting never
+   gets the callback. fitFrame is idempotent and costs a division, so run it
+   from all of them and let the last correct read win. */
+if (typeof ResizeObserver === 'function') {
+  new ResizeObserver(fitFrame).observe($('stage'));
+}
+addEventListener('resize', () => {
+  fitFrame();                                  // immediate, may read stale
+  requestAnimationFrame(fitFrame);             // again after layout settles
+});
+fitFrame();
+
 renderProgress();
 renderPool(POOLS[0].id);
 paintDots(-1);

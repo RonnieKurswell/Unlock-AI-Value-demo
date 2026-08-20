@@ -15,6 +15,13 @@
   <div id="vignette"></div>
   <div id="grain"></div>
 
+  <!-- The DOM overlay is laid out at a nominal 1920x1080 and scaled uniformly
+       to the stage, so the composition is identical at every window size and
+       nothing can overflow: if it fits at 1920x1080 it fits everywhere. The
+       canvas stays outside the frame so the 3D renders at native resolution —
+       both agree because both are always 16:9. -->
+  <div id="frame">
+
   <!-- brand lockup, nothing else -->
   <div id="chrome">
     <div class="bar top">
@@ -233,10 +240,12 @@
       <p class="body" id="tsDetail">—</p>
       <div class="pending-note" id="tsFlag" hidden></div>
     </div>
-  </div>
+  </div><!-- /views -->
 
-</div>
-</div>
+  </div><!-- /frame -->
+
+</div><!-- /stage -->
+</div><!-- /shell -->
 
 <script type="module" src="js/app.js"></script>
 </body>
