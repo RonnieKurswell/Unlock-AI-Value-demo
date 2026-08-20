@@ -6,54 +6,109 @@
    Anything not in those sources is marked PENDING. Do not invent.
    ============================================================= */
 
+/* Client brand rules may force a single-blue palette. Both are built; flip the
+   flag rather than re-editing every hue. The mono ramp keeps the same lightness
+   ordering as the six hues so the benchmark bars stay distinguishable. */
+export const MONO_PALETTE = false;
+
+const MONO_RAMP = {
+  strategy: '#8FC6F2',
+  data:     '#37A6E4',
+  process:  '#6FB9E8',
+  legacy:   '#1E7FC0',
+  physical: '#A8D6F6',
+  trust:    '#0E6099'
+};
+
+/* The hexagon expects pools ordered by the edge they own: index i sits on the
+   edge at i x 60 degrees. Same order as the booth build. */
+export const hexOrder = () => [...POOLS].sort((a, b) => a.edge - b.edge)
+  .map(p => ({ id: p.id, title: p.name, verb: p.verb, accent: p.color, room: p.room }));
+
 export const POOLS = [
   {
     id: 'strategy', index: 0,
     name: 'AI Strategy & Engineering',
     lines: ['AI STRATEGY', '& ENGINEERING'],
-    verb: 'Orchestrate',
-    color: 0x7B61FF, hex: '#7B61FF',
-    blurb: 'Fragmented pilots, no shared platform, and inference cost nobody owns. Infosys builds the operating model and cost-aware architecture that let AI scale across every line of business.'
+    verb: 'Orchestrate', edge: 1,
+    color: 0x4F9DFF, hex: '#4F9DFF',
+    room: ['#0B2244', '#03080F'],
+    blurb: 'Fragmented pilots, no shared platform, and inference cost nobody owns. Infosys builds the operating model and cost-aware architecture that let AI scale across every line of business.',
+    facts: [
+      'One AI operating model across every line of business',
+      'Topaz Fabric and Insurance Genome, integrated with Guidewire',
+      'AI FinOps keeps token and inference cost governed'
+    ]
   },
   {
     id: 'data', index: 1,
     name: 'Data for AI',
     lines: ['DATA FOR AI'],
-    verb: 'Trust',
-    color: 0x007CC3, hex: '#007CC3',
-    blurb: 'Policy, claims and treaty data sit in silos and unindexed PDFs. Infosys makes it AI-ready and audit-ready, with lineage a regulator can actually follow.'
+    verb: 'Insight', edge: 0,
+    color: 0x35D0F5, hex: '#35D0F5',
+    room: ['#0A2B3A', '#030C14'],
+    blurb: 'Policy, claims and treaty data sit in silos and unindexed PDFs. Infosys makes it AI-ready and audit-ready, with lineage a regulator can actually follow.',
+    facts: [
+      'Lineage a regulator can follow, decision by decision',
+      'Synthetic data — model training without PII exposure',
+      'One trusted record across policy, claims and party data'
+    ]
   },
   {
     id: 'process', index: 2,
     name: 'Process AI',
     lines: ['PROCESS AI'],
-    verb: 'Redesign',
-    color: 0x00A9A5, hex: '#00A9A5',
-    blurb: 'Task-level automation inside an unchanged workflow. Infosys redesigns the whole journey — submission to bound, FNOL to settlement — around agents working alongside underwriters.'
+    verb: 'Transform', edge: 5,
+    color: 0xFF7AB0, hex: '#FF7AB0',
+    room: ['#3A1226', '#14050C'],
+    blurb: 'Task-level automation inside an unchanged workflow. Infosys redesigns the whole journey — submission to bound, FNOL to settlement — around agents working alongside underwriters.',
+    facts: [
+      'Submission to bound, straight through',
+      'FNOL triaged by severity, routine claims settled touchlessly',
+      'Manual underwriting effort cut 50% at Allied World'
+    ]
   },
   {
     id: 'legacy', index: 3,
     name: 'Agentic Legacy Modernization',
     lines: ['AGENTIC LEGACY', 'MODERNIZATION'],
-    verb: 'Unlock',
-    color: 0x3F6BE5, hex: '#3F6BE5',
-    blurb: 'Rating logic nobody fully understands, on platforms too risky to replace. Infosys recovers the intent with AI and modernises module by module while the book stays live.'
+    verb: 'Modernize', edge: 4,
+    color: 0xB08BFF, hex: '#B08BFF',
+    room: ['#1D1440', '#0A0618'],
+    blurb: 'Rating logic nobody fully understands, on platforms too risky to replace. Infosys recovers the intent with AI and modernises module by module while the book stays live.',
+    facts: [
+      'Rating logic recovered from legacy code by AI agents',
+      'Module-by-module migration while the book stays live',
+      '99.2% extraction accuracy (F1) at MassMutual'
+    ]
   },
   {
     id: 'physical', index: 4,
     name: 'Physical AI',
     lines: ['PHYSICAL AI'],
-    verb: 'Sense',
-    color: 0xC2569F, hex: '#C2569F',
-    blurb: 'Telematics, IoT and drone data treated as a reporting by-product. Infosys engineers it into pricing and claims as a first-class input, with digital twins for exposure.'
+    verb: 'Innovate', edge: 3,
+    color: 0xFFB454, hex: '#FFB454',
+    room: ['#3A2708', '#150B02'],
+    blurb: 'Telematics, IoT and drone data treated as a reporting by-product. Infosys engineers it into pricing and claims as a first-class input, with digital twins for exposure.',
+    facts: [
+      'Telematics and IoT engineered into live pricing',
+      'Catastrophe damage validated in hours, not weeks',
+      'Digital twins simulate loss before it happens'
+    ]
   },
   {
     id: 'trust', index: 5,
     name: 'AI Trust',
     lines: ['AI TRUST'],
-    verb: 'Assure',
-    color: 0x14ADE0, hex: '#14ADE0',
-    blurb: 'A model that cannot explain a declined claim is not deployable. Infosys builds bias testing, explainability and audit trails in from the start, not as a final gate.'
+    verb: 'Assure', edge: 2,
+    color: 0x7EE0C0, hex: '#7EE0C0',
+    room: ['#0A2E26', '#03110E'],
+    blurb: 'A model that cannot explain a declined claim is not deployable. Infosys builds bias testing, explainability and audit trails in from the start, not as a final gate.',
+    facts: [
+      'Bias and fairness tested before deployment, not after',
+      'Explainability built into the model architecture',
+      'Ready for NAIC bulletins and the EU AI Act'
+    ]
   }
 ];
 
@@ -113,6 +168,13 @@ export const TILES = {
       detail: 'Glass-box auditability is central to the pillar\u2019s argument but no client proof point is documented.' }
   ]
 };
+
+if (MONO_PALETTE) {
+  for (const p of POOLS) {
+    p.hex = MONO_RAMP[p.id];
+    p.color = parseInt(MONO_RAMP[p.id].slice(1), 16);
+  }
+}
 
 export const POOL = Object.fromEntries(POOLS.map(p => [p.id, p]));
 export const ORDER = POOLS.map(p => p.id);
@@ -412,36 +474,36 @@ export const ARCHETYPES = {
     key: 'foundation',
     name: 'Foundation First',
     tag: 'Groundwork before ambition',
-    body: 'Across all six value pools you are early. That is not a failing — it is a sequencing opportunity. Carriers who start with a governed foundation reach production faster than those who start with a use case and retrofit the platform underneath it.',
-    risk: 'The most common failure from here is launching a visible pilot to build momentum, then discovering the data and governance underneath it cannot support production.'
+    body: 'You are early across all six pools. That is a sequencing opportunity, not a failing — a governed foundation reaches production faster than a use case with the platform retrofitted underneath.',
+    risk: 'The usual failure from here: a visible pilot for momentum, then the data underneath it will not support production.'
   },
   purgatory: {
     key: 'purgatory',
     name: 'Pilot Purgatory',
     tag: 'Proofs that never reach production',
-    body: 'You have demonstrated technical feasibility. What you have not yet built is the path from a working proof to a live decision in the core. The barrier is rarely the model — it is data readiness, governance, or the change management to put it in an underwriter’s hands.',
-    risk: 'Every additional pilot that does not reach production makes the next business case harder to fund.'
+    body: 'Feasibility is proven. The path from a working proof to a live decision in the core is not. The barrier is rarely the model — it is data readiness, governance, and getting it into an underwriter’s hands.',
+    risk: 'Each pilot that stalls makes the next business case harder to fund.'
   },
   myopia: {
     key: 'myopia',
     name: 'Point-Solution Myopia',
     tag: 'Local gains that refuse to compound',
-    body: 'Your process maturity is ahead of your foundation. Individual workflows are genuinely faster, but each tool brought its own pipeline and its own governance, so value is capped at the boundary of the business unit that built it.',
-    risk: 'The next ten use cases will each cost roughly what the first one did. Without a shared foundation, there is no flywheel.'
+    body: 'Your process maturity is ahead of your foundation. Workflows are genuinely faster, but each tool brought its own pipeline — so value stops at the boundary of the unit that built it.',
+    risk: 'Without a shared foundation the next ten use cases each cost what the first one did.'
   },
   platform: {
     key: 'platform',
     name: 'Platform Without Purpose',
     tag: 'Capability built, value unclaimed',
-    body: 'You have invested ahead of the curve on strategy and data. The gap is application — the capability exists but has not been pointed at the workflows where insurance economics actually accrue: submission to bound policy, FNOL to settlement.',
-    risk: 'Underutilised platform investment is the hardest kind to defend at the next budget cycle.'
+    body: 'You have invested ahead of the curve on strategy and data. The gap is application — the capability exists but is not yet pointed at where the economics accrue: submission to bound, FNOL to settlement.',
+    risk: 'Underutilised platform investment is the hardest kind to defend at budget.'
   },
   compounding: {
     key: 'compounding',
     name: 'Enterprise Compounding',
     tag: 'Each use case makes the next cheaper',
-    body: 'Foundation, application and governance are moving together. This is the state the playbook describes as the goal: AI as an enterprise operating model rather than a portfolio of point solutions.',
-    risk: 'At this maturity the binding constraint shifts from technology to workforce — whether underwriters trust the models enough to act on them.'
+    body: 'Foundation, application and governance are moving together — AI as an operating model rather than a portfolio of point solutions.',
+    risk: 'From here the constraint is workforce, not technology — whether underwriters trust the models enough to act on them.'
   }
 };
 
@@ -460,14 +522,14 @@ export function classifyArchetype(scores) {
 }
 
 /* -------------------------------------------------------------
-   SECTORS. Peer medians are ILLUSTRATIVE placeholders — Infosys
+   Benchmark medians are ILLUSTRATIVE placeholders — Infosys
    has not supplied benchmark data. Every surface that shows them
    must carry the provisional label. Do not present as research.
    ------------------------------------------------------------- */
 
-export const BENCHMARK_STATUS = 'Illustrative insurance peer median · pending Infosys data';
+export const BENCHMARK_STATUS = 'Illustrative industry benchmark · pending Infosys data';
 
-export const PEER_MEDIAN = { strategy: 6, data: 6, process: 7, legacy: 5, physical: 4, trust: 6 };
+export const BENCHMARK_MEDIAN = { strategy: 6, data: 6, process: 7, legacy: 5, physical: 4, trust: 6 };
 
 /* -------------------------------------------------------------
    WORKFORCE ROLE EVOLUTION — verbatim structure from the
@@ -477,33 +539,34 @@ export const PEER_MEDIAN = { strategy: 6, data: 6, process: 7, legacy: 5, physic
 
 export const ROLES = [
   {
-    match: ['underwrit', 'risk', 'appetite'],
+    match: ['underwrit', 'risk', 'appetite'], focus: ['process', 'data', 'trust'],
     from: 'Underwriter', to: 'AI-Augmented Risk Advisor',
     change: 'Shifts from data gathering and manual risk assessment to overseeing AI-driven risk models — concentrating human judgment on the complex and novel risks where model confidence is low.'
   },
   {
-    match: ['claim', 'adjust', 'loss', 'fnol'],
+    match: ['claim', 'adjust', 'loss', 'fnol'], focus: ['process', 'physical', 'data'],
     from: 'Claims Adjuster', to: 'AI-Assisted Decision Maker',
     change: 'Moves from end-to-end case management to exception handling and complex case oversight, with AI managing routine assessment, documentation and settlement.'
   },
   {
-    match: ['actuar', 'pricing', 'reserv', 'model'],
+    match: ['actuar', 'pricing', 'reserv', 'model'], focus: ['data', 'trust', 'strategy'],
     from: 'Actuary', to: 'AI Model Steward',
     change: 'Evolves from building models to validating, governing and continuously improving AI pricing and reserving models — with explainability and fairness as core responsibilities.'
   },
   {
-    match: ['distribut', 'sales', 'growth', 'agency', 'channel'],
+    match: ['distribut', 'sales', 'growth', 'agency', 'channel'], focus: ['data', 'process', 'strategy'],
     from: 'Distribution Manager', to: 'AI-Enabled Growth Leader',
     change: 'Gains real-time performance intelligence, AI-powered lead scoring and agent copilot tools — shifting from reactive support to proactive growth enablement.'
   },
   {
-    match: ['broker', 'agent', 'advis', 'placement'],
+    match: ['broker', 'agent', 'advis', 'placement'], focus: ['process', 'data', 'legacy'],
     from: 'Broker / Agent', to: 'AI-Powered Advisory Partner',
     change: 'Shifts from manual quote comparison and paperwork-intensive placement to relationship-led advisory, with AI streamlining quote aggregation, risk matching and proposal creation.'
   }
 ];
 
 export const ROLE_DEFAULT = {
+  focus: ['strategy', 'trust', 'legacy'],
   from: 'Insurance Leader', to: 'AI Portfolio Owner',
   change: 'Accountability moves from approving individual AI initiatives to owning an operating model — where governance, value tracking and workforce readiness are the levers that determine whether AI scales.'
 };
@@ -531,7 +594,7 @@ export function forecast(scores) {
 }
 
 export const FORECAST_LINES = {
-  compounding: 'Left on its current trajectory, this is where your advantage widens. Each use case in a mature pool costs less than the last.',
-  exposed: 'On a five-year view this is where the gap grows fastest — not because it degrades, but because peers compound while it stays flat.',
-  holding: 'Enough capability to move, not enough to compound. These are the pools where a decision this year changes the five-year position.'
+  compounding: 'Where your advantage widens. Each use case in a mature pool costs less than the last.',
+  exposed: 'Where the gap grows fastest — not because it degrades, but because the benchmark moves while it stays flat.',
+  holding: 'Enough capability to move, not to compound. A decision this year changes the five-year position.'
 };

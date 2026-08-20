@@ -39,12 +39,9 @@
     </section>
 
 
-    <!-- EXPLORE — wheel left, reading right -->
+    <!-- EXPLORE — framework hexagon left, reading right -->
     <section class="view" id="v-explore">
-      <div class="wheel-ui">
-        <div class="wheel-pips" id="wheelPips"></div>
-        <div class="wheel-hint"><span>Drag to rotate</span></div>
-      </div>
+      <div class="hex-hint"><span class="touch-dot"><i></i></span><span>Touch a value pool to explore</span></div>
 
       <div class="col">
         <div class="pool-read" id="poolRead">
@@ -52,8 +49,7 @@
           <div class="pr-verb" id="prVerb">—</div>
           <h2 class="pr-name" id="prName">—</h2>
           <p class="pr-blurb" id="prBlurb">—</p>
-          <div class="pr-tiles-head"><span class="label cool">Proof points</span></div>
-          <div class="pr-tiles" id="prTiles"></div>
+          <ul class="pr-facts" id="prFacts"></ul>
         </div>
         <div class="foot">
           <span class="hint"><span id="seenCount">0</span> of 6 read</span>
@@ -85,8 +81,8 @@
     <section class="view" id="v-identify">
       <div class="deliver-wrap">
         <span class="label">Almost there</span>
-        <h2 class="d-l" style="margin-top:var(--s3)">Tap your badge<br>to see your results</h2>
-        <p class="lede">Your badge tells us your role, so the blueprint is written for your job — and your report is sent without you typing anything.</p>
+        <h2 class="d-l" style="margin-top:var(--s3)">Tap your badge</h2>
+        <p class="lede">Your badge carries your role, so the blueprint fits your job.</p>
 
         <div class="socket" id="socket">
           <div class="ring"></div>
@@ -119,14 +115,16 @@
     <section class="view" id="v-wrap">
 
       <div class="beat" id="beat1">
-        <div class="b1">
-          <span class="label">Your position</span>
-          <h1 class="arch-name" id="archName">—</h1>
-          <p class="arch-tag" id="archTag">—</p>
-        </div>
-        <div class="arch-cols">
-          <p class="body arch-body" id="archBody">—</p>
-          <div class="arch-risk" id="archRisk">—</div>
+        <div class="arch-wrap">
+          <div class="b1">
+            <span class="label">Your position</span>
+            <h1 class="arch-name" id="archName">—</h1>
+            <p class="arch-tag" id="archTag">—</p>
+          </div>
+          <div class="arch-cols">
+            <p class="body arch-body" id="archBody">—</p>
+            <div class="arch-risk" id="archRisk">—</div>
+          </div>
         </div>
         <div class="beat-nav">
           <div class="beat-pips"></div>
@@ -135,12 +133,15 @@
       </div>
 
       <div class="beat" id="beat2">
-        <div class="bench-head">
-          <span class="label cool">Where you lead, where you lag</span>
-          <h2 class="d-m">Against your peers</h2>
-          <div class="bench-note" id="benchNote">—</div>
+        <div class="bench-wrap">
+          <div class="bench-head">
+            <span class="label cool">Where you lead, where you lag</span>
+            <h2 class="d-m">Against the benchmark</h2>
+            <p class="lede bench-praise" id="benchPraise"></p>
+            <div class="bench-note" id="benchNote">—</div>
+          </div>
+          <div class="bench-list" id="benchList"></div>
         </div>
-        <div class="bench-list" id="benchList"></div>
         <div class="beat-nav">
           <div class="beat-pips"></div>
           <button class="btn primary" data-next>Continue <span class="arrow">→</span></button>
@@ -148,19 +149,6 @@
       </div>
 
       <div class="beat" id="beat3">
-        <div class="fc-head">
-          <span class="label cool">Five-year view</span>
-          <h2 class="d-m">Where the gap goes</h2>
-          <p class="lede">Left unchanged, this is your five-year position.</p>
-        </div>
-        <div class="fc-grid" id="fcGrid"></div>
-        <div class="beat-nav">
-          <div class="beat-pips"></div>
-          <button class="btn primary" data-next>Continue <span class="arrow">→</span></button>
-        </div>
-      </div>
-
-      <div class="beat" id="beat4">
         <div class="role-wrap">
           <div>
             <span class="label">And your role</span>
@@ -169,12 +157,12 @@
               <div class="to" id="roleTo">—</div>
             </div>
             <p class="role-change" id="roleChange">—</p>
+            <p class="role-focus" id="roleFocus"></p>
             <div class="role-src">Matched from your badge · playbook workforce transformation table</div>
           </div>
           <div class="role-aside">
             <span class="label cool">The human constraint</span>
-            <p class="body">The professionals most affected by AI are also the domain experts whose knowledge makes AI work in the first place. An underwriting team may have a risk model and lack the confidence to trust it over decades of manual judgment.</p>
-            <p class="body">Carriers succeeding with enterprise AI have board-level accountability for governance, C-suite sponsorship of reskilling, and incentives that reward AI-enabled outcomes rather than preserving legacy ways of working.</p>
+            <p class="body">The people most affected by AI are the domain experts who make it work. A team can have the model and still not trust it over decades of manual judgment — which is why the carriers that scale it own governance at board level and reward AI-enabled outcomes.</p>
           </div>
         </div>
         <div class="beat-nav">
@@ -183,18 +171,21 @@
         </div>
       </div>
 
-      <div class="beat" id="beat5">
-        <div class="case-head">
-          <span class="label cool">Proof · <span id="caseFor">—</span></span>
-          <h2 class="d-m">It has been done before</h2>
+      <div class="beat" id="beat4">
+        <div class="fc-wrap">
+          <div class="fc-head">
+            <span class="label cool">Five-year view</span>
+            <h2 class="d-m">Where the gap goes</h2>
+            <p class="lede">Unchanged, this is your five-year position.</p>
+          </div>
+          <div class="fc-grid" id="fcGrid"></div>
         </div>
-        <div class="case-grid" id="caseGrid"></div>
-        <div class="pending-note" id="caseNote" hidden></div>
         <div class="beat-nav">
           <div class="beat-pips"></div>
           <button class="btn primary" data-next>Finish <span class="arrow">→</span></button>
         </div>
       </div>
+
 
     </section>
 
@@ -204,8 +195,13 @@
       <div class="statement">
         <span class="label">Report dispatched</span>
         <h2 class="d-l" style="margin-top:var(--s3)">On its way<span id="doneName"></span></h2>
-        <div class="qr">QR · OPEN NOW</div>
-        <p class="lede">Sent to <span id="doneEmail" style="color:var(--blue-lift)">—</span>. Scan to open it now, or talk it through at the consultation screen.</p>
+        <div class="qr">QR · PLACEHOLDER</div>
+        <p class="lede">Sent to <span id="doneEmail" style="color:var(--blue-lift)">—</span>. Three ways to get it back:</p>
+        <ol class="retrieve">
+          <li><span class="r-n">01</span><span>Scan the code above</span></li>
+          <li><span class="r-n">02</span><span>Open the email we just sent</span></li>
+          <li><span class="r-n">03</span><span>Scan your badge at the booth to see and discuss your result</span></li>
+        </ol>
         <p class="reset-note">Resetting in <span id="resetIn">12</span>s</p>
       </div>
     </section>
@@ -213,15 +209,17 @@
   </div>
 
   <!-- proof tile detail -->
-  <aside id="tileSheet">
-    <button id="tileClose">Close ✕</button>
-    <div class="ts-rule" id="tsRule"></div>
-    <span class="label cool" id="tsClient">—</span>
-    <h3 class="ts-title" id="tsTitle">—</h3>
-    <div class="ts-metric" id="tsMetric">—</div>
-    <p class="body" id="tsDetail">—</p>
-    <div class="pending-note" id="tsFlag" hidden></div>
-  </aside>
+  <div id="tileSheet">
+    <div class="ts-card" role="dialog" aria-modal="true">
+      <button id="tileClose">Close ✕</button>
+      <div class="ts-rule" id="tsRule"></div>
+      <span class="label cool" id="tsClient">—</span>
+      <h3 class="ts-title" id="tsTitle">—</h3>
+      <div class="ts-metric" id="tsMetric">—</div>
+      <p class="body" id="tsDetail">—</p>
+      <div class="pending-note" id="tsFlag" hidden></div>
+    </div>
+  </div>
 
 </div>
 </div>

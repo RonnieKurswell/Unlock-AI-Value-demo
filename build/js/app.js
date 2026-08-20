@@ -6,8 +6,8 @@
 import { HiveScene } from './scene.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
-  classifyArchetype, PEER_MEDIAN, BENCHMARK_STATUS, ROLES, ROLE_DEFAULT,
-  TILES, forecast, FORECAST_LINES
+  classifyArchetype, BENCHMARK_MEDIAN, BENCHMARK_STATUS, ROLES, ROLE_DEFAULT,
+  TILES, forecast, FORECAST_LINES, hexOrder
 } from './data.js';
 
 const $ = id => document.getElementById(id);
@@ -67,7 +67,12 @@ function show(view) {
 
 $('v-attract').addEventListener('pointerdown', () => start());
 
-function start() { reset(false); show('explore'); renderPool(POOLS[scene.face].id); }
+function start() {
+  reset(false);
+  show('explore');
+  if (!scene.hex) scene.buildHex(hexOrder());
+  scene.selectHex(0);
+}
 
 function reset(toAttract = true) {
   S.read = new Set();
@@ -79,7 +84,7 @@ function reset(toAttract = true) {
   S.recipient = null;
   ORDER.forEach(id => { S.scores[id] = 0; });
   scene.resetTiles();
-  scene.face = 0;
+  scene.clearHex();
   renderProgress();
   resetDelivery();
   if (toAttract) show('attract');
@@ -87,21 +92,28 @@ function reset(toAttract = true) {
 
 
 /* =============================================================
-   EXPLORE — drag the wheel, read on the right
+   EXPLORE — the framework hexagon, read on the right
    ============================================================= */
 
-function buildWheelPips() {
-  const host = $('wheelPips');
-  host.innerHTML = '';
-  POOLS.forEach((p, i) => {
-    const n = el('i');
-    n.dataset.i = i;
-    n.style.cursor = 'pointer';
-    host.appendChild(n);
-  });
-  host.style.pointerEvents = 'auto';
-  host.onclick = e => { const i = e.target.dataset?.i; if (i != null) scene.setFace(Number(i)); };
-}
+/* The framework hexagon lives in the 3D scene. Its labels are canvas
+   textures, so it can only be built once the webfonts have loaded. */
+scene.onHexSelect = id => renderPool(id);
+
+/* The scene reports the room it is moving to; the stage gradient follows so
+   the WebGL fog and the CSS backdrop agree. */
+scene.onRoom = ([a, b]) => {
+  const st = $('stage');
+  st.style.setProperty('--room-a', a);
+  st.style.setProperty('--room-b', b);
+};
+
+/* Build it up front so a fast tap never lands on an empty explore screen,
+   then re-rasterise once the webfonts are in. */
+scene.buildHex(hexOrder());
+document.fonts.ready.then(() => {
+  scene.rebuildHex(hexOrder());
+  if (S.view === 'explore') scene.selectHex(Math.max(0, scene.hexSelected));
+});
 
 function renderPool(poolId) {
   const p = POOL[poolId];
@@ -109,14 +121,20 @@ function renderPool(poolId) {
   S.read.add(poolId);
 
   $('prRule').style.background = p.hex;
-  $('prVerb').textContent = `${p.verb} · Value pool 0${p.index + 1}`;
+  $('prVerb').textContent = p.verb;
   $('prVerb').style.color = p.hex;
   $('prName').textContent = p.name;
   $('prBlurb').textContent = p.blurb;
-  renderTiles(p);
+
+  const facts = $('prFacts');
+  facts.innerHTML = '';
+  (p.facts || []).forEach(f => {
+    const li = el('li', null, f);
+    li.style.setProperty('--seg', p.hex);
+    facts.appendChild(li);
+  });
 
   $('seenCount').textContent = S.read.size;
-  [...$('wheelPips').children].forEach((n, i) => n.classList.toggle('on', i === p.index));
 
   const card = $('poolRead');
   card.classList.remove('swap');
@@ -124,21 +142,18 @@ function renderPool(poolId) {
   card.classList.add('swap');
 }
 
-/* Three proof tiles per pool. Pending ones stay visible and say so. */
-function renderTiles(p) {
-  const host = $('prTiles');
-  host.innerHTML = '';
-  (TILES[p.id] || []).forEach((t, i) => {
-    const b = el('button', 'tile' + (t.pending ? ' pending' : ''));
-    b.innerHTML = `
-      <span class="t-n">0${i + 1}</span>
-      <span class="t-client">${t.client || 'Pending'}</span>
-      <span class="t-title">${t.title}</span>
-      <span class="t-metric">${t.metric}</span>`;
-    b.style.setProperty('--tile-accent', p.hex);
-    b.onclick = () => openTile(p, t);
-    host.appendChild(b);
-  });
+/* One proof tile, rendered wherever it is asked for. Pending ones stay
+   visible and say so rather than being hidden. */
+function tileEl(p, t, i) {
+  const b = el('button', 'tile' + (t.pending ? ' pending' : ''));
+  b.innerHTML = `
+    <span class="t-n">0${i + 1}</span>
+    <span class="t-client">${t.client || 'Pending'}</span>
+    <span class="t-title">${t.title}</span>
+    <span class="t-metric">${t.metric}</span>`;
+  b.style.setProperty('--tile-accent', p.hex);
+  b.onclick = () => openTile(p, t);
+  return b;
 }
 
 function openTile(p, t) {
@@ -161,13 +176,16 @@ function openTile(p, t) {
   $('tileSheet').classList.add('on');
 }
 
-$('tileClose').onclick = () => $('tileSheet').classList.remove('on');
+const closeTile = () => $('tileSheet').classList.remove('on');
+$('tileClose').onclick = closeTile;
+$('tileSheet').addEventListener('pointerdown', e => { if (e.target === $('tileSheet')) closeTile(); });
 
-scene.onFace = (i, poolId) => {
-  if (S.view !== 'explore') return;
-  $('tileSheet').classList.remove('on');
-  renderPool(poolId);
-};
+/* Keyboard parity with the booth build: 1–6 select, arrows cycle, Esc clears. */
+function exploreKeys(e) {
+  if (/^[1-6]$/.test(e.key)) return scene.selectHex(Number(e.key) - 1);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') return scene.cycleHex(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') return scene.cycleHex(-1);
+}
 
 $('beginDiag').onclick = () => { S.qi = 0; show('diag'); renderQuestion(); };
 
@@ -293,10 +311,9 @@ function composeNarrative() {
   const top = ranked[0], low = ranked[ranked.length - 1];
   const tb = bandOf(S.scores[top]), lb = bandOf(S.scores[low]);
   const notes = Object.entries(S.notes).filter(([, v]) => v && v.trim());
-  let out = `Your strongest pool is ${POOL[top].name} — ${BAND_COPY[top][tb].read.toLowerCase().replace(/\.$/, '')}. `;
-  out += `Your binding constraint is ${POOL[low].name}: ${BAND_COPY[low][lb].read.toLowerCase().replace(/\.$/, '')}. `;
+  let out = `Strongest: ${POOL[top].name}. Binding constraint: ${POOL[low].name} — ${BAND_COPY[low][lb].read.toLowerCase().replace(/\.$/, '')}. `;
   out += BAND_COPY[low][lb].move;
-  if (notes.length) out += ` You also told us: “${notes[0][1].trim().replace(/\s+/g, ' ').slice(0, 180)}” — carried into your report.`;
+  if (notes.length) out += ` Your own note is carried into the report.`;
   return out;
 }
 
@@ -307,21 +324,34 @@ function buildWrapped() {
   $('archBody').innerHTML = `${arch.body}<br><br>${composeNarrative()}`;
   $('archRisk').textContent = arch.risk;
 
-  const pips = [0, 1, 2, 3, 4].map(i => `<i data-pip="${i}"></i>`).join('');
+  const pips = [0, 1, 2, 3].map(i => `<i data-pip="${i}"></i>`).join('');
   document.querySelectorAll('.beat-pips').forEach(n => { n.innerHTML = pips; });
 
-  /* peer benchmark */
+  /* benchmark */
   $('benchNote').textContent = BENCHMARK_STATUS;
+
+  const ahead = ORDER.filter(id => S.scores[id] > BENCHMARK_MEDIAN[id]);
+  const level = ORDER.filter(id => S.scores[id] === BENCHMARK_MEDIAN[id]);
+  const praise = $('benchPraise');
+  if (ahead.length >= 3) {
+    praise.innerHTML = `You are ahead of the benchmark in <b>${ahead.length} of 6</b> pools — ${POOL[ahead[0]].name} most of all. That is where your advantage compounds.`;
+  } else if (ahead.length) {
+    praise.innerHTML = `<b>${POOL[ahead[0]].name}</b> is ahead of the benchmark. Strength there is what funds the rest.`;
+  } else if (level.length) {
+    praise.innerHTML = `You are level with the benchmark on <b>${level.length} of 6</b> — no ground lost, and the gaps are addressable.`;
+  } else {
+    praise.textContent = 'Every pool is below the benchmark, which means the first move is a sequencing decision rather than a technology one.';
+  }
   const list = $('benchList');
   list.innerHTML = '';
   [...ORDER].sort((a, b) => S.scores[b] - S.scores[a]).forEach(id => {
-    const p = POOL[id], sc = S.scores[id], med = PEER_MEDIAN[id], d = sc - med;
+    const p = POOL[id], sc = S.scores[id], med = BENCHMARK_MEDIAN[id], d = sc - med;
     const row = el('div', 'bench-row');
     row.innerHTML = `
       <div><div class="nm">${p.name}</div><div class="bd">${BANDS[bandOf(sc)]}</div></div>
       <div class="track">
         <div class="fill" style="background:${p.hex}"></div>
-        <div class="peer" style="left:${(med / MAX_POOL_SCORE) * 100}%"></div>
+        <div class="bmark" style="left:${(med / MAX_POOL_SCORE) * 100}%"></div>
       </div>
       <div class="val"><b>${sc}</b>/12 <span class="${d >= 0 ? 'delta-up' : 'delta-dn'}">${d >= 0 ? '+' : ''}${d}</span></div>`;
     list.appendChild(row);
@@ -343,70 +373,69 @@ function buildWrapped() {
       ? `<ul>${c.ids.map(id => `<li><i style="background:${POOL[id].hex}"></i>${POOL[id].name}</li>`).join('')}</ul>`
       : `<div class="fc-empty">None in this band</div>`;
     d.innerHTML = `<h4>${c.title}</h4><p>${FORECAST_LINES[c.key]}</p>${items}`;
+
+    /* Proof under each column. These describe today, not the forecast, so the
+       label says so — otherwise it reads as evidence of a five-year claim. */
+    const pick = columnProof(c.ids);
+    if (pick) {
+      const wrap = el('div', 'fc-proof');
+      wrap.appendChild(el('div', 'fc-proof-label', 'Proven now'));
+      wrap.appendChild(tileEl(POOL[pick.poolId], pick.tile, 0));
+      d.appendChild(wrap);
+    }
     grid.appendChild(d);
   });
 
   buildRoleBeat();
-  buildCase();
 }
 
 /* ---- beat 4: pick your role, see it transform ---- */
 
 function buildRoleBeat() { paintRole(S.role); }
 
+/* The note asks for role read from the scan AND the questionnaire. The badge
+   gives the transformation; the answers decide which pool to point them at —
+   weakest among the pools that actually matter to that role, so an actuary is
+   sent to Data or Trust rather than to whatever scored lowest overall. */
+function focusPool(role) {
+  const candidates = (role && role.focus && role.focus.length) ? role.focus : ORDER;
+  return [...candidates].sort((a, b) => S.scores[a] - S.scores[b])[0];
+}
+
 function paintRole(i) {
   const r = (i == null) ? ROLE_DEFAULT : ROLES[i];
   $('roleFrom').textContent = r.from;
   $('roleTo').textContent = r.to;
   $('roleChange').textContent = r.change;
+
+  const f = POOL[focusPool(r)];
+  const el2 = $('roleFocus');
+  if (el2 && f) {
+    el2.innerHTML = `Your focus area is <b style="color:${f.hex}">${f.name}</b> — the pool where your answers and your role intersect.`;
+  }
 }
 
 /* ---- beat 5: proof ---- */
 
-/* Proof is shown for the pool they scored lowest on — that is the one
-   they need convincing about. Pending tiles stay in, labelled. */
-function pickCase() {
-  const ranked = [...ORDER].sort((a, b) => S.scores[a] - S.scores[b]);
-  return ranked[0];
-}
-
-function buildCase() {
-  const poolId = pickCase();
-  const p = POOL[poolId];
-  const tiles = TILES[poolId] || [];
-
-  $('caseFor').textContent = p.name;
-  $('caseFor').style.color = p.hex;
-
-  const g = $('caseGrid');
-  g.innerHTML = '';
-  tiles.forEach((t, i) => {
-    const b = el('button', 'tile' + (t.pending ? ' pending' : ''));
-    b.innerHTML = `
-      <span class="t-n">0${i + 1}</span>
-      <span class="t-client">${t.client || 'Pending'}</span>
-      <span class="t-title">${t.title}</span>
-      <span class="t-metric">${t.metric}</span>`;
-    b.style.setProperty('--tile-accent', p.hex);
-    b.onclick = () => openTile(p, t);
-    g.appendChild(b);
-  });
-
-  const allPending = tiles.every(t => t.pending);
-  const note = $('caseNote');
-  if (allPending) {
-    note.hidden = false;
-    note.innerHTML = `<b>Content pending · ${p.name}</b><br>Neither the playbook nor the use case register contains a proof point for this pool. Infosys to supply before the event.`;
-  } else {
-    note.hidden = true;
+/* Best available proof for a timeline column: a real engagement if one of the
+   column's pools has one, otherwise a pending tile with its label intact. */
+function columnProof(ids) {
+  for (const id of ids) {
+    const real = (TILES[id] || []).find(t => !t.pending);
+    if (real) return { poolId: id, tile: real };
   }
+  for (const id of ids) {
+    const any = (TILES[id] || [])[0];
+    if (any) return { poolId: id, tile: any };
+  }
+  return null;
 }
 
 /* ---- beats ---- */
 
 function setBeat(i) {
   S.beat = i;
-  [1, 2, 3, 4, 5].forEach(n => $('beat' + n).classList.toggle('on', n === i + 1));
+  [1, 2, 3, 4].forEach(n => $('beat' + n).classList.toggle('on', n === i + 1));
   document.querySelectorAll('.beat-pips').forEach(nav => {
     [...nav.querySelectorAll('i')].forEach((pip, k) => pip.classList.toggle('on', k <= i));
   });
@@ -415,7 +444,7 @@ function setBeat(i) {
 }
 
 document.querySelectorAll('[data-next]').forEach(b => {
-  b.onclick = () => { if (S.beat < 4) setBeat(S.beat + 1); else showDone(); };
+  b.onclick = () => { if (S.beat < 3) setBeat(S.beat + 1); else showDone(); };
 });
 
 /* =============================================================
@@ -501,16 +530,13 @@ function countdown() {
 const typing = () => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') return $('tileSheet').classList.remove('on');
+  if (e.key === 'Escape') return closeTile();
   if (S.view === 'attract' && (e.key === 'Enter' || e.key === ' ')) return start();
-  if (S.view === 'explore') {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') return scene.nextFace(1);
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') return scene.nextFace(-1);
-  }
+  if (S.view === 'explore') return exploreKeys(e);
   if (S.view === 'diag' && /^[1-5]$/.test(e.key) && !typing()) return answer(Number(e.key) - 1);
   if (S.view === 'wrap' && (e.key === 'Enter' || e.key === ' ')) {
     e.preventDefault();
-    if (S.beat < 4) setBeat(S.beat + 1); else showDone();
+    if (S.beat < 3) setBeat(S.beat + 1); else showDone();
   }
 });
 
@@ -525,7 +551,6 @@ function bumpIdle() {
    BOOT
    ============================================================= */
 
-buildWheelPips();
 renderProgress();
 renderPool(POOLS[0].id);
 S.read = new Set();

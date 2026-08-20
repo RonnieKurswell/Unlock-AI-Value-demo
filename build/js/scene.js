@@ -1,16 +1,16 @@
 /* =============================================================
    THREE.JS SCENE — the hexagon is the interface, not decoration.
 
-   One object, two postures:
-     flat ring      → attract, diagnostic, results, delivery
-     upright wheel  → framework explore (drag to rotate and read)
+   A flat ring of six prisms behind attract, the diagnostic, the results
+   and delivery. It grows with progress and extrudes to the final scores.
 
-   `rig` carries posture and offset; `hive` carries the spin, so
-   the ring can stand upright and still rotate within its plane.
+   The explore screen's framework hexagon is SVG, not WebGL — see
+   js/hexagon.js for why. The rig is hidden there.
    ============================================================= */
 
 import * as THREE from '../vendor/three.module.js';
 import { POOLS } from './data.js';
+import { buildHexagon, R as HEX_R, PALETTE } from './hex.js';
 
 const RING = 1.78;
 const TILE_R = 0.98;
@@ -18,6 +18,7 @@ const BASE_H = 0.26;
 const MAX_H = 2.70;
 const DARK = 0x080B11;
 const TAU = Math.PI * 2;
+const HEX_HOLD = 0.62;   // seconds the board waits out the camera move
 const STEP = Math.PI / 3;
 
 const damp = (c, t, l, dt) => c + (t - c) * (1 - Math.exp(-l * dt));
@@ -31,17 +32,14 @@ export class HiveScene {
     this.hoverId = null;
     this.pickEnabled = false;
     this.onPick = null;
-    this.onFace = null;
     this.onFrame = null;
     this.layout = 'ring';
-    this.wheel = false;
-    this.face = 0;
     this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.0;
+    this.renderer.toneMappingExposure = 1.16;
 
     this.scene = new THREE.Scene();
     this.scene.fog = new THREE.FogExp2(0x05070B, 0.034);
@@ -72,7 +70,6 @@ export class HiveScene {
 
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2(-2, -2);
-    this.drag = null;
     this._bind();
     this.resize();
     this.setState('attract');
@@ -81,15 +78,40 @@ export class HiveScene {
   /* ---------- build ------------------------------------------ */
 
   _lights() {
-    this.scene.add(new THREE.HemisphereLight(0x1a2436, 0x03050A, 0.65));
+    /* Two rigs. The prism ring is lit soft and cool; the hexagon's metallic
+       bands need a hard key to read their bevels. Lights are global, so each
+       rig is a group toggled with the object it belongs to. */
+    this.ringLights = new THREE.Group();
+    this.ringLights.add(new THREE.HemisphereLight(0x1a2436, 0x03050A, 0.65));
     const key = new THREE.DirectionalLight(0x9fc4e8, 0.9);
     key.position.set(-5, 9, 7);
-    this.scene.add(key);
+    this.ringLights.add(key);
     const rim = new THREE.DirectionalLight(0x2a3f6b, 0.7);
     rim.position.set(6, 3, -7);
-    this.scene.add(rim);
+    this.ringLights.add(rim);
     this.coreLight = new THREE.PointLight(0x37A6E4, 2.0, 14, 2);
-    this.scene.add(this.coreLight);
+    this.ringLights.add(this.coreLight);
+    this.scene.add(this.ringLights);
+
+    this.hexLights = new THREE.Group();
+    this.hexLights.visible = false;
+    this.hexLights.add(new THREE.AmbientLight(0x5a7cb8, 0.72));
+    const hKey = new THREE.DirectionalLight(0xdcecff, 2.5);
+    hKey.position.set(-7, 9, 12);
+    this.hexLights.add(hKey);
+    const hFill = new THREE.DirectionalLight(0x3f8ae0, 1.25);
+    hFill.position.set(9, -6, 8);
+    this.hexLights.add(hFill);
+    const hRim = new THREE.PointLight(0x36d6ff, 34, 34, 2);
+    hRim.position.set(0, 0, -5);
+    this.hexLights.add(hRim);
+
+    /* Travels to whichever segment is chosen and takes its accent, so the
+       board is lit *by* the selection rather than just tinted. */
+    this.hexAccentLight = new THREE.PointLight(0xffffff, 0, 26, 2);
+    this.hexAccentLight.position.set(0, 0, 4);
+    this.hexLights.add(this.hexAccentLight);
+    this.scene.add(this.hexLights);
   }
 
   _ground() {
@@ -206,7 +228,7 @@ export class HiveScene {
     geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
     this.dustMat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      uniforms: { uTime: { value: 0 }, uSize: { value: 2.4 * Math.min(window.devicePixelRatio, 2) } },
+      uniforms: { uTime: { value: 0 }, uSize: { value: 2.4 * Math.min(window.devicePixelRatio, 2) }, uTint: { value: new THREE.Color(0xaecbf5) } },
       vertexShader: `attribute float aSeed; uniform float uTime; uniform float uSize; varying float vA;
         void main(){
           vec3 p = position;
@@ -217,11 +239,11 @@ export class HiveScene {
           gl_PointSize = uSize * (1.0 + aSeed) * (12.0 / -mv.z);
           vA = (0.16 + 0.5*aSeed) * smoothstep(46.0, 6.0, -mv.z);
         }`,
-      fragmentShader: `varying float vA;
+      fragmentShader: `varying float vA; uniform vec3 uTint;
         void main(){
           float d = length(gl_PointCoord - 0.5);
           if (d > 0.5) discard;
-          gl_FragColor = vec4(vec3(0.68,0.80,0.96), vA * (1.0 - d*2.0));
+          gl_FragColor = vec4(uTint * 1.6, vA * (1.0 - d*2.0));
         }`
     });
     this.scene.add(new THREE.Points(geo, this.dustMat));
@@ -239,44 +261,17 @@ export class HiveScene {
       return p;
     };
 
-    this.canvas.addEventListener('pointerdown', e => {
-      const p = toLocal(e);
-      if (this.wheel) {
-        this.drag = { x: p.clientX, rot0: this.hive.rotation.y, moved: 0 };
-        this.rotTarget = null;
-        try { this.canvas.setPointerCapture(e.pointerId); } catch {}
-        return;
+    this.canvas.addEventListener('pointerdown', () => {
+      if (this.hex && this.hexRig.visible) {
+        const i = this._pickHex();
+        if (i >= 0) return this.selectHex(i);
       }
       if (this.pickEnabled && this.onPick) {
         const hit = this._pick();
         if (hit) this.onPick(hit);
       }
     });
-
-    this.canvas.addEventListener('pointermove', e => {
-      const p = toLocal(e);
-      if (this.drag) {
-        const dx = p.clientX - this.drag.x;
-        this.drag.moved = Math.max(this.drag.moved, Math.abs(dx));
-        this.hive.rotation.y = this.drag.rot0 - dx * 0.0072;
-      }
-    });
-
-    const release = () => {
-      if (!this.drag) return;
-      const tapped = this.drag.moved < 6;
-      this.drag = null;
-      if (tapped) {
-        const hit = this._pick();
-        if (hit) {
-          const i = this.tiles.findIndex(t => t.pool.id === hit);
-          if (i >= 0) return this.setFace(i);
-        }
-      }
-      this.snapFace();
-    };
-    this.canvas.addEventListener('pointerup', release);
-    this.canvas.addEventListener('pointercancel', release);
+    this.canvas.addEventListener('pointermove', toLocal);
   }
 
   _pick() {
@@ -297,41 +292,104 @@ export class HiveScene {
     this._frame();
   }
 
-  /* ---------- wheel ------------------------------------------ */
+  /* ---------- framework hexagon ------------------------------ */
 
-  /** Rotation that brings face i to twelve o'clock. */
-  detent(i) { return -Math.PI + i * STEP; }
-
-  faceFromRotation() {
-    const raw = (this.hive.rotation.y + Math.PI) / STEP;
-    return ((Math.round(raw) % 6) + 6) % 6;
+  /** Call after document.fonts.ready — label textures rasterise the face. */
+  buildHex(pools) {
+    if (this.hex) return this.hex;
+    this.hex = buildHexagon(pools);
+    this.hexRig = new THREE.Group();
+    this.hexRig.add(this.hex.group);
+    this.hexRig.visible = false;
+    this.scene.add(this.hexRig);
+    this.hexHit = this.hex.segments.flatMap(s => s.hitTargets);
+    this.hexSelected = -1;
+    this.hexHovered = -1;
+    if (this.state === 'explore') this.setState('explore');
+    return this.hex;
   }
 
-  /** Snap to the nearest detent without unwinding whole turns. */
-  _aim(i) {
-    const turns = Math.round((this.hive.rotation.y - this.detent(i)) / TAU) * TAU;
-    this.rotTarget = this.detent(i) + turns;
+  /** Rebuild with freshly rasterised labels — used once fonts have loaded. */
+  rebuildHex(pools) {
+    if (this.hex) {
+      this.hexRig.remove(this.hex.group);
+      this.hex.group.traverse(o => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) {
+          if (o.material.map) o.material.map.dispose();
+          o.material.dispose();
+        }
+      });
+      this.hex = null;
+      this.hexRig = null;
+    }
+    const sel = this.hexSelected;
+    this.buildHex(pools);
+    if (sel >= 0) this.selectHex(sel);
+    return this.hex;
   }
 
-  snapFace() { const i = this.faceFromRotation(); this._aim(i); this._activate(i); }
-  setFace(i) { this._aim(i); this._activate(i); }
-  nextFace(d = 1) { this.setFace((this.face + d + 6) % 6); }
+  selectHex(i) {
+    if (!this.hex) return;
+    const changed = this.hexSelected !== i;
+    this.hexSelected = i;
 
-  _activate(i) {
-    const changed = this.face !== i;
-    this.face = i;
-    this.tiles.forEach((t, k) => {
-      const on = k === i;
-      t.glowTarget = on ? 0.40 : 0.055;
-      t.hTarget = on ? BASE_H + 0.60 : BASE_H + 0.10;
+    /* Lean the whole board toward the chosen edge. Small angles only — the
+       labels are flat planes and read as skewed past about 9 degrees. */
+    const theta = this.hex.segments[i].theta * Math.PI / 180;
+    this.hexTiltTarget = { x: Math.sin(theta) * 0.085, y: Math.cos(theta) * 0.085 };
+    if (changed) { this.hexPop = 1; this.hexRipple = 0; this.hexKick = 1; }
+    this.setRoom(this.hex.segments[i].room);
+    this.hex.segments.forEach((p, k) => {
+      p.targetLift = k === i ? 1 : -0.35;
+      p.targetGlow = k === i ? 1 : 0;
+      p.targetDim = k === i ? 1 : 0.52;
     });
-    if (changed) this.ping(this.tiles[i].pool.id);
-    if (this.onFace) this.onFace(i, this.tiles[i].pool.id);
+    if (this.onHexSelect) this.onHexSelect(this.hex.segments[i].id, i);
+  }
+
+  cycleHex(n) {
+    if (!this.hex) return;
+    const len = this.hex.segments.length;
+    const cur = this.hexSelected < 0 ? 0 : this.hexSelected + n;
+    this.selectHex(((cur % len) + len) % len);
+  }
+
+  clearHex() {
+    if (!this.hex) return;
+    this.hexSelected = -1;
+    this.hexTiltTarget = { x: 0, y: 0 };
+    this.hex.segments.forEach(p => { p.targetLift = 0; p.targetGlow = 0; p.targetDim = 1; });
+  }
+
+  _pickHex() {
+    if (!this.hex || !this.hexRig.visible) return -1;
+    this.raycaster.setFromCamera(this.pointer, this.camera);
+    const hits = this.raycaster.intersectObjects(this.hexHit, false);
+    if (!hits.length) return -1;
+    let n = hits[0].object;
+    while (n && n.userData.poolIndex === undefined) n = n.parent;
+    return n ? n.userData.poolIndex : -1;
   }
 
   /* ---------- public ----------------------------------------- */
 
   setCoreVisible(v) { this.core.visible = v; this.coreHalo.visible = v; }
+
+  /* Each pool gets its own room: fog and the drifting motes take its tint, so
+     choosing a segment changes the space and not just the object. */
+  setRoom(room) {
+    if (!room) return;
+    this.roomTarget = new THREE.Color(room[0]);
+    this.roomDeep = new THREE.Color(room[1]);
+    if (this.onRoom) this.onRoom(room);
+  }
+
+  clearRoom() {
+    this.roomTarget = new THREE.Color(0x0A1A2B);
+    this.roomDeep = new THREE.Color(0x04070C);
+    if (this.onRoom) this.onRoom(['#0A1A2B', '#04070C']);
+  }
 
   _tint(t, hex) {
     const c = new THREE.Color(hex);
@@ -395,13 +453,18 @@ export class HiveScene {
 
     this.camTarget.copy(camPos);
     this.lookTarget.copy(focus).addScaledVector(right, bx).addScaledVector(up, by);
+
+    // objBias slides the subject sideways in world space, keeping the camera
+    // square to it — the difference between an off-centre object and a
+    // skewed one.
+    this.hexOffsetTarget = -(S.objBias ?? 0) * halfH * dist;   // halfH already carries aspect
   }
 
   setState(name) {
     this.state = name;
     const ST = {
       attract:     { focus: [0, 0, 0],   radius: 2.90, elev: 14, margin: 1.55, bias: [0,    0.86], spin: 0.055, spread: 1.00, fade: 0.90, tilt: 0,             off: [0, 0, 0] },
-      explore:     { focus: [0, 0, 0],   radius: 2.85, elev: 2,  margin: 1.55, bias: [0.50, 0.02], spin: 0,     spread: 1.02, fade: 0.18, tilt: -Math.PI / 2,  off: [0, 0, 0] },
+      explore:     { focus: [0, 0, 0],   radius: HEX_R * 1.02, elev: 0, margin: 1.72, bias: [0, 0], objBias: 0.45, spin: 0, spread: 1.02, fade: 0.18, tilt: 0, off: [0, 0, 0] },
       diagnostic:  { focus: [0, 0.6, 0], radius: 3.20, elev: 32, margin: 1.70, bias: [0.52, 0.10], spin: 0.030, spread: 1.00, fade: 0.42, tilt: 0,             off: [0, 0, 0] },
       results:     { focus: [0, 0.9, 0], radius: 3.50, elev: 24, margin: 1.50, bias: [0,    0.22], spin: 0.045, spread: 1.04, fade: 0.80, tilt: 0,             off: [0, 0, 0] },
       resultsQuiet:{ focus: [0, 0.9, 0], radius: 3.50, elev: 32, margin: 2.60, bias: [0,    0.52], spin: 0.020, spread: 1.04, fade: 0.22, tilt: 0,             off: [0, 0, 0] },
@@ -418,16 +481,24 @@ export class HiveScene {
     this.offTarget.set(...S.off);
     this.rotTarget = (S.rot === undefined) ? null : S.rot;
 
-    this.wheel = (name === 'explore');
+    const onHex = (name === 'explore');
+    this.rig.visible = !onHex;
+    this.ringLights.visible = !onHex;
+    this.hexLights.visible = onHex;
+    /* The board is held back until the camera has finished travelling to the
+       explore framing, then makes its own contained entrance. Revealing it
+       during the camera move would show it sliced by the left edge, because
+       the attract framing is far wider than this one. */
+    this.hexOn = onHex;
+    if (this.hexRig) this.hexRig.visible = false;
+    if (onHex) { this.hexEnter = 0; this.hexHold = HEX_HOLD; }
     this.pickEnabled = false;
-    this.setCoreVisible(!this.wheel);
-    this.ground.visible = !this.wheel;
-    this.canvas.style.cursor = this.wheel ? 'grab' : 'default';
+    this.setCoreVisible(true);
+    this.ground.visible = !onHex;
 
     if (name === 'attract' || name === 'delivery') {
       this.tiles.forEach(t => { t.hTarget = BASE_H + 0.34; t.glowTarget = 0.10; t.liftTarget = 0; });
     }
-    if (this.wheel) this.setFace(this.face);
   }
 
   setProgress(poolId, v) {
@@ -451,7 +522,6 @@ export class HiveScene {
   }
 
   focus(poolId) {
-    if (this.wheel) return;
     this.focused = poolId;
     this.tiles.forEach(t => {
       const on = t.pool.id === poolId;
@@ -474,7 +544,7 @@ export class HiveScene {
     const t = this.clock.elapsedTime;
 
     this.spin = damp(this.spin, this.spinTarget, 3, dt);
-    if (this.rotTarget === null) { if (!this.drag) this.hive.rotation.y += this.spin * dt; }
+    if (this.rotTarget === null) this.hive.rotation.y += this.spin * dt;
     else this.hive.rotation.y = damp(this.hive.rotation.y, this.rotTarget, 5, dt);
 
     this.spread = damp(this.spread, this.spreadTarget, 4, dt);
@@ -484,6 +554,7 @@ export class HiveScene {
     this.rig.position.copy(this.off);
 
     this.camera.position.lerp(this.camTarget, 1 - Math.exp(-2.6 * dt));
+    if (this.hexKick) this.camera.position.z -= this.hexKick * 0.9;
     this.lookAt.lerp(this.lookTarget, 1 - Math.exp(-2.6 * dt));
     this.camera.position.x += this.pointer.x * 0.018;
     this.camera.position.y += this.pointer.y * 0.012;
@@ -527,13 +598,112 @@ export class HiveScene {
     this.core.getWorldPosition(this.coreLight.position);
     this.coreLight.position.y += 0.7;
 
+    if (this.hex && this.hexOn) {
+      const hovered = this._pickHex();
+      if (hovered !== this.hexHovered) {
+        this.hexHovered = hovered;
+        this.canvas.style.cursor = hovered >= 0 ? 'pointer' : 'default';
+      }
+      this.hex.segments.forEach((p, i) => {
+        const hot = i === this.hexHovered;
+        const wantGlow = this.hexSelected === i ? 1 : (hot && this.hexSelected < 0 ? 0.65 : p.targetGlow);
+        const wantLift = this.hexSelected < 0 && hot ? 0.35 : p.targetLift;
+
+        p.glow = damp(p.glow, wantGlow, 6, dt);
+        p.lift = damp(p.lift, wantLift, 5.5, dt);
+        p.dim = damp(p.dim, p.targetDim, 5, dt);
+
+        p.holder.position.z = p.lift * 0.85 + (this.hexSelected < 0 ? Math.sin(t * 0.8 + i) * 0.045 : 0);
+        p.rimMesh.material.opacity = Math.min(1, p.glow * 0.9 + (i === this.hexSelected ? this.hexPop * 0.8 : 0));
+        p.materials.forEach((m, k) => {
+          m.emissiveIntensity = (k === 0 ? 0.14 : 0.05) + p.glow * (k === 0 ? 0.5 : 0.3);
+          const deep = k === 0 ? p.deepOuter : p.deepInner;
+          const rest = k === 0 ? p.restOuter : p.restInner;
+          const hot  = k === 0 ? p.hotOuter  : p.hotInner;
+          m.color.copy(deep).lerp(rest, p.dim).lerp(hot, p.glow);
+        });
+        p.labels.forEach(l => { l.material.opacity = 0.34 + p.dim * 0.66; });
+      });
+      const showTitle = this.hexSelected < 0 ? 1 : 0.26;
+      this.hex.coreTitle.material.opacity = damp(this.hex.coreTitle.material.opacity, showTitle, 9, dt);
+      this.hex.coreTitle.visible = this.hex.coreTitle.material.opacity > 0.01;
+      const tgt = this.hexTiltTarget || { x: 0, y: 0 };
+      this.hexTilt = this.hexTilt || { x: 0, y: 0 };
+      this.hexTilt.x = damp(this.hexTilt.x, tgt.x, 3.4, dt);
+      this.hexTilt.y = damp(this.hexTilt.y, tgt.y, 3.4, dt);
+      this.hexRig.rotation.set(this.hexTilt.x + Math.sin(t * 0.21) * 0.02, this.hexTilt.y, 0);
+      /* Zoom: the rig moves toward the camera and slides so the chosen
+         edge heads for the centre of its half of the frame. Moving the rig
+         rather than the camera keeps every other view's framing untouched. */
+      /* Entrance. Held for as long as the camera takes to travel in from the
+         attract framing, then the board rises into place from just below and
+         slightly back — motion that stays inside the frame. Revealing it during
+         the camera move would show it sliced by the left edge, because the
+         attract framing is far wider than this one. */
+      if (this.hexHold > 0) {
+        this.hexHold -= dt;
+        this.hexRig.visible = false;
+      } else {
+        this.hexRig.visible = true;
+        this.hexEnter = damp(this.hexEnter ?? 1, 1, 3.6, dt);
+      }
+      const enter = this.hexEnter ?? 1;
+      this.hexRig.scale.setScalar(0.9 + 0.1 * enter);
+
+      const selSeg = this.hexSelected >= 0 ? this.hex.segments[this.hexSelected] : null;
+      this.hexZoom = damp(this.hexZoom || 0, selSeg ? enter : 0, 3.0, dt);
+      const za = selSeg ? selSeg.theta * Math.PI / 180 : 0;
+      this.hexShift = this.hexShift || { x: 0, y: 0 };
+      this.hexShift.x = damp(this.hexShift.x, selSeg ? -Math.cos(za) * 1.1 : 0, 3.0, dt);
+      this.hexShift.y = damp(this.hexShift.y, selSeg ? -Math.sin(za) * 1.1 : 0, 3.0, dt);
+      this.hexBaseX = damp(this.hexBaseX ?? (this.hexOffsetTarget ?? 0), this.hexOffsetTarget ?? 0, 3.2, dt);
+      this.hexRig.position.set(
+        this.hexBaseX + this.hexShift.x * this.hexZoom,
+        this.hexShift.y * this.hexZoom - (1 - enter) * 1.05,
+        this.hexZoom * 3.0 - (1 - enter) * 2.2
+      );
+
+      /* Ripple out of the core, and a short camera push toward the board. */
+      if (this.hexRipple !== undefined && this.hexRipple < 1) {
+        this.hexRipple = Math.min(1, this.hexRipple + dt * 1.5);
+        const e = this.hexRipple;
+        this.hex.ripple.scale.setScalar(1 + e * 1.15);
+        this.hex.ripple.material.opacity = (1 - e) * 0.5;
+        if (this.hexSelected >= 0) this.hex.ripple.material.color.copy(this.hex.segments[this.hexSelected].accentColor);
+      } else if (this.hex.ripple) {
+        this.hex.ripple.material.opacity = 0;
+      }
+
+      this.hexKick = damp(this.hexKick || 0, 0, 4.4, dt);
+
+      // a short settle on the board itself when the selection changes
+      this.hexPop = damp(this.hexPop || 0, 0, 5.2, dt);
+      this.hexRig.scale.setScalar(1 + this.hexPop * 0.055);
+
+      if (this.hexAccentLight) {
+        const sel = this.hexSelected >= 0 ? this.hex.segments[this.hexSelected] : null;
+        if (sel) {
+          const a = sel.theta * Math.PI / 180;
+          this.hexAccentLight.position.set(
+            Math.cos(a) * HEX_R * 0.82, Math.sin(a) * HEX_R * 0.82, 3.2);
+          this.hexAccentLight.color.copy(sel.accentColor);
+        }
+        this.hexAccentLight.intensity = damp(this.hexAccentLight.intensity, sel ? 22 : 0, 4, dt);
+      }
+    }
+
     this.groundMat.uniforms.uTime.value = t;
     this.groundMat.uniforms.uFade.value = damp(this.groundMat.uniforms.uFade.value, this.groundFadeTarget, 3, dt);
     this.dustMat.uniforms.uTime.value = t;
 
-    if (this.wheel) {
-      this.canvas.style.cursor = this.drag ? 'grabbing' : 'grab';
-    } else if (this.pickEnabled) {
+    if (this.roomTarget) {
+      this.scene.fog.color.lerp(this.roomDeep, 1 - Math.exp(-2.2 * dt));
+      this.dustTint = this.dustTint || new THREE.Color(0xaecbf5);
+      this.dustTint.lerp(this.roomTarget, 1 - Math.exp(-2.2 * dt));
+      this.dustMat.uniforms.uTint.value.copy(this.dustTint);
+    }
+
+    if (this.pickEnabled) {
       const id = this._pick();
       if (id !== this.hoverId) {
         this.hoverId = id;
@@ -585,7 +755,22 @@ export class HiveScene {
   }
 
   start() {
-    const loop = () => { this.tick(); requestAnimationFrame(loop); };
+    /* The next frame is scheduled BEFORE tick runs. The old order meant one
+       thrown frame killed the loop for good — on an unattended kiosk that is
+       a dead screen until someone walks over. Errors are logged (throttled)
+       instead of silently swallowed, so the cause stays visible in devtools. */
+    const loop = () => {
+      requestAnimationFrame(loop);
+      try {
+        this.tick();
+      } catch (err) {
+        const now = performance.now();
+        if (!this._lastTickErr || now - this._lastTickErr > 5000) {
+          this._lastTickErr = now;
+          console.error('[kiosk] tick failed, frame skipped:', err);
+        }
+      }
+    };
     loop();
   }
 }
