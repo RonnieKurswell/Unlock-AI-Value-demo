@@ -202,6 +202,11 @@ export function buildHexagon(pools) {
       room: pool.room,
       deepOuter: shade(0.13), restOuter: shade(0.42), hotOuter: shade(1.0),
       deepInner: shade(0.06), restInner: shade(0.18), hotInner: shade(0.55),
+      /* The diagnostic charges a grey board up: each segment lerps from these
+         neutrals to its own colour as that pool's questions are answered. */
+      greyOuter: new THREE.Color(0x3E4859),
+      greyInner: new THREE.Color(0x272F3C),
+      fill: 0, fillTarget: 0, charge: 0,
       holder, rimMesh,
       materials: [outerMat, innerMat],
       labels: [titleLabel, verbLabel],

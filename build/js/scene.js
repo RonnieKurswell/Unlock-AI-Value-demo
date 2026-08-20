@@ -262,7 +262,7 @@ export class HiveScene {
     };
 
     this.canvas.addEventListener('pointerdown', () => {
-      if (this.hex && this.hexRig.visible) {
+      if (this.hex && this.hexPickable && this.hexRig.visible) {
         const i = this._pickHex();
         if (i >= 0) return this.selectHex(i);
       }
@@ -465,7 +465,7 @@ export class HiveScene {
     const ST = {
       attract:     { focus: [0, 0, 0],   radius: 2.90, elev: 14, margin: 1.55, bias: [0,    0.86], spin: 0.055, spread: 1.00, fade: 0.90, tilt: 0,             off: [0, 0, 0] },
       explore:     { focus: [0, 0, 0],   radius: HEX_R * 1.02, elev: 0, margin: 1.72, bias: [0, 0], objBias: 0.45, spin: 0, spread: 1.02, fade: 0.18, tilt: 0, off: [0, 0, 0] },
-      diagnostic:  { focus: [0, 0.6, 0], radius: 3.20, elev: 32, margin: 1.70, bias: [0.52, 0.10], spin: 0.030, spread: 1.00, fade: 0.42, tilt: 0,             off: [0, 0, 0] },
+      diagnostic:  { focus: [0, 0, 0],   radius: HEX_R * 1.02, elev: 0, margin: 2.05, bias: [0, 0], objBias: 0.50, spin: 0, spread: 1.00, fade: 0.10, tilt: 0, off: [0, 0, 0] },
       results:     { focus: [0, 0.9, 0], radius: 3.50, elev: 24, margin: 1.50, bias: [0,    0.22], spin: 0.045, spread: 1.04, fade: 0.80, tilt: 0,             off: [0, 0, 0] },
       resultsQuiet:{ focus: [0, 0.9, 0], radius: 3.50, elev: 32, margin: 2.60, bias: [0,    0.52], spin: 0.020, spread: 1.04, fade: 0.22, tilt: 0,             off: [0, 0, 0] },
       delivery:    { focus: [0, 0, 0],   radius: 3.00, elev: 34, margin: 3.00, bias: [0,    0.60], spin: 0.022, spread: 1.10, fade: 0.30, tilt: 0,             off: [0, 0, 0] }
@@ -481,7 +481,11 @@ export class HiveScene {
     this.offTarget.set(...S.off);
     this.rotTarget = (S.rot === undefined) ? null : S.rot;
 
-    const onHex = (name === 'explore');
+    const onHex = (name === 'explore' || name === 'diagnostic');
+    // Only the framework page lets you choose a pool; during the questionnaire
+    // the board is an indicator, so it must not respond to taps or show a
+    // pointer cursor.
+    this.hexPickable = (name === 'explore');
     this.rig.visible = !onHex;
     this.ringLights.visible = !onHex;
     this.hexLights.visible = onHex;
@@ -492,6 +496,13 @@ export class HiveScene {
     this.hexOn = onHex;
     if (this.hexRig) this.hexRig.visible = false;
     if (onHex) { this.hexEnter = 0; this.hexHold = HEX_HOLD; }
+    // No selection during the diagnostic: it would zoom and lean the board.
+    if (name === 'diagnostic') {
+      this.clearHex();
+      // Drop whatever pool room the framework page left behind — the board
+      // has to start from neutral for the charge to read.
+      this.clearRoom();
+    }
     this.pickEnabled = false;
     this.setCoreVisible(true);
     this.ground.visible = !onHex;
@@ -502,6 +513,8 @@ export class HiveScene {
   }
 
   setProgress(poolId, v) {
+    const seg = this.hex && this.hex.segments.find(p => p.id === poolId);
+    if (seg) seg.fillTarget = v;
     const t = this.tiles.find(x => x.pool.id === poolId);
     if (!t) return;
     t.hTarget = BASE_H + (MAX_H - BASE_H) * 0.42 * v;
@@ -516,6 +529,9 @@ export class HiveScene {
   }
 
   resetTiles() {
+    if (this.hex) {
+      this.hex.segments.forEach(p => { p.fillTarget = 0; p.fill = 0; p.charge = 0; p.targetLift = 0; });
+    }
     this.tiles.forEach(t => { t.hTarget = BASE_H; t.glowTarget = 0.09; t.liftTarget = 0; });
     this.coreFlareTarget = 0;
     this.focused = null;
@@ -523,6 +539,9 @@ export class HiveScene {
 
   focus(poolId) {
     this.focused = poolId;
+    if (this.hex) {
+      this.hex.segments.forEach(p => { p.targetLift = p.id === poolId ? 0.55 : 0; });
+    }
     this.tiles.forEach(t => {
       const on = t.pool.id === poolId;
       t.liftTarget = on ? 0.85 : 0;
@@ -531,6 +550,8 @@ export class HiveScene {
   }
 
   ping(poolId) {
+    const seg = this.hex && this.hex.segments.find(p => p.id === poolId);
+    if (seg) seg.charge = 1;
     const t = this.tiles.find(x => x.pool.id === poolId);
     if (t) t.pingT = 0;
   }
@@ -599,11 +620,12 @@ export class HiveScene {
     this.coreLight.position.y += 0.7;
 
     if (this.hex && this.hexOn) {
-      const hovered = this._pickHex();
+      const hovered = this.hexPickable ? this._pickHex() : -1;
       if (hovered !== this.hexHovered) {
         this.hexHovered = hovered;
         this.canvas.style.cursor = hovered >= 0 ? 'pointer' : 'default';
       }
+      const diag = this.state === 'diagnostic';
       this.hex.segments.forEach((p, i) => {
         const hot = i === this.hexHovered;
         const wantGlow = this.hexSelected === i ? 1 : (hot && this.hexSelected < 0 ? 0.65 : p.targetGlow);
@@ -612,17 +634,37 @@ export class HiveScene {
         p.glow = damp(p.glow, wantGlow, 6, dt);
         p.lift = damp(p.lift, wantLift, 5.5, dt);
         p.dim = damp(p.dim, p.targetDim, 5, dt);
+        p.fill = damp(p.fill, p.fillTarget, 3.6, dt);
+        p.charge = Math.max(0, p.charge - dt * 2.0);   // decays after each answer
 
-        p.holder.position.z = p.lift * 0.85 + (this.hexSelected < 0 ? Math.sin(t * 0.8 + i) * 0.045 : 0);
-        p.rimMesh.material.opacity = Math.min(1, p.glow * 0.9 + (i === this.hexSelected ? this.hexPop * 0.8 : 0));
+        // The idle bob is parked during the diagnostic — the board has to read
+        // as a steady instrument, not something floating.
+        p.holder.position.z = p.lift * 0.85 +
+          (!diag && this.hexSelected < 0 ? Math.sin(t * 0.8 + i) * 0.045 : 0);
+        p.rimMesh.material.opacity = diag
+          ? Math.min(1, p.fill * 0.42 + p.charge * 0.9)
+          : Math.min(1, p.glow * 0.9 + (i === this.hexSelected ? this.hexPop * 0.8 : 0));
         p.materials.forEach((m, k) => {
-          m.emissiveIntensity = (k === 0 ? 0.14 : 0.05) + p.glow * (k === 0 ? 0.5 : 0.3);
-          const deep = k === 0 ? p.deepOuter : p.deepInner;
-          const rest = k === 0 ? p.restOuter : p.restInner;
-          const hot  = k === 0 ? p.hotOuter  : p.hotInner;
-          m.color.copy(deep).lerp(rest, p.dim).lerp(hot, p.glow);
+          if (diag) {
+            const grey = k === 0 ? p.greyOuter : p.greyInner;
+            const full = k === 0 ? p.hotOuter  : p.hotInner;
+            m.color.copy(grey).lerp(full, p.fill);
+            // The unfilled board still needs a floor of light on it, or the
+            // greys read as black and the labels become unreadable.
+            m.emissiveIntensity = (k === 0 ? 0.11 : 0.05)
+              + p.fill * (k === 0 ? 0.46 : 0.20)
+              + p.charge * 0.55;
+          } else {
+            m.emissiveIntensity = (k === 0 ? 0.14 : 0.05) + p.glow * (k === 0 ? 0.5 : 0.3);
+            const deep = k === 0 ? p.deepOuter : p.deepInner;
+            const rest = k === 0 ? p.restOuter : p.restInner;
+            const hot  = k === 0 ? p.hotOuter  : p.hotInner;
+            m.color.copy(deep).lerp(rest, p.dim).lerp(hot, p.glow);
+          }
         });
-        p.labels.forEach(l => { l.material.opacity = 0.34 + p.dim * 0.66; });
+        p.labels.forEach(l => {
+          l.material.opacity = diag ? 0.44 + p.fill * 0.56 : 0.34 + p.dim * 0.66;
+        });
       });
       const showTitle = this.hexSelected < 0 ? 1 : 0.26;
       this.hex.coreTitle.material.opacity = damp(this.hex.coreTitle.material.opacity, showTitle, 9, dt);
