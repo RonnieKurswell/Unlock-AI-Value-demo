@@ -274,6 +274,12 @@ export class HiveScene {
        three gestures the booth build uses, hinted on screen. */
     let down = null;
     this.canvas.addEventListener('pointerdown', e => {
+      // Picking reads this.pointer, so it has to be taken from the event that
+      // is actually being handled. Touch gives a pointerdown with no preceding
+      // pointermove, so relying on the move handler alone meant a tap picked
+      // whatever the previous one pointed at — wrong pool on every tap but the
+      // first, on the touchscreen this is built for.
+      toLocal(e);
       down = { x: e.clientX, y: e.clientY };
       if (this.pickEnabled && this.onPick) {
         const hit = this._pick();
@@ -290,6 +296,7 @@ export class HiveScene {
         return this.cycleHex(dx < 0 ? 1 : -1);
       }
       if (Math.hypot(dx, dy) > 14) return;   // a drag, not a tap
+      toLocal(e);                            // pick where the finger lifted
       const i = this._pickHex();
       if (i >= 0) this.selectHex(i);
       else this.clearHex();

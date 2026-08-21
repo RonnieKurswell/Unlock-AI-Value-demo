@@ -111,6 +111,11 @@ input, textarea { font: inherit; }
   transform: scale(var(--k, 1));
   container-type: size;
   container-name: stage;
+  /* Transparent to input. The frame covers the whole stage and sits above the
+     canvas, so with the default `auto` it swallowed every tap and the board
+     could not be touched. Everything inside that needs events — .view, the
+     buttons — sets pointer-events itself. */
+  pointer-events: none;
 }
 
 #grain {
