@@ -11,6 +11,12 @@
 <div id="shell">
 <div id="stage">
 
+  <!-- Hexagon texture, generated on Replicate (nano-banana-2, 4K, 16:9) and
+       re-encoded down to 312KB so the build stays offline-friendly. Sits behind
+       the canvas, which is alpha:true, so the room gradient still shows through
+       and still changes per pool. -->
+  <div id="bg" aria-hidden="true"></div>
+
   <canvas id="gl"></canvas>
   <div id="vignette"></div>
   <div id="grain"></div>

@@ -95,6 +95,18 @@ input, textarea { font: inherit; }
   transition: background 900ms var(--ease);
   isolation: isolate;
 }
+/* The generated hexagon texture. Screen blending means only the lattice lines
+   and the soft glow register — the near-black ground of the image adds nothing —
+   so the room gradient underneath keeps its colour and still shifts per pool.
+   Held well below reading contrast; the copy sits above the canvas regardless. */
+#bg {
+  position: absolute; inset: 0;
+  background: url('../images/hex-bg.jpg') center / cover no-repeat;
+  opacity: 0.40;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* The design surface. Fixed at 1920x1080 and scaled to whatever the stage is,
