@@ -106,6 +106,8 @@ scene.onHexSelect = (id, i) => {
   view.classList.add('focus');
   // On the view, so the dots and the swipe hint pick up the pool's colour too.
   view.style.setProperty('--seg', POOL[id].hex);
+  // Drives that pool's own background plate in CSS.
+  $('stage').dataset.pool = id;
   paintDots(i);
 };
 
@@ -114,6 +116,7 @@ scene.onHexClear = () => {
   const view = $('v-explore');
   view.classList.remove('focus');
   view.style.removeProperty('--seg');
+  delete $('stage').dataset.pool;
   paintDots(-1);
 };
 
@@ -469,6 +472,8 @@ function columnProof(ids) {
 
 function setBeat(i) {
   S.beat = i;
+  // Each beat has its own plate, composed around where its copy sits.
+  $('stage').dataset.beat = String(i + 1);
   [1, 2, 3, 4].forEach(n => $('beat' + n).classList.toggle('on', n === i + 1));
   document.querySelectorAll('.beat-pips').forEach(nav => {
     [...nav.querySelectorAll('i')].forEach((pip, k) => pip.classList.toggle('on', k <= i));

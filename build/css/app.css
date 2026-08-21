@@ -132,11 +132,26 @@ input, textarea { font: inherit; }
   background-image: url('../images/bg-identify.jpg');
   opacity: 0.26;
 }
-/* Nitin's note: soft, near-plain, blue on blue. The plate is already a wash. */
-#stage[data-view='wrap'] #bg {
-  background-image: url('../images/bg-wrap.jpg');
-  opacity: 0.30;
-}
+/* Opening a pool swaps to that pool's own plate: tinted to its colour, with the
+   left third left clean and dark so the copy column reads over flat ground and
+   the lattice sits behind the slabs on the right. The overview keeps the neutral
+   explore plate, since nothing is open. */
+#stage[data-view='explore'][data-pool='data']     #bg { background-image: url('../images/bg-pool-data.jpg'); }
+#stage[data-view='explore'][data-pool='strategy'] #bg { background-image: url('../images/bg-pool-strategy.jpg'); }
+#stage[data-view='explore'][data-pool='process']  #bg { background-image: url('../images/bg-pool-process.jpg'); }
+#stage[data-view='explore'][data-pool='legacy']   #bg { background-image: url('../images/bg-pool-legacy.jpg'); }
+#stage[data-view='explore'][data-pool='physical'] #bg { background-image: url('../images/bg-pool-physical.jpg'); }
+#stage[data-view='explore'][data-pool='trust']    #bg { background-image: url('../images/bg-pool-trust.jpg'); }
+#stage[data-view='explore'][data-pool] #bg { opacity: 0.30; }
+
+/* Nitin's note: soft, near-plain, blue on blue. Each beat gets its own plate,
+   each built around where that beat puts its copy — so the pattern is always
+   somewhere the reading is not. */
+#stage[data-view='wrap'] #bg { opacity: 0.34; }
+#stage[data-view='wrap'][data-beat='1'] #bg { background-image: url('../images/bg-beat1.jpg'); }
+#stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/bg-beat2.jpg'); opacity: 0.24; }
+#stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/bg-beat3.jpg'); }
+#stage[data-view='wrap'][data-beat='4'] #bg { background-image: url('../images/bg-beat4.jpg'); }
 #stage[data-view='done'] #bg {
   background-image: url('../images/bg-done.jpg');
   opacity: 0.55;
