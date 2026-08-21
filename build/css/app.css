@@ -284,11 +284,15 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 }
 .touch-cue {
   margin-top: var(--s5); white-space: nowrap;
+  /* inline-flex so the parent's text-align keeps it centred */
+  display: inline-flex; align-items: center; gap: var(--s3);
   font-family: var(--label); font-weight: 500;
   font-size: clamp(9.5px, 0.62cqw, 12px);
   letter-spacing: 0.34em; text-transform: uppercase; color: var(--fg-3);
 }
-.touch-cue span { animation: breathe 3.4s var(--ease) infinite; }
+/* Only the wording breathes. The beacon keeps its own ping, which is the part
+   that says "touch"; fading the two together would mute exactly that. */
+.touch-cue .tc-text { animation: breathe 3.4s var(--ease) infinite; }
 @keyframes breathe { 0%, 100% { opacity: 0.4 } 50% { opacity: 1 } }
 
 /* ---------- explore: framework hexagon left, reading right --- */
