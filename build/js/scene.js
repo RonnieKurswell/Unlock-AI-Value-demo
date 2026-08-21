@@ -11,7 +11,6 @@
 import * as THREE from '../vendor/three.module.js';
 import { POOLS } from './data.js';
 import { buildHexagon, R as HEX_R, PALETTE } from './hex.js';
-import { buildVial, H as VIAL_H } from './vial.js';
 
 const RING = 1.78;
 const TILE_R = 0.98;
@@ -335,30 +334,6 @@ export class HiveScene {
   }
 
   /** Rebuild with freshly rasterised labels — used once fonts have loaded. */
-  /** The diagnostic's fill indicator. `order` is the questionnaire order,
-      bottom band first. */
-  buildVial(order) {
-    if (!this.vialRig) {
-      this.vialRig = new THREE.Group();
-      this.scene.add(this.vialRig);
-    }
-    if (this.vial) {
-      this.vialRig.remove(this.vial.group);
-      this.vial.group.traverse(o => {
-        if (o.geometry) o.geometry.dispose();
-        if (o.material) o.material.dispose();
-      });
-    }
-    this.vial = buildVial(order);
-    this.vialRig.add(this.vial.group);
-    this.vialRig.visible = false;
-    this.vialFill = 0;
-    this.vialTarget = 0;
-    this.vialSurge = 0;
-    this.poolFrac = new Map(order.map(p => [p.id, 0]));
-    this.vialOrder = order;
-  }
-
   rebuildHex(pools) {
     if (this.hex) {
       this.hexRig.remove(this.hex.group);
@@ -518,7 +493,6 @@ export class HiveScene {
     // square to it — the difference between an off-centre object and a
     // skewed one.
     this.hexOffsetTarget = -(S.objBias ?? 0) * halfH * dist;   // halfH already carries aspect
-    this.vialOffsetTarget = this.hexOffsetTarget;
   }
 
   /* The explore transform, solved the way the booth build solves it.
@@ -544,9 +518,24 @@ export class HiveScene {
 
     const T = this.hexTargets || (this.hexTargets = { x: 0, y: 0, scale: 1, roll: 0, labelFlip: 0 });
 
+    const boardH = HEX_R * 2 * 1.02;
+    const boardW = HEX_R * 2 * Math.cos(Math.PI / 6) * 1.02;
+
+    if (this.state === 'diagnostic') {
+      // The questions own the right of the frame, so the board is centred in
+      // what is left and sized to fit it, rather than filling the whole stage.
+      const colFrac = Math.min(this.canvas.clientWidth * 0.46, 880) /
+                      (this.canvas.clientWidth || 1);
+      const freeW = worldW * (1 - colFrac);
+      T.x = -(worldW * colFrac) / 2;
+      T.y = 0;
+      T.scale = Math.min((worldH * 0.74) / boardH, (freeW * 0.84) / boardW);
+      T.roll = nearestTurn(0, T.roll);
+      T.labelFlip = 0;
+      return T;
+    }
+
     if (this.hexSelected < 0) {
-      const boardH = HEX_R * 2 * 1.02;
-      const boardW = HEX_R * 2 * Math.cos(Math.PI / 6) * 1.02;
       const fill = Math.min((worldH * 0.80) / boardH, (worldW * 0.90) / boardW);
       T.x = 0;
       // Lifted a touch so the room left over sits under the board, where the
@@ -596,7 +585,7 @@ export class HiveScene {
     const ST = {
       attract:     { focus: [0, 0, 0],   radius: 2.90, elev: 14, margin: 1.55, bias: [0,    0.86], spin: 0.055, spread: 1.00, fade: 0.90, tilt: 0,             off: [0, 0, 0] },
       explore:     { focus: [0, 0, 0],   radius: HEX_R * 1.70, elev: 0, margin: 1.00, bias: [0, 0], objBias: 0, spin: 0, spread: 1.02, fade: 0.18, tilt: 0, off: [0, 0, 0] },
-      diagnostic:  { focus: [0, 0, 0],   extent: [1.55, VIAL_H / 2], elev: 6, margin: 1.50, bias: [0, 0], objBias: 0.52, spin: 0, spread: 1.00, fade: 0.10, tilt: 0, off: [0, 0, 0] },
+      diagnostic:  { focus: [0, 0, 0],   radius: HEX_R * 1.70, elev: 0, margin: 1.00, bias: [0, 0], objBias: 0, spin: 0, spread: 1.00, fade: 0.10, tilt: 0, off: [0, 0, 0] },
       results:     { focus: [0, 0.9, 0], radius: 3.50, elev: 24, margin: 1.50, bias: [0,    0.22], spin: 0.045, spread: 1.04, fade: 0.80, tilt: 0,             off: [0, 0, 0] },
       resultsQuiet:{ focus: [0, 0.9, 0], radius: 3.50, elev: 32, margin: 2.60, bias: [0,    0.52], spin: 0.020, spread: 1.04, fade: 0.22, tilt: 0,             off: [0, 0, 0] },
       delivery:    { focus: [0, 0, 0],   radius: 3.00, elev: 34, margin: 3.00, bias: [0,    0.60], spin: 0.022, spread: 1.10, fade: 0.30, tilt: 0,             off: [0, 0, 0] }
@@ -612,15 +601,14 @@ export class HiveScene {
     this.offTarget.set(...S.off);
     this.rotTarget = (S.rot === undefined) ? null : S.rot;
 
-    const onHex = (name === 'explore');
-    const onVial = (name === 'diagnostic');
+    const onHex = (name === 'explore' || name === 'diagnostic');
     // Only the framework page lets you choose a pool; during the questionnaire
     // the board is an indicator, so it must not respond to taps or show a
     // pointer cursor.
     this.hexPickable = (name === 'explore');
-    this.rig.visible = !onHex && !onVial;
-    this.ringLights.visible = !onHex && !onVial;
-    this.hexLights.visible = onHex || onVial;
+    this.rig.visible = !onHex;
+    this.ringLights.visible = !onHex;
+    this.hexLights.visible = onHex;
     /* The board is held back until the camera has finished travelling to the
        explore framing, then makes its own contained entrance. Revealing it
        during the camera move would show it sliced by the left edge, because
@@ -631,19 +619,15 @@ export class HiveScene {
 
     if (!onHex) { this.hexKick = 0; this.hexPop = 0; }
 
-    this.vialOn = onVial;
-    if (this.vialRig) this.vialRig.visible = false;
-    if (onVial) {
-      this.vialEnter = 0;
-      this.vialHold = HEX_HOLD;
+    if (name === 'diagnostic') {
+      // No selection here: it would zoom and lean the board. And the room the
+      // framework page left behind has to go, or the charge cannot read.
       this.clearHex();
-      // Drop the room the framework page left behind: the vial supplies the
-      // colour here, and a tinted ground fights the liquid.
       this.clearRoom();
     }
     this.pickEnabled = false;
     this.setCoreVisible(true);
-    this.ground.visible = !onHex && !onVial;
+    this.ground.visible = !onHex;
 
     if (name === 'attract' || name === 'delivery') {
       this.tiles.forEach(t => { t.hTarget = BASE_H + 0.34; t.glowTarget = 0.10; t.liftTarget = 0; });
@@ -651,13 +635,6 @@ export class HiveScene {
   }
 
   setProgress(poolId, v) {
-    if (this.poolFrac && this.poolFrac.has(poolId)) {
-      this.poolFrac.set(poolId, v);
-      // Each pool owns one band, so the level is the mean of the six.
-      let total = 0;
-      this.poolFrac.forEach(f => { total += f; });
-      this.vialTarget = total / this.poolFrac.size;
-    }
     const seg = this.hex && this.hex.segments.find(p => p.id === poolId);
     if (seg) seg.fillTarget = v;
     const t = this.tiles.find(x => x.pool.id === poolId);
@@ -674,10 +651,6 @@ export class HiveScene {
   }
 
   resetTiles() {
-    this.vialTarget = 0;
-    this.vialFill = 0;
-    this.vialSurge = 0;
-    if (this.poolFrac) this.poolFrac.forEach((_, k) => this.poolFrac.set(k, 0));
     if (this.hex) {
       this.hex.segments.forEach(p => { p.fillTarget = 0; p.fill = 0; p.charge = 0; p.targetLift = 0; });
     }
@@ -699,7 +672,6 @@ export class HiveScene {
   }
 
   ping(poolId) {
-    this.vialSurge = 1;
     const seg = this.hex && this.hex.segments.find(p => p.id === poolId);
     if (seg) seg.charge = 1;
     const t = this.tiles.find(x => x.pool.id === poolId);
@@ -770,44 +742,6 @@ export class HiveScene {
     this.core.getWorldPosition(this.coreLight.position);
     this.coreLight.position.y += 0.7;
 
-    /* ---------- the diagnostic vial ---------- */
-    if (this.vial && this.vialOn) {
-      // Same contained entrance the board gets: wait out the camera move, then
-      // rise into place rather than being revealed mid-flight.
-      if (this.vialHold > 0) {
-        this.vialHold -= dt;
-        this.vialRig.visible = false;
-      } else {
-        this.vialRig.visible = true;
-        this.vialEnter = damp(this.vialEnter ?? 1, 1, 3.6, dt);
-      }
-      const vEnter = this.vialEnter ?? 1;
-      this.vialRig.position.set(this.vialOffsetTarget ?? 0, -(1 - vEnter) * 1.1, 0);
-      this.vialRig.scale.setScalar(0.92 + 0.08 * vEnter);
-
-      this.vialFill = damp(this.vialFill, this.vialTarget, 2.6, dt);
-      this.vialSurge = Math.max(0, this.vialSurge - dt * 1.7);
-
-      // A small overshoot on each answer, so the level lands like liquid
-      // rather than a progress bar snapping.
-      const slosh = Math.sin(this.vialSurge * Math.PI * 2.2) * 0.012 * this.vialSurge;
-      const shown = Math.min(1, Math.max(0, this.vialFill + slosh));
-
-      this.vial.liquidMat.uniforms.uFill.value = shown;
-      this.vial.liquidMat.uniforms.uSurge.value = this.vialSurge;
-
-      // The surface sits at the level and takes the colour of the band it is
-      // crossing, so the hue changes as each new pool starts filling.
-      const n = this.vialOrder.length;
-      const bandAt = Math.min(n - 1, Math.max(0, Math.floor(shown * n - 1e-6)));
-      this.vial.capMat.color.set(this.vialOrder[bandAt].color);
-      this.vial.cap.visible = shown > 0.004;
-      this.vial.cap.position.y = -VIAL_H / 2 + shown * VIAL_H;
-      this.vial.capMat.opacity = 0.62 + this.vialSurge * 0.38;
-      this.vial.cap.scale.setScalar(1 + this.vialSurge * 0.05);
-      this.vial.edges.material.opacity = 0.30 + this.vialSurge * 0.22;
-    }
-
     if (this.hex && this.hexOn) {
       const hovered = this.hexPickable ? this._pickHex() : -1;
       if (hovered !== this.hexHovered) {
@@ -866,7 +800,10 @@ export class HiveScene {
         });
         p.rimMesh.material.opacity *= p.fade;
         p.labels.forEach(l => {
-          l.material.opacity = (diag ? 0.44 + p.fill * 0.56 : 0.34 + p.dim * 0.66) * p.fade;
+          // The diagnostic shows the shape alone. Names and verbs belong to the
+          // framework page, where there is a reason to read them.
+          l.visible = !diag;
+          l.material.opacity = (0.34 + p.dim * 0.66) * p.fade;
           // The label carries the opposite of the board's roll, so the text
           // reads straight across while the geometry turns under it.
           l.rotation.z = l.userData.baseRot +
@@ -875,9 +812,11 @@ export class HiveScene {
       });
       // The centre plate belongs to the framework view; it clears away with
       // the other sectors when a pool opens.
+      // The centre lockup is a title too, so it goes with the rest on the
+      // diagnostic. The plate itself stays — that is part of the shape.
       const showCore = this.hexSelected < 0 ? 1 : 0;
-      this.hex.coreTitle.material.opacity = damp(this.hex.coreTitle.material.opacity, diag ? 1 : showCore, 9, dt);
-      this.hex.coreTitle.visible = this.hex.coreTitle.material.opacity > 0.01;
+      this.hex.coreTitle.material.opacity = damp(this.hex.coreTitle.material.opacity, diag ? 0 : showCore, 9, dt);
+      this.hex.coreTitle.visible = !diag && this.hex.coreTitle.material.opacity > 0.01;
       this.hex.coreMat.opacity = damp(this.hex.coreMat.opacity, diag ? 1 : showCore, 9, dt);
       this.hex.core.visible = this.hex.coreMat.opacity > 0.01;
       const coreFading = this.hex.coreMat.opacity < 0.995;

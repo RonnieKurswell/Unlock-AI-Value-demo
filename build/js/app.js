@@ -134,9 +134,6 @@ scene.onRoom = ([a, b]) => {
 /* Build it up front so a fast tap never lands on an empty explore screen,
    then re-rasterise once the webfonts are in. */
 scene.buildHex(hexOrder());
-// The diagnostic's fill indicator. Bands run bottom-up in the order the
-// questions are asked, so each pool owns one sixth of the column.
-scene.buildVial(ORDER.map(id => ({ id, color: POOL[id].color })));
 document.fonts.ready.then(() => {
   scene.rebuildHex(hexOrder());
   if (S.view === 'explore') scene.selectHex(Math.max(0, scene.hexSelected));
