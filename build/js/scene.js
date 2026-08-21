@@ -20,6 +20,8 @@ const DARK = 0x080B11;
 const TAU = Math.PI * 2;
 const HEX_HOLD = 0.62;   // seconds the board waits out the camera move
 const HEX_FOCUS_SCALE = 2.5;   // how far an opened pool zooms in
+// What a segment glows before it has been answered: cool, near-black, no hue.
+const EMISSIVE_OFF = new THREE.Color(0x171D26);
 
 // Same angle, nearest full turn to `ref`, so the extra half-turn in the
 // orientation fix never becomes a 300-degree spin between two pools.
@@ -805,12 +807,17 @@ export class HiveScene {
             const grey = k === 0 ? p.greyOuter : p.greyInner;
             const full = k === 0 ? p.hotOuter  : p.hotInner;
             m.color.copy(grey).lerp(full, p.fill);
-            // The unfilled board still needs a floor of light on it, or the
-            // greys read as black and the labels become unreadable.
-            m.emissiveIntensity = (k === 0 ? 0.11 : 0.05)
-              + p.fill * (k === 0 ? 0.46 : 0.20)
+            /* The glow has to come up with the fill as well, not just the
+               surface colour. Each segment's emissive is its pool accent, and
+               with the fog gone that alone lit an unanswered board in full
+               colour — so it never read as grey. Neutral until answers arrive. */
+            m.emissive.copy(EMISSIVE_OFF).lerp(p.accentColor, p.fill);
+            // A floor of light stays, or the greys read as flat black.
+            m.emissiveIntensity = (k === 0 ? 0.10 : 0.05)
+              + p.fill * (k === 0 ? 0.52 : 0.24)
               + p.charge * 0.55;
           } else {
+            m.emissive.copy(p.accentColor);   // restored: the diagnostic lerps it
             m.emissiveIntensity = (k === 0 ? 0.14 : 0.05) + p.glow * (k === 0 ? 0.5 : 0.3);
             const deep = k === 0 ? p.deepOuter : p.deepInner;
             const rest = k === 0 ? p.restOuter : p.restInner;
