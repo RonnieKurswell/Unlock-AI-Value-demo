@@ -54,6 +54,8 @@ const SCENE_STATE = { attract: 'attract', explore: 'explore', diag: 'diagnostic'
 const BEAT_SCENE = i => (i === 0 ? 'results' : 'resultsQuiet');
 
 function show(view) {
+  // Drives the per-screen background plate in CSS.
+  $('stage').dataset.view = view;
   S.view = view;
   Object.values(VIEWS).forEach(id => $(id).classList.remove('on'));
   $(VIEWS[view]).classList.add('on');

@@ -95,16 +95,51 @@ input, textarea { font: inherit; }
   transition: background 900ms var(--ease);
   isolation: isolate;
 }
-/* The generated hexagon texture. Screen blending means only the lattice lines
-   and the soft glow register — the near-black ground of the image adds nothing —
-   so the room gradient underneath keeps its colour and still shifts per pool.
-   Held well below reading contrast; the copy sits above the canvas regardless. */
+/* One generated plate per screen, swapped on #stage[data-view]. Screen blending
+   means only the lattice and the glow register — the near-black ground of each
+   image adds nothing — so the room gradient underneath keeps its colour and
+   still shifts per pool.
+
+   Opacity is per screen rather than global, because the plates differ in how
+   much light they carry and the screens differ in how much reading they ask
+   for: attract is a headline and can take a dominant plate, the diagnostic is
+   eighteen questions and cannot. */
 #bg {
   position: absolute; inset: 0;
-  background: url('../images/hex-bg.jpg') center / cover no-repeat;
-  opacity: 0.40;
+  background: center / cover no-repeat;
+  opacity: 0;
   mix-blend-mode: screen;
   pointer-events: none;
+  transition: opacity 700ms var(--ease), background-image 0ms;
+}
+
+/* Attract carries the whole screen: the 3D ring and the floor grid are off here,
+   so the plate is the composition. */
+#stage[data-view='attract'] #bg {
+  background-image: url('../images/bg-attract.jpg');
+  opacity: 0.85;
+}
+#stage[data-view='explore'] #bg {
+  background-image: url('../images/bg-explore.jpg');
+  opacity: 0.34;
+}
+/* Quietest of the six — the questions and five options live on the right. */
+#stage[data-view='diag'] #bg {
+  background-image: url('../images/bg-diag.jpg');
+  opacity: 0.30;
+}
+#stage[data-view='identify'] #bg {
+  background-image: url('../images/bg-identify.jpg');
+  opacity: 0.26;
+}
+/* Nitin's note: soft, near-plain, blue on blue. The plate is already a wash. */
+#stage[data-view='wrap'] #bg {
+  background-image: url('../images/bg-wrap.jpg');
+  opacity: 0.30;
+}
+#stage[data-view='done'] #bg {
+  background-image: url('../images/bg-done.jpg');
+  opacity: 0.55;
 }
 
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -239,7 +274,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 
 /* ---------- attract ----------------------------------------- */
 
-#v-attract { display: none; place-items: center; padding-bottom: 16cqh; }
+#v-attract { display: none; place-items: center; padding-bottom: 30cqh; }
 #v-attract.on { display: grid; }
 #v-attract .statement { max-width: none; }
 #v-attract .d-xl { max-width: 21ch; margin: var(--s3) auto 0; }

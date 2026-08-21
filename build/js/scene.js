@@ -618,8 +618,12 @@ export class HiveScene {
     // the board is an indicator, so it must not respond to taps or show a
     // pointer cursor.
     this.hexPickable = (name === 'explore');
-    this.rig.visible = !onHex;
-    this.ringLights.visible = !onHex;
+    /* Attract is the generated plate plus the headline, nothing else: the ring
+       of prisms and the floor grid are off there so the background can carry
+       the screen. They still belong to results and delivery. */
+    const bare = (name === 'attract');
+    this.rig.visible = !onHex && !bare;
+    this.ringLights.visible = !onHex && !bare;
     this.hexLights.visible = onHex;
     /* The board is held back until the camera has finished travelling to the
        explore framing, then makes its own contained entrance. Revealing it
@@ -638,8 +642,8 @@ export class HiveScene {
       this.clearRoom();
     }
     this.pickEnabled = false;
-    this.setCoreVisible(true);
-    this.ground.visible = !onHex;
+    this.setCoreVisible(!bare);
+    this.ground.visible = !onHex && !bare;
 
     if (name === 'attract' || name === 'delivery') {
       this.tiles.forEach(t => { t.hTarget = BASE_H + 0.34; t.glowTarget = 0.10; t.liftTarget = 0; });
