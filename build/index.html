@@ -111,12 +111,29 @@
     <section class="view" id="v-identify">
       <div class="deliver-wrap">
         <span class="label">Almost there</span>
-        <h2 class="d-l" style="margin-top:var(--s3)">Tap your badge</h2>
+        <h2 class="d-xl id-title">Tap your badge</h2>
         <p class="lede">Your badge carries your role, so the blueprint fits your job.</p>
 
+        <!-- The reader is the screen. Rings pulse outward from it so the eye is
+             pulled to the one place a badge is meant to go, and the glyph shows
+             the gesture rather than naming the technology. -->
         <div class="socket" id="socket">
-          <div class="ring"></div>
-          <div class="cradle" id="cradle">NFC</div>
+          <svg class="s-rings" viewBox="0 0 100 100" aria-hidden="true">
+            <path class="s-ring r1" d="M50 2 L95 26 L95 74 L50 98 L5 74 L5 26 Z"/>
+            <path class="s-ring r2" d="M50 16 L82 34 L82 66 L50 84 L18 66 L18 34 Z"/>
+            <path class="s-ring r3" d="M50 27 L73 40 L73 60 L50 73 L27 60 L27 40 Z"/>
+          </svg>
+          <span class="s-sweep" aria-hidden="true"></span>
+          <div class="cradle" id="cradle">
+            <svg class="badge-glyph" viewBox="0 0 44 34" aria-hidden="true">
+              <rect x="1.5" y="1.5" width="27" height="31" rx="3"/>
+              <circle cx="15" cy="12" r="4"/>
+              <path d="M8.5 25c1.6-3.6 11.4-3.6 13 0"/>
+              <path class="wave w1" d="M33 11a9 9 0 0 1 0 12"/>
+              <path class="wave w2" d="M37.5 7a15 15 0 0 1 0 20"/>
+            </svg>
+            <span class="cradle-mark" id="cradleMark"></span>
+          </div>
         </div>
         <div class="scan-state" id="scanState">Waiting for badge</div>
 

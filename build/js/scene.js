@@ -621,7 +621,10 @@ export class HiveScene {
     /* Attract is the generated plate plus the headline, nothing else: the ring
        of prisms and the floor grid are off there so the background can carry
        the screen. They still belong to results and delivery. */
-    const bare = (name === 'attract');
+    /* Attract, identify and the closing screen are the plate plus copy: the
+       ring of prisms muddled them rather than adding anything. Results keeps
+       it, since the beats are read against the object. */
+    const bare = (name === 'attract' || name === 'delivery');
     this.rig.visible = !onHex && !bare;
     this.ringLights.visible = !onHex && !bare;
     this.hexLights.visible = onHex;

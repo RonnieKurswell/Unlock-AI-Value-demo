@@ -493,7 +493,7 @@ document.querySelectorAll('[data-next]').forEach(b => {
 function resetDelivery() {
   $('tileSheet').classList.remove('on');
   $('socket').classList.remove('locked');
-  $('cradle').textContent = 'NFC';
+  $('cradleMark').textContent = '';
   $('scanState').textContent = 'Waiting for badge…';
   $('manualForm').classList.remove('on');
   document.querySelector('#v-identify .deliver-wrap')?.classList.remove('form-open');
@@ -525,7 +525,7 @@ $('manualForm').addEventListener('submit', e => {
 /* Stands in for the NFC read. On the kiosk the reader fires this. */
 $('simulateTap').onclick = () => {
   $('socket').classList.add('locked');
-  $('cradle').textContent = '✓';
+  $('cradleMark').textContent = '✓';
   $('scanState').textContent = 'Badge read · profile matched';
   scene.flare(1);
   // a real badge carries name, job title and email; the sim supplies a title

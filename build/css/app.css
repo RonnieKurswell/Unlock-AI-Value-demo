@@ -130,7 +130,7 @@ input, textarea { font: inherit; }
 }
 #stage[data-view='identify'] #bg {
   background-image: url('../images/bg-identify.jpg');
-  opacity: 0.26;
+  opacity: 0.44;
 }
 /* Opening a pool swaps to that pool's own plate: tinted to its colour, with the
    left third left clean and dark so the copy column reads over flat ground and
@@ -820,41 +820,122 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   content: ''; position: absolute; inset: 0; z-index: -1;
   background: radial-gradient(64% 58% at 50% 46%, rgba(5, 8, 14, 0.95) 0%, rgba(5, 8, 14, 0.8) 56%, rgba(5, 8, 14, 0.3) 100%);
 }
-.deliver-wrap { text-align: center; width: min(680px, 46cqw); }
+/* Wider than the other statement screens: the reader needs room to be the
+   subject rather than a detail under the copy. */
+.deliver-wrap { text-align: center; width: min(860px, 58cqw); }
 .deliver-wrap .lede { margin: var(--s3) auto 0; max-width: 46ch; }
+.id-title { margin-top: var(--s2); }
 
-.socket { position: relative; width: 132px; height: 132px; margin: var(--s6) auto var(--s3); display: grid; place-items: center; }
-.socket .ring {
-  position: absolute; inset: 0;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: linear-gradient(180deg, rgba(0, 124, 195, 0.28), rgba(0, 124, 195, 0.04));
-  animation: sweep 3.6s var(--ease) infinite;
-}
-@keyframes sweep { 0%, 100% { opacity: 0.35 } 50% { opacity: 1 } }
-.socket .cradle {
-  width: 84px; height: 84px;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: rgba(0, 124, 195, 0.18);
+/* ---------- the badge reader ----------
+   Sized to be the first thing seen, and centred so it lands on the middle of
+   the identify plate, whose hexagon rings radiate from exactly there — plate
+   and target then read as one object rather than two. */
+.socket {
+  position: relative;
+  width: clamp(200px, 17cqw, 330px);
+  aspect-ratio: 1;
+  margin: var(--s5) auto var(--s4);
   display: grid; place-items: center;
-  font-family: var(--label); font-weight: 500; font-size: 9px;
-  letter-spacing: 0.22em; color: var(--blue-lift);
-  transition: background 0.4s var(--ease);
 }
-.socket.locked .cradle { background: rgba(55, 166, 228, 0.5); color: var(--fg); }
+
+/* Three hexagon outlines pulsing outward, staggered. Drawn as strokes in SVG
+   because clip-path can only fill a shape, not outline one. */
+.s-rings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.s-ring {
+  fill: none; stroke: var(--blue-lift); stroke-width: 1.4;
+  transform-box: fill-box; transform-origin: center;
+  animation: ringOut 3.2s var(--ease) infinite;
+}
+.s-ring.r2 { animation-delay: 1.05s; }
+.s-ring.r3 { animation-delay: 2.1s; }
+@keyframes ringOut {
+  0%   { transform: scale(0.62); opacity: 0; }
+  22%  { opacity: 0.85; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Slow radar sweep across the face. */
+.s-sweep {
+  position: absolute; inset: 6%;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: conic-gradient(from 0deg,
+    transparent 0 62%, rgba(55, 166, 228, 0.20) 78%, rgba(55, 166, 228, 0.02) 88%, transparent 100%);
+  animation: sweepSpin 5.5s linear infinite;
+}
+@keyframes sweepSpin { to { transform: rotate(360deg); } }
+
+.socket .cradle {
+  position: relative;
+  width: 56%; aspect-ratio: 1;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background:
+    linear-gradient(180deg, rgba(55, 166, 228, 0.42), rgba(0, 124, 195, 0.16));
+  box-shadow: 0 0 60px rgba(55, 166, 228, 0.22);
+  display: grid; place-items: center;
+  transition: background 0.45s var(--ease), transform 0.45s var(--ease);
+}
+
+/* A card and signal waves: shows the gesture instead of naming the radio. */
+.badge-glyph {
+  width: 46%; height: auto;
+  fill: none; stroke: var(--fg); stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0.92;
+  transition: opacity 0.3s var(--ease);
+}
+.badge-glyph .wave { stroke: var(--blue-lift); }
+.badge-glyph .w1 { animation: waveOn 1.9s var(--ease) infinite; }
+.badge-glyph .w2 { animation: waveOn 1.9s var(--ease) infinite 0.32s; }
+@keyframes waveOn { 0%, 100% { opacity: 0.25 } 50% { opacity: 1 } }
+
+.cradle-mark {
+  position: absolute;
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(30px, 3cqw, 54px); color: var(--fg);
+}
+
+/* Read: the rings stop, the face floods, the glyph gives way to the tick. */
+.socket.locked .s-ring,
+.socket.locked .s-sweep { animation-play-state: paused; opacity: 0; }
+.socket.locked .cradle {
+  background: linear-gradient(180deg, rgba(55, 166, 228, 0.85), rgba(0, 124, 195, 0.55));
+  transform: scale(1.04);
+}
+.socket.locked .badge-glyph { opacity: 0; }
+
 .scan-state {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62cqw, 12px);
-  letter-spacing: 0.24em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 600; font-size: clamp(10px, 0.7cqw, 13px);
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--fg-2);
+  display: inline-flex; align-items: center; gap: var(--s2);
+}
+.scan-state::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--blue-lift); flex: none;
+  animation: breathe 1.6s var(--ease) infinite;
+}
+.socket.locked ~ .scan-state::before { animation: none; background: var(--fg-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .s-ring, .s-sweep, .badge-glyph .wave, .scan-state::before { animation: none; }
+  .s-ring { opacity: 0.4; }
 }
 
 .deliver-actions { margin-top: var(--s5); display: flex; justify-content: center; }
 
 /* once they choose typing, the badge socket is decoration — shrink it so the
    form fits without the screen overflowing */
-.deliver-wrap.form-open .socket { transform: scale(0.6); margin: var(--s3) auto 0; }
+/* Shrink the box, not just the paint. transform: scale() leaves the layout box
+   at full size, which at the reader's new 326px pushed the form 11px past the
+   bottom of the stage. */
+.deliver-wrap.form-open .socket {
+  width: clamp(110px, 8cqw, 150px);
+  margin: var(--s2) auto 0;
+}
+.deliver-wrap.form-open .s-sweep { display: none; }
 .deliver-wrap.form-open .scan-state { opacity: 0; }
 .deliver-wrap.form-open .deliver-actions { display: none; }
 .deliver-wrap.form-open .demo-trigger { margin-top: var(--s4); }
-.socket, .scan-state { transition: transform 0.4s var(--ease), opacity 0.3s var(--ease), margin 0.4s var(--ease); }
+.socket, .scan-state { transition: width 0.4s var(--ease), opacity 0.3s var(--ease), margin 0.4s var(--ease); }
 
 .manual-form { display: none; margin: var(--s4) auto 0; max-width: 440px; text-align: left; }
 .manual-form.on { display: block; animation: rise 0.44s var(--ease) both; }
