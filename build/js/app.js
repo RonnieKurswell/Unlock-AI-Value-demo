@@ -211,7 +211,15 @@ function exploreKeys(e) {
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') return scene.cycleHex(-1);
 }
 
-$('beginDiag').onclick = () => { S.qi = 0; show('diag'); renderQuestion(); };
+/* One entry point for the questionnaire. Both the framework page and the
+   overview shortcut go through it: showing the view without rendering a question
+   leaves the screen empty except the chrome. */
+function startDiagnostic() {
+  S.qi = 0;
+  show('diag');
+  renderQuestion();
+}
+$('beginDiag').onclick = startDiagnostic;
 
 /* =============================================================
    DIAGNOSTIC
@@ -602,7 +610,7 @@ renderProgress();
 renderPool(POOLS[0].id);
 paintDots(-1);
 $('backToFramework').addEventListener('click', () => scene.clearHex());
-$('beginDiagOv').addEventListener('click', () => show('diag'));
+$('beginDiagOv').addEventListener('click', startDiagnostic);
 S.read = new Set();
 $('seenCount').textContent = '0';
 show('attract');
