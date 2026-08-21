@@ -110,7 +110,6 @@
     <!-- IDENTIFY — before results, so nobody leaves without tapping -->
     <section class="view" id="v-identify">
       <div class="deliver-wrap">
-        <span class="label">Almost there</span>
         <h2 class="d-xl id-title">Tap your badge</h2>
         <p class="lede">Your badge carries your role, so the blueprint fits your job.</p>
 
@@ -118,12 +117,16 @@
              pulled to the one place a badge is meant to go, and the glyph shows
              the gesture rather than naming the technology. -->
         <div class="socket" id="socket">
+          <!-- Three concentric regular hexagons. Generated from circumradius so
+               all three are the same shape: width is height * cos30. Hand-typed
+               paths had them at 0.94, 0.94 and 1.00 width-to-height against the
+               correct 0.866, which read as a skewed, lopsided target. -->
           <svg class="s-rings" viewBox="0 0 100 100" aria-hidden="true">
-            <path class="s-ring r1" d="M50 2 L95 26 L95 74 L50 98 L5 74 L5 26 Z"/>
-            <path class="s-ring r2" d="M50 16 L82 34 L82 66 L50 84 L18 66 L18 34 Z"/>
-            <path class="s-ring r3" d="M50 27 L73 40 L73 60 L50 73 L27 60 L27 40 Z"/>
+            <path class="s-ring r1" d="M50.00 2.00 L8.43 26.00 L8.43 74.00 L50.00 98.00 L91.57 74.00 L91.57 26.00 Z"/>
+            <path class="s-ring r2" d="M50.00 11.00 L16.23 30.50 L16.23 69.50 L50.00 89.00 L83.77 69.50 L83.77 30.50 Z"/>
+            <path class="s-ring r3" d="M50.00 20.00 L24.02 35.00 L24.02 65.00 L50.00 80.00 L75.98 65.00 L75.98 35.00 Z"/>
           </svg>
-          <span class="s-sweep" aria-hidden="true"></span>
+          <span class="s-pulse" aria-hidden="true"></span>
           <div class="cradle" id="cradle">
             <svg class="badge-glyph" viewBox="0 0 44 34" aria-hidden="true">
               <rect x="1.5" y="1.5" width="27" height="31" rx="3"/>

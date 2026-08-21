@@ -854,20 +854,25 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   100% { transform: scale(1.5); opacity: 0; }
 }
 
-/* Slow radar sweep across the face. */
-.s-sweep {
-  position: absolute; inset: 6%;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: conic-gradient(from 0deg,
-    transparent 0 62%, rgba(55, 166, 228, 0.20) 78%, rgba(55, 166, 228, 0.02) 88%, transparent 100%);
-  animation: sweepSpin 5.5s linear infinite;
+/* A symmetric breath behind the face. The previous version rotated a conic
+   gradient inside a hexagon clip, which drew a lopsided dark wedge and made the
+   whole target look sheared. */
+.s-pulse {
+  position: absolute; inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(55, 166, 228, 0.22) 0%, rgba(55, 166, 228, 0.07) 55%, transparent 100%);
+  animation: pulseBreath 3.2s var(--ease) infinite;
 }
-@keyframes sweepSpin { to { transform: rotate(360deg); } }
+@keyframes pulseBreath {
+  0%, 100% { opacity: 0.45; transform: scale(0.92); }
+  50%      { opacity: 1;    transform: scale(1.06); }
+}
 
 .socket .cradle {
   position: relative;
   width: 56%; aspect-ratio: 1;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  clip-path: polygon(50% 0, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
   background:
     linear-gradient(180deg, rgba(55, 166, 228, 0.42), rgba(0, 124, 195, 0.16));
   box-shadow: 0 0 60px rgba(55, 166, 228, 0.22);
@@ -896,7 +901,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 
 /* Read: the rings stop, the face floods, the glyph gives way to the tick. */
 .socket.locked .s-ring,
-.socket.locked .s-sweep { animation-play-state: paused; opacity: 0; }
+.socket.locked .s-pulse { animation-play-state: paused; opacity: 0; }
 .socket.locked .cradle {
   background: linear-gradient(180deg, rgba(55, 166, 228, 0.85), rgba(0, 124, 195, 0.55));
   transform: scale(1.04);
@@ -916,7 +921,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .socket.locked ~ .scan-state::before { animation: none; background: var(--fg-2); }
 
 @media (prefers-reduced-motion: reduce) {
-  .s-ring, .s-sweep, .badge-glyph .wave, .scan-state::before { animation: none; }
+  .s-ring, .s-pulse, .badge-glyph .wave, .scan-state::before { animation: none; }
   .s-ring { opacity: 0.4; }
 }
 
@@ -931,7 +936,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   width: clamp(110px, 8cqw, 150px);
   margin: var(--s2) auto 0;
 }
-.deliver-wrap.form-open .s-sweep { display: none; }
+.deliver-wrap.form-open .s-pulse { display: none; }
 .deliver-wrap.form-open .scan-state { opacity: 0; }
 .deliver-wrap.form-open .deliver-actions { display: none; }
 .deliver-wrap.form-open .demo-trigger { margin-top: var(--s4); }
