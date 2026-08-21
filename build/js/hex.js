@@ -15,6 +15,10 @@
    i x 60 degrees, so 0 is the right edge and the ring runs anticlockwise.
    ============================================================= */
 
+/* Every material here sets fog: false. The scene's fog is a depth cue for the
+   ambient field, but the board is the subject and both framings that show it put
+   the camera ~25 units out, where FogExp2 at 0.034 washes over half the colour
+   away. Re-enabling fog here is what makes the demo look muted. */
 import * as THREE from '../vendor/three.module.js';
 
 const DEG = Math.PI / 180;
@@ -128,7 +132,7 @@ export function makeTextTexture(text, opts = {}) {
 function labelMesh(text, theta, radiusFactor, planeW, planeH, texOpts) {
   const mat = new THREE.MeshBasicMaterial({
     map: makeTextTexture(text, texOpts),
-    transparent: true, depthWrite: false, toneMapped: false
+    transparent: true, depthWrite: false, toneMapped: false, fog: false
   });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
   const a = theta * DEG;
@@ -164,12 +168,12 @@ export function buildHexagon(pools) {
     const outerMat = new THREE.MeshStandardMaterial({
       color: PALETTE.outer, roughness: 0.30, metalness: 0.42,
       emissive: new THREE.Color(pool.accent), emissiveIntensity: 0.16,
-      transparent: true
+      transparent: true, fog: false
     });
     const innerMat = new THREE.MeshStandardMaterial({
       color: PALETTE.inner, roughness: 0.40, metalness: 0.52,
       emissive: new THREE.Color(pool.accent), emissiveIntensity: 0.05,
-      transparent: true
+      transparent: true, fog: false
     });
 
     const outerMesh = new THREE.Mesh(
@@ -179,7 +183,7 @@ export function buildHexagon(pools) {
 
     // rim that traces the outer edge and lights on hover / select
     const rimMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(pool.accent), transparent: true, opacity: 0, toneMapped: false
+      color: new THREE.Color(pool.accent), transparent: true, opacity: 0, toneMapped: false, fog: false
     });
     const rimMesh = new THREE.Mesh(
       extrude(trapezoidShape(theta, BANDS.outer.from, BANDS.outer.from - 0.028), BANDS.outer.depth * 1.05), rimMat);
@@ -235,7 +239,7 @@ export function buildHexagon(pools) {
   const coreMat = new THREE.MeshStandardMaterial({
     color: PALETTE.core, roughness: 0.25, metalness: 0.75,
     emissive: new THREE.Color(0x0a1b45), emissiveIntensity: 0.5,
-    transparent: true
+    transparent: true, fog: false
   });
   const corePlate = new THREE.Mesh(extrude(coreShape, 0.18), coreMat);
   corePlate.position.z = -0.02;
@@ -244,7 +248,7 @@ export function buildHexagon(pools) {
     new THREE.PlaneGeometry(R * 0.82, R * 0.34),
     new THREE.MeshBasicMaterial({
       map: makeTextTexture('', { lines: ['UNLOCK', 'AI VALUE'], size: 128, weight: 500, width: 1024, height: 420, tracking: 4 }),
-      transparent: true, depthWrite: false, toneMapped: false
+      transparent: true, depthWrite: false, toneMapped: false, fog: false
     })
   );
   coreTitle.position.z = 0.14;
@@ -256,7 +260,7 @@ export function buildHexagon(pools) {
     new THREE.RingGeometry(R * 0.5, R * 0.54, 6, 1),
     new THREE.MeshBasicMaterial({
       color: 0xffffff, transparent: true, opacity: 0,
-      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false
+      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false, fog: false
     })
   );
   ripple.rotation.z = 30 * DEG;

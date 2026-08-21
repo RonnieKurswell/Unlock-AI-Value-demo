@@ -367,7 +367,10 @@ export class HiveScene {
 
     // Straight on while focused: a lean fights the zoom and hurts legibility.
     this.hexTiltTarget = { x: 0, y: 0 };
-    if (changed) { this.hexPop = 1; this.hexRipple = 0; this.hexKick = 1; }
+    if (changed) {
+      this.hexPop = 1; this.hexRipple = 0; this.hexKick = 1;
+      this.hexRippleColor = this.hex.segments[i].accentColor;
+    }
     this.setRoom(this.hex.segments[i].room);
     this.hexSeen.add(i);
     this.hex.segments.forEach((p, k) => {
@@ -678,9 +681,27 @@ export class HiveScene {
     });
   }
 
+  /* Each answer lands as an event on the board rather than a silent state
+     change: the answered segment kicks forward and flashes its rim, a ring
+     ripples out of the core in that pool's colour, and the whole board takes a
+     short settle. Everything decays on its own, so answering fast just stacks
+     the pulses instead of queueing them. */
   ping(poolId) {
     const seg = this.hex && this.hex.segments.find(p => p.id === poolId);
-    if (seg) seg.charge = 1;
+    if (seg) {
+      seg.charge = 1;
+      seg.kick = 1;
+      this.hexRipple = 0;
+      this.hexRippleColor = seg.accentColor;
+      this.hexPop = 0.7;
+      if (this.hexAccentLight) {
+        const a = seg.theta * Math.PI / 180;
+        this.hexAccentLight.position.set(
+          Math.cos(a) * HEX_R * 0.82, Math.sin(a) * HEX_R * 0.82, 3.2);
+        this.hexAccentLight.color.copy(seg.accentColor);
+      }
+      this.hexFlash = 1;
+    }
     const t = this.tiles.find(x => x.pool.id === poolId);
     if (t) t.pingT = 0;
   }
@@ -766,13 +787,18 @@ export class HiveScene {
         p.dim = damp(p.dim, p.targetDim, 5, dt);
         p.fill = damp(p.fill, p.fillTarget, 3.6, dt);
         p.charge = Math.max(0, p.charge - dt * 2.0);   // decays after each answer
+        p.kick = Math.max(0, (p.kick || 0) - dt * 2.6);
+        // Eased so the kick leaves fast and returns slowly, which reads as a
+        // knock rather than a wobble.
+        const kick = p.kick * p.kick;
 
         // The idle bob is parked during the diagnostic — the board has to read
         // as a steady instrument, not something floating.
-        p.holder.position.z = p.lift * 0.85 +
+        p.holder.position.z = p.lift * 0.85 + kick * 0.55 +
           (!diag && this.hexSelected < 0 ? Math.sin(t * 0.8 + i) * 0.045 : 0);
+        p.holder.scale.setScalar(1 + kick * 0.035);
         p.rimMesh.material.opacity = diag
-          ? Math.min(1, p.fill * 0.42 + p.charge * 0.9)
+          ? Math.min(1, p.fill * 0.42 + p.charge * 0.9 + kick * 0.8)
           : Math.min(1, p.glow * 0.9 + (i === this.hexSelected ? this.hexPop * 0.8 : 0));
         p.materials.forEach((m, k) => {
           if (diag) {
@@ -864,7 +890,9 @@ export class HiveScene {
         const e = this.hexRipple;
         this.hex.ripple.scale.setScalar(1 + e * 1.15);
         this.hex.ripple.material.opacity = (1 - e) * 0.5;
-        if (this.hexSelected >= 0) this.hex.ripple.material.color.copy(this.hex.segments[this.hexSelected].accentColor);
+        const rc = this.hexRippleColor ||
+          (this.hexSelected >= 0 ? this.hex.segments[this.hexSelected].accentColor : null);
+        if (rc) this.hex.ripple.material.color.copy(rc);
       } else if (this.hex.ripple) {
         this.hex.ripple.material.opacity = 0;
       }
@@ -882,7 +910,15 @@ export class HiveScene {
             Math.cos(a) * HEX_R * 0.82, Math.sin(a) * HEX_R * 0.82, 3.2);
           this.hexAccentLight.color.copy(sel.accentColor);
         }
-        this.hexAccentLight.intensity = damp(this.hexAccentLight.intensity, sel ? 22 : 0, 4, dt);
+        /* The steady level belongs to a selection; the flash belongs to an
+           answer, which has no selection behind it. Decayed separately and
+           added, so a burst of answers reads as repeated pulses. */
+        this.hexFlash = Math.max(0, (this.hexFlash || 0) - dt * 2.2);
+        const steady = damp(this.hexAccentLight.intensity - (this.hexLastFlash || 0),
+                            sel ? 22 : 0, 4, dt);
+        const flash = this.hexFlash * this.hexFlash * 26;
+        this.hexLastFlash = flash;
+        this.hexAccentLight.intensity = steady + flash;
       }
     }
 
