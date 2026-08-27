@@ -9,7 +9,10 @@
 /* Client brand rules may force a single-blue palette. Both are built; flip the
    flag rather than re-editing every hue. The mono ramp keeps the same lightness
    ordering as the six hues so the benchmark bars stay distinguishable. */
-export const MONO_PALETTE = false;
+/* All six pools render in one blue family, per the client's brand direction.
+   Set to false to restore the six-hue palette kept in POOLS below — the pool
+   objects still carry their original hex, this only overrides it. */
+export const MONO_PALETTE = true;
 
 const MONO_RAMP = {
   strategy: '#8FC6F2',
@@ -46,7 +49,7 @@ export const POOLS = [
     lines: ['DATA FOR AI'],
     verb: 'Insight', edge: 0,
     color: 0x35D0F5, hex: '#35D0F5',
-    room: ['#0A2B3A', '#030C14'],
+    room: ['#0A2038', '#03070E'],
     blurb: 'Policy, claims and treaty data sit in silos and unindexed PDFs. Infosys makes it AI-ready and audit-ready, with lineage a regulator can actually follow.',
     facts: [
       'Lineage a regulator can follow, decision by decision',
@@ -60,7 +63,7 @@ export const POOLS = [
     lines: ['PROCESS AI'],
     verb: 'Transform', edge: 5,
     color: 0xFF7AB0, hex: '#FF7AB0',
-    room: ['#3A1226', '#14050C'],
+    room: ['#122C4E', '#050B16'],
     blurb: 'Task-level automation inside an unchanged workflow. Infosys redesigns the whole journey — submission to bound, FNOL to settlement — around agents working alongside underwriters.',
     facts: [
       'Submission to bound, straight through',
@@ -74,7 +77,7 @@ export const POOLS = [
     lines: ['AGENTIC LEGACY', 'MODERNIZATION'],
     verb: 'Modernize', edge: 4,
     color: 0xB08BFF, hex: '#B08BFF',
-    room: ['#1D1440', '#0A0618'],
+    room: ['#081B33', '#02060C'],
     blurb: 'Rating logic nobody fully understands, on platforms too risky to replace. Infosys recovers the intent with AI and modernises module by module while the book stays live.',
     facts: [
       'Rating logic recovered from legacy code by AI agents',
@@ -88,7 +91,7 @@ export const POOLS = [
     lines: ['PHYSICAL AI'],
     verb: 'Innovate', edge: 3,
     color: 0xFFB454, hex: '#FFB454',
-    room: ['#3A2708', '#150B02'],
+    room: ['#15325A', '#060D1A'],
     blurb: 'Telematics, IoT and drone data treated as a reporting by-product. Infosys engineers it into pricing and claims as a first-class input, with digital twins for exposure.',
     facts: [
       'Telematics and IoT engineered into live pricing',
@@ -102,7 +105,7 @@ export const POOLS = [
     lines: ['AI TRUST'],
     verb: 'Assure', edge: 2,
     color: 0x7EE0C0, hex: '#7EE0C0',
-    room: ['#0A2E26', '#03110E'],
+    room: ['#061529', '#02050A'],
     blurb: 'A model that cannot explain a declined claim is not deployable. Infosys builds bias testing, explainability and audit trails in from the start, not as a final gate.',
     facts: [
       'Bias and fairness tested before deployment, not after',

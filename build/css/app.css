@@ -3,7 +3,7 @@
 
    Type   Geist Light for display, Inter for text and labels — the pairing
           infosys.com itself serves (their h1 is Geist 300, tracked -1px)
-   Colour Infosys blue on a deep ground; cool six-hue pool family
+   Colour Infosys blue on a deep ground; all six pools in one blue family
    Layout centred statements, no boxes, air instead of borders
 
    Rules held here, deliberately:
@@ -33,14 +33,6 @@
   --fg-3: rgba(243, 247, 251, 0.46);
   --fg-4: rgba(243, 247, 251, 0.24);
   --hair: rgba(243, 247, 251, 0.085);
-
-  /* six pools, one cool family — no rainbow */
-  --p-strategy: #7B61FF;
-  --p-data: #007CC3;
-  --p-process: #00A9A5;
-  --p-legacy: #3F6BE5;
-  --p-physical: #C2569F;
-  --p-trust: #14ADE0;
 
   /* spacing scales with the stage, which is always 16:9 and width-driven */
   --s1: clamp(4px, 0.32cqw, 7px);
