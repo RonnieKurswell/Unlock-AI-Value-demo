@@ -56,6 +56,21 @@ const BEAT_SCENE = i => (i === 0 ? 'results' : 'resultsQuiet');
 function show(view) {
   // Drives the per-screen background plate in CSS.
   $('stage').dataset.view = view;
+
+  /* Attract's film runs only while attract is showing. Left playing it would
+     decode behind every other screen for nothing, and on a kiosk that runs all
+     day that is real heat and power. Rewound on the way in so each visitor sees
+     it from the top. */
+  const film = $('bgVideo');
+  if (film) {
+    if (view === 'attract') {
+      try { film.currentTime = 0; } catch (e) { /* not seekable yet */ }
+      const p = film.play();
+      if (p && p.catch) p.catch(() => { /* autoplay refused; poster stands in */ });
+    } else {
+      film.pause();
+    }
+  }
   S.view = view;
   Object.values(VIEWS).forEach(id => $(id).classList.remove('on'));
   $(VIEWS[view]).classList.add('on');

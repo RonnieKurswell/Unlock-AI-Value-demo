@@ -17,6 +17,16 @@
        and still changes per pool. -->
   <div id="bg" aria-hidden="true"></div>
 
+  <!-- Attract only. Muted and playsinline so it can autoplay, and postered with
+       the still plate so nothing flashes before the first frame decodes. app.js
+       pauses it whenever the attract screen is not showing — a background video
+       decoding behind the questionnaire would burn the kiosk's GPU for nothing. -->
+  <video id="bgVideo" aria-hidden="true" muted loop playsinline preload="auto"
+         poster="images/bg-attract.jpg">
+    <source src="media/attract.mp4" type="video/mp4">
+  </video>
+  <div id="bgVideoScrim" aria-hidden="true"></div>
+
   <canvas id="gl"></canvas>
   <div id="vignette"></div>
   <div id="grain"></div>

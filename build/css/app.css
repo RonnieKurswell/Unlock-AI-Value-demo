@@ -157,6 +157,30 @@ input, textarea { font: inherit; }
   opacity: 0.55;
 }
 
+/* Attract's background film, and the 20% black over it. Both sit above #bg and
+   below the canvas, so the 3D and all copy still render on top. Shown only on
+   attract — every other screen keeps its still plate. */
+#bgVideo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms var(--ease);
+}
+#bgVideoScrim {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.20);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms var(--ease);
+}
+#stage[data-view='attract'] #bgVideo,
+#stage[data-view='attract'] #bgVideoScrim { opacity: 1; }
+
+/* The still plate is the video's poster, so it must not also paint over it. */
+#stage[data-view='attract'] #bg { opacity: 0; }
+
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* The design surface. Fixed at 1920x1080 and scaled to whatever the stage is,
