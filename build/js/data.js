@@ -9,19 +9,19 @@
 /* Client brand rules may force a single-blue palette. Both are built; flip the
    flag rather than re-editing every hue. The mono ramp keeps the same lightness
    ordering as the six hues so the benchmark bars stay distinguishable. */
-/* All six pools render in one blue family, per the client's brand direction.
-   Set to false to restore the six-hue palette kept in POOLS below — the pool
-   objects still carry their original hex, this only overrides it. */
+/* Every pool renders in one blue, per the client's brand direction. Not a ramp
+   of tints — a single value, so no pool reads as its own colour. Set the flag to
+   false to restore the six-hue palette kept in POOLS below; the pool objects
+   still carry their original hex, this only overrides it. */
 export const MONO_PALETTE = true;
 
-const MONO_RAMP = {
-  strategy: '#8FC6F2',
-  data:     '#37A6E4',
-  process:  '#6FB9E8',
-  legacy:   '#1E7FC0',
-  physical: '#A8D6F6',
-  trust:    '#0E6099'
-};
+/* The value AI Trust was using, now shared by all six. */
+const MONO_BLUE = '#0E6099';
+
+/* Matching room, so the space does not shift hue between pools either. On the
+   open-pool screens Khai's artwork covers the room anyway; this keeps the
+   framework board and the diagnostic consistent with it. */
+const MONO_ROOM = ['#061529', '#02050A'];
 
 /* The hexagon expects pools ordered by the edge they own: index i sits on the
    edge at i x 60 degrees. Same order as the booth build. */
@@ -174,8 +174,9 @@ export const TILES = {
 
 if (MONO_PALETTE) {
   for (const p of POOLS) {
-    p.hex = MONO_RAMP[p.id];
-    p.color = parseInt(MONO_RAMP[p.id].slice(1), 16);
+    p.hex = MONO_BLUE;
+    p.color = parseInt(MONO_BLUE.slice(1), 16);
+    p.room = [...MONO_ROOM];
   }
 }
 
