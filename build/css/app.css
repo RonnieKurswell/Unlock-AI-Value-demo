@@ -132,17 +132,25 @@ input, textarea { font: inherit; }
   background-image: url('../images/bg-identify.jpg');
   opacity: 0.44;
 }
-/* Opening a pool swaps to that pool's own plate: tinted to its colour, with the
-   left third left clean and dark so the copy column reads over flat ground and
-   the lattice sits behind the slabs on the right. The overview keeps the neutral
-   explore plate, since nothing is open. */
+/* Opening a pool swaps to that pool's own plate — Khai's artwork, exported from
+   the Figma file. Each is composed with its form on the right, behind the slabs,
+   and its left side dark for the copy column. They are blue rather than
+   per-pool: the pool now reads from the slabs, eyebrow, markers and dots. The
+   overview keeps the neutral explore plate, since nothing is open. */
 #stage[data-view='explore'][data-pool='data']     #bg { background-image: url('../images/bg-pool-data.jpg'); }
 #stage[data-view='explore'][data-pool='strategy'] #bg { background-image: url('../images/bg-pool-strategy.jpg'); }
 #stage[data-view='explore'][data-pool='process']  #bg { background-image: url('../images/bg-pool-process.jpg'); }
 #stage[data-view='explore'][data-pool='legacy']   #bg { background-image: url('../images/bg-pool-legacy.jpg'); }
 #stage[data-view='explore'][data-pool='physical'] #bg { background-image: url('../images/bg-pool-physical.jpg'); }
 #stage[data-view='explore'][data-pool='trust']    #bg { background-image: url('../images/bg-pool-trust.jpg'); }
-#stage[data-view='explore'][data-pool] #bg { opacity: 0.30; }
+/* Khai's pool plates are finished artwork with their own blacks, not a texture
+   meant to sit over the room gradient. Screen blending at 0.30 washed them out
+   and greyed their darks, so the pool case blends normally at full strength.
+   Every other screen keeps screen blending — those plates are still textures. */
+#stage[data-view='explore'][data-pool] #bg {
+  mix-blend-mode: normal;
+  opacity: 1;
+}
 
 /* Nitin's note: soft, near-plain, blue on blue. Each beat gets its own plate,
    each built around where that beat puts its copy — so the pattern is always
@@ -223,6 +231,24 @@ input, textarea { font: inherit; }
    fill-mode both, so its final opacity:1 would outrank those rules and both
    modes would show at once. */
 #v-explore.on > * { animation: none; }
+
+/* Insurance for the copy column. Khai's plates each keep their left side dark,
+   but the build should not depend on the next one doing the same. */
+#v-explore .copy-scrim {
+  position: absolute; inset: 0;
+  /* Two gradients, one element: the left band carries the copy column, the
+     bottom band carries the swipe and framework affordances, which otherwise
+     sit on bright glass and stop being readable. */
+  background:
+    linear-gradient(90deg,
+      rgba(5, 8, 14, 0.92) 0%, rgba(5, 8, 14, 0.82) 34%, rgba(5, 8, 14, 0) 58%),
+    linear-gradient(0deg,
+      rgba(5, 8, 14, 0.78) 0%, rgba(5, 8, 14, 0.34) 9%, rgba(5, 8, 14, 0) 16%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms var(--ease);
+}
+#v-explore.focus .copy-scrim { opacity: 1; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
 /* ---------- type primitives --------------------------------- */
