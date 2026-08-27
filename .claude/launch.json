@@ -1,11 +1,11 @@
 {
   "version": "0.0.1",
+  "autoPort": true,
   "configurations": [
     {
       "name": "unlock-ai-kiosk",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4321", "--directory", "build"],
-      "port": 4321
+      "runtimeArgs": ["tools/serve.py"]
     }
   ]
 }
