@@ -75,16 +75,19 @@
       </div>
 
       <div class="col">
-        <div class="pool-read" id="poolRead">
+        <div class="pool-read panel" id="poolRead">
           <div class="pr-rule" id="prRule"></div>
           <div class="pr-verb" id="prVerb">—</div>
           <h2 class="pr-name" id="prName">—</h2>
           <p class="pr-blurb" id="prBlurb">—</p>
           <ul class="pr-facts" id="prFacts"></ul>
-        </div>
-        <div class="foot">
-          <span class="hint"><span id="seenCount">0</span> of 6 read</span>
-          <button class="btn primary" id="beginDiag">Begin diagnostic <span class="arrow">→</span></button>
+          <!-- Inside the panel: it was failing contrast out on the artwork, and
+               Anshul's note was that the diagnostic CTA reads as secondary.
+               On the white surface it is both legible and clearly the next step. -->
+          <div class="foot">
+            <span class="hint"><span id="seenCount">0</span> of 6 read</span>
+            <button class="btn primary" id="beginDiag">Begin diagnostic <span class="arrow">→</span></button>
+          </div>
         </div>
       </div>
 
@@ -102,16 +105,18 @@
     <!-- DIAGNOSTIC -->
     <section class="view" id="v-diag">
       <div class="qcol">
-        <div class="qmeta">
-          <span class="pool-tag" id="qPool">—</span>
-          <span class="count" id="qCount">01 / 18</span>
-        </div>
-        <div class="qkind" id="qKind">—</div>
-        <h2 class="qtext" id="qText">—</h2>
-        <div class="opts" id="qOpts"></div>
-        <div class="qfoot" id="qFoot"></div>
-        <div id="explainBox">
-          <textarea id="explainText" placeholder="Optional — anything the options above don't capture."></textarea>
+        <div class="panel qpanel">
+          <div class="qmeta">
+            <span class="pool-tag" id="qPool">—</span>
+            <span class="count" id="qCount">01 / 18</span>
+          </div>
+          <div class="qkind" id="qKind">—</div>
+          <h2 class="qtext" id="qText">—</h2>
+          <div class="opts" id="qOpts"></div>
+          <div class="qfoot" id="qFoot"></div>
+          <div id="explainBox">
+            <textarea id="explainText" placeholder="Optional — anything the options above don't capture."></textarea>
+          </div>
         </div>
       </div>
       <div class="prog" id="progClusters"></div>

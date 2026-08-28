@@ -15,13 +15,17 @@
    still carry their original hex, this only overrides it. */
 export const MONO_PALETTE = true;
 
-/* The value AI Trust was using, now shared by all six. */
-const MONO_BLUE = '#0E6099';
+/* Two values, not one. The stage is dark and the copy panels are light, so a
+   single accent cannot serve both: #5CBDF5 reads on the 3D and disappears on
+   white, #00639E is the reverse. `hex` is the ground/3D value, `hexInk` is for
+   text and rules sitting on a light panel. */
+const MONO_BLUE = '#5CBDF5';   /* 6.76:1 on the ground */
+const MONO_INK  = '#00639E';   /* 6.41:1 on white */
 
 /* Matching room, so the space does not shift hue between pools either. On the
    open-pool screens Khai's artwork covers the room anyway; this keeps the
    framework board and the diagnostic consistent with it. */
-const MONO_ROOM = ['#061529', '#02050A'];
+const MONO_ROOM = ['#00436F', '#00243F'];
 
 /* The hexagon expects pools ordered by the edge they own: index i sits on the
    edge at i x 60 degrees. Same order as the booth build. */
@@ -175,6 +179,7 @@ export const TILES = {
 if (MONO_PALETTE) {
   for (const p of POOLS) {
     p.hex = MONO_BLUE;
+    p.hexInk = MONO_INK;
     p.color = parseInt(MONO_BLUE.slice(1), 16);
     p.room = [...MONO_ROOM];
   }

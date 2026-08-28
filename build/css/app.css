@@ -19,20 +19,32 @@
   --body: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
   --label: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
 
-  /* ground — deep, cool, never pure black so the 3D reads */
-  --ink: #05080E;
-  --ink-lift: #0B1220;
+  /* GROUND CONTEXT — the 3D stage and the plates behind it.
+     Lifted out of near-black on Anshul's "too dark" note. Every text token
+     below clears WCAG AA body against both ends of the ground gradient;
+     the old ramp had --fg-3 at 4.29:1 and --fg-4 at 1.97:1. */
+  /* Hue 205 at full saturation. The previous pair was hue 215 at 18% value:
+     saturated on paper, grey to the eye. Infosys blue is hue 202, so the
+     ground has to sit next to it, not drift toward navy. */
+  --ink: #00243F;
+  --ink-lift: #00436F;
 
-  /* Infosys blue leads. One warm note is reserved for "unlocked". */
-  --blue: #007CC3;
-  --blue-lift: #37A6E4;
-  --blue-deep: #0A3D62;
+  /* Infosys blue leads. --blue fills, --blue-lift carries text: the split
+     matters because a fill only needs 3:1 while text needs 4.5:1. */
+  --blue: #2BA0E8;
+  --blue-lift: #6EC8FF;
+  --blue-deep: #00568C;
 
-  --fg: #F3F7FB;
-  --fg-2: rgba(243, 247, 251, 0.74);
-  --fg-3: rgba(243, 247, 251, 0.46);
-  --fg-4: rgba(243, 247, 251, 0.24);
-  --hair: rgba(243, 247, 251, 0.085);
+  --fg: #FFFFFF;          /* 10.33:1 on ground */
+  --fg-2: #DCEAF7;        /*  8.44:1 */
+  --fg-3: #B8D4EC;        /*  6.72:1  (was 4.29 — failed AA) */
+  --fg-4: #9DBCD8;        /*  5.22:1  (was 1.97 — failed AA) */
+  --hair: rgba(184, 212, 236, 0.30);
+
+  /* SURFACE CONTEXT — see .panel. */
+  --surface: #FFFFFF;
+  --surface-2: #F2F7FC;
+  --radius: 16px;
 
   /* spacing scales with the stage, which is always 16:9 and width-driven */
   --s1: clamp(4px, 0.32cqw, 7px);
@@ -50,6 +62,41 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-mech: cubic-bezier(0.65, 0, 0.35, 1);
 }
+
+/* -------------------------------------------------------------
+   COPY PANEL
+
+   Anshul's readability note and a 40+ audience point the same way: stop
+   setting long copy over artwork. Copy moves onto a light surface, and the
+   surface re-points the text tokens for everything inside it.
+
+   That re-pointing is the whole trick. Rules elsewhere already say
+   `color: var(--fg-3)`; inside a panel the same rule resolves dark-on-light
+   instead of light-on-dark, so the flip costs no per-rule edits and cannot
+   drift out of sync as the design moves.
+
+   The reference was the GCC deck's clarity, not its styling — no drop
+   shadows, no heavy rounding, no illustration. Our hairlines and our type
+   hierarchy, on a light ground.
+   ------------------------------------------------------------- */
+.panel {
+  background: var(--surface);
+  color: var(--fg);      /* load-bearing: without it, anything that merely
+                            inherits its colour stays white-on-white */
+  border-radius: var(--radius);
+  padding: clamp(22px, 2.3cqw, 46px) clamp(24px, 2.6cqw, 52px);
+
+  --fg: #0A1C2E;          /* 17.23:1 on white */
+  --fg-2: #33506D;        /*  8.37:1 */
+  --fg-3: #4A6683;        /*  5.97:1 */
+  --fg-4: #55718C;        /*  4.9:1  — carries meta text, so it has to clear
+                                       body contrast, not just large */
+  --hair: #D3E0EC;
+  --blue: #0079BF;
+  --blue-lift: #00639E;   /*  6.41:1 — accent-as-text needs the darker one */
+}
+/* For a panel sitting directly on another panel. */
+.panel.panel-2 { background: var(--surface-2); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -96,11 +143,14 @@ input, textarea { font: inherit; }
    much light they carry and the screens differ in how much reading they ask
    for: attract is a headline and can take a dominant plate, the diagnostic is
    eighteen questions and cannot. */
+/* Every plate is now finished artwork rather than a faint texture meant to sit
+   over the room gradient, so the default is a normal blend at full strength.
+   Screen blending at 0.24-0.55 was what made the new plates read dull and grey:
+   it lifts blacks and desaturates everything it touches. */
 #bg {
   position: absolute; inset: 0;
   background: center / cover no-repeat;
   opacity: 0;
-  mix-blend-mode: screen;
   pointer-events: none;
   transition: opacity 700ms var(--ease), background-image 0ms;
 }
@@ -109,20 +159,19 @@ input, textarea { font: inherit; }
    so the plate is the composition. */
 #stage[data-view='attract'] #bg {
   background-image: url('../images/bg-attract.jpg');
-  opacity: 0.85;
+  opacity: 1;
 }
 #stage[data-view='explore'] #bg {
   background-image: url('../images/bg-explore.jpg');
-  opacity: 0.34;
+  opacity: 1;
 }
-/* Quietest of the six — the questions and five options live on the right. */
 #stage[data-view='diag'] #bg {
   background-image: url('../images/bg-diag.jpg');
-  opacity: 0.30;
+  opacity: 1;
 }
 #stage[data-view='identify'] #bg {
   background-image: url('../images/bg-identify.jpg');
-  opacity: 0.44;
+  opacity: 1;
 }
 /* Opening a pool swaps to that pool's own plate — Khai's artwork, exported from
    the Figma file. Each is composed with its form on the right, behind the slabs,
@@ -139,22 +188,19 @@ input, textarea { font: inherit; }
    meant to sit over the room gradient. Screen blending at 0.30 washed them out
    and greyed their darks, so the pool case blends normally at full strength.
    Every other screen keeps screen blending — those plates are still textures. */
-#stage[data-view='explore'][data-pool] #bg {
-  mix-blend-mode: normal;
-  opacity: 1;
-}
+#stage[data-view='explore'][data-pool] #bg { opacity: 1; }
 
 /* Nitin's note: soft, near-plain, blue on blue. Each beat gets its own plate,
    each built around where that beat puts its copy — so the pattern is always
    somewhere the reading is not. */
-#stage[data-view='wrap'] #bg { opacity: 0.34; }
+#stage[data-view='wrap'] #bg { opacity: 1; }
 #stage[data-view='wrap'][data-beat='1'] #bg { background-image: url('../images/bg-beat1.jpg'); }
-#stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/bg-beat2.jpg'); opacity: 0.24; }
+#stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/bg-beat2.jpg'); }
 #stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/bg-beat3.jpg'); }
 #stage[data-view='wrap'][data-beat='4'] #bg { background-image: url('../images/bg-beat4.jpg'); }
 #stage[data-view='done'] #bg {
   background-image: url('../images/bg-done.jpg');
-  opacity: 0.55;
+  opacity: 1;
 }
 
 /* Attract's background film, and the 20% black over it. Both sit above #bg and
@@ -164,17 +210,44 @@ input, textarea { font: inherit; }
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
+  /* Blurred and desaturated so it reads as depth behind the headline rather
+     than imagery competing with it. Scaled up because blur samples past the
+     edge and would otherwise show a soft border. */
+  filter: blur(9px) saturate(0.72);
+  transform: scale(1.06);
   opacity: 0;
   pointer-events: none;
   transition: opacity 700ms var(--ease);
 }
 #bgVideoScrim {
   position: absolute; inset: 0;
-  background: rgba(0, 0, 0, 0.20);
+  background: rgba(0, 0, 0, 0.58);
   opacity: 0;
   pointer-events: none;
   transition: opacity 700ms var(--ease);
 }
+/* -------------------------------------------------------------
+   CENTRE SCRIM — identify and done
+
+   Both centre their copy directly over the plate, with no panel to sit on.
+   Making the plates vivid blue cost the contrast the old near-black ones
+   gave away for free: white fell to 3.19:1 on identify and --fg-3 to 1.97:1.
+   A radial scrim buys it back behind the copy while leaving the artwork at
+   the edges bright, which is where the hexagon forms live on both plates.
+   ------------------------------------------------------------- */
+#v-identify::before,
+#v-done::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(72% 64% at 50% 50%,
+    rgba(0, 26, 45, 0.80) 0%,
+    rgba(0, 26, 45, 0.62) 46%,
+    rgba(0, 26, 45, 0) 80%);
+}
+
+/* --blue-lift measured 2.91:1 over the film. White clears it without
+   pushing the scrim so dark the film stops reading as motion. */
+#v-attract .label { color: var(--fg); }
+
 #stage[data-view='attract'] #bgVideo,
 #stage[data-view='attract'] #bgVideoScrim { opacity: 1; }
 
@@ -229,8 +302,8 @@ input, textarea { font: inherit; }
 .brand .div { width: 1px; height: 14px; background: var(--hair); }
 .brand span {
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(9.5px, 0.62cqw, 12px);
-  letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
+  font-size: clamp(13.1px, 0.856cqw, 16.6px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 
 /* ---------- views ------------------------------------------- */
@@ -255,11 +328,13 @@ input, textarea { font: inherit; }
   /* Two gradients, one element: the left band carries the copy column, the
      bottom band carries the swipe and framework affordances, which otherwise
      sit on bright glass and stop being readable. */
+  /* Much lighter than it was: the copy now sits on a panel, so this only has
+     to settle the artwork behind the footer chrome, not carry text contrast. */
   background:
     linear-gradient(90deg,
-      rgba(5, 8, 14, 0.92) 0%, rgba(5, 8, 14, 0.82) 34%, rgba(5, 8, 14, 0) 58%),
+      rgba(0, 36, 63, 0.52) 0%, rgba(0, 36, 63, 0.34) 38%, rgba(0, 36, 63, 0) 62%),
     linear-gradient(0deg,
-      rgba(5, 8, 14, 0.78) 0%, rgba(5, 8, 14, 0.34) 9%, rgba(5, 8, 14, 0) 16%);
+      rgba(0, 36, 63, 0.72) 0%, rgba(0, 36, 63, 0.30) 10%, rgba(0, 36, 63, 0) 18%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 520ms var(--ease);
@@ -271,8 +346,8 @@ input, textarea { font: inherit; }
 
 .label {
   font-family: var(--label); font-weight: 600;
-  font-size: clamp(9.5px, 0.62cqw, 12px);
-  letter-spacing: 0.24em; text-transform: uppercase;
+  font-size: clamp(13.1px, 0.856cqw, 16.6px);
+  letter-spacing: 0.13em; text-transform: uppercase;
   color: var(--blue-lift);
 }
 .label.cool { color: var(--fg-2); }
@@ -289,9 +364,9 @@ input, textarea { font: inherit; }
 
 p.lede {
   color: var(--fg-2); font-weight: 300;
-  font-size: clamp(14px, 1.02cqw, 20px); line-height: 1.6;
+  font-size: clamp(14.8px, 1.081cqw, 21.2px); line-height: 1.6;
 }
-p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-height: 1.62; }
+p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-height: 1.62; }
 
 /* centred statement block — the default composition */
 .statement { width: min(1120px, 64cqw); margin: 0 auto; text-align: center; }
@@ -302,8 +377,8 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 
 .btn {
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(10px, 0.68cqw, 13px);
-  letter-spacing: 0.2em; text-transform: uppercase;
+  font-size: clamp(13.0px, 0.857cqw, 16.4px);
+  letter-spacing: 0.13em; text-transform: uppercase;
   color: var(--fg);
   display: inline-flex; align-items: center; gap: var(--s2);
   padding: var(--s2) 0;
@@ -315,17 +390,18 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   background: var(--fg-4); transition: background 0.24s var(--ease), transform 0.3s var(--ease-mech);
   transform-origin: left;
 }
-.btn:hover { color: var(--blue-lift); gap: calc(var(--s2) + 6px); }
-.btn:hover::after { background: var(--blue-lift); }
+.btn:active { color: var(--blue-lift); gap: calc(var(--s2) + 6px); }
+.btn:active::after { background: var(--blue-lift); }
 
 .btn.primary { color: var(--blue-lift); }
 .btn.primary::after { background: var(--blue); height: 2px; }
-.btn.primary:hover { color: var(--fg); }
-.btn.primary:hover::after { background: var(--blue-lift); }
+.btn.primary:active { color: var(--fg); }
+.btn.primary:active::after { background: var(--blue-lift); }
 
-.btn.quiet { color: var(--fg-3); }
+/* Sits out on the plate in overview mode, where --fg-3 measured 4.18:1. */
+.btn.quiet { color: var(--fg-2); }
 .btn.quiet::after { background: transparent; }
-.btn.quiet:hover { color: var(--fg); }
+.btn.quiet:active { color: var(--fg); }
 .btn:disabled { opacity: 0.28; pointer-events: none; }
 .btn .arrow { font-family: var(--body); font-size: 1.15em; }
 
@@ -337,15 +413,15 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 #v-attract .d-xl { max-width: 21ch; margin: var(--s3) auto 0; }
 #v-attract .sub {
   margin-top: var(--s4); color: var(--fg-2);
-  font-size: clamp(13px, 0.95cqw, 19px); white-space: nowrap;
+  font-size: clamp(13.8px, 1.007cqw, 20.1px); white-space: nowrap;
 }
 .touch-cue {
   margin-top: var(--s5); white-space: nowrap;
   /* inline-flex so the parent's text-align keeps it centred */
   display: inline-flex; align-items: center; gap: var(--s3);
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(9.5px, 0.62cqw, 12px);
-  letter-spacing: 0.34em; text-transform: uppercase; color: var(--fg-3);
+  font-size: clamp(13.1px, 0.856cqw, 16.6px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 /* Only the wording breathes. The beacon keeps its own ping, which is the part
    that says "touch"; fading the two together would mute exactly that. */
@@ -363,8 +439,8 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   margin: 0 auto; width: max-content;
   display: flex; align-items: center; justify-content: center; gap: var(--s3);
   font-family: var(--label); font-weight: 600;
-  font-size: clamp(9.5px, 0.62cqw, 12px);
-  letter-spacing: 0.26em; text-transform: uppercase; color: var(--fg-3);
+  font-size: clamp(13.1px, 0.856cqw, 16.6px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
   pointer-events: none;
 }
 .touch-dot { position: relative; width: 26px; height: 26px; flex: none; }
@@ -389,7 +465,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   --seg: var(--blue);
   position: relative; padding: var(--s2) 0 var(--s2) calc(var(--s3) + 8px);
   border-bottom: 1px solid var(--hair);
-  font-size: clamp(12.5px, 0.9cqw, 16px); color: var(--fg-2);
+  font-size: clamp(14.2px, 1.026cqw, 18.2px); color: var(--fg-2);
 }
 .pr-facts li:first-child { border-top: 1px solid var(--hair); }
 /* Pointy-top hexagon marker, the same silhouette as the framework board.
@@ -468,11 +544,17 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .ff-hint, .ff-back {
   display: inline-flex; align-items: center; gap: var(--s2);
   font-family: var(--label); font-weight: 500;
-  font-size: clamp(9px, 0.6cqw, 11.5px);
-  letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
+  font-size: clamp(13.0px, 0.828cqw, 15.9px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
-.ff-back { color: var(--fg-2); }
-.ff-back:hover { color: var(--fg); }
+/* Both of these are real targets on the panel, so they need the 44px minimum
+   rather than hugging their text. */
+.ff-back {
+  color: var(--fg-2);
+  min-height: 44px; display: inline-flex; align-items: center; gap: 10px;
+  padding: 0 4px;
+}
+.ff-back:active { color: var(--fg); }
 .ff-back .touch-dot { width: 20px; height: 20px; }
 .ff-div { width: 1px; height: 13px; background: var(--hair); }
 .ff-arrow { color: var(--seg, var(--blue-lift)); }
@@ -494,15 +576,15 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 
 .pr-rule { height: 2px; width: 44px; margin-bottom: var(--s3); background: var(--blue); }
 .pr-verb {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62cqw, 12px);
-  letter-spacing: 0.24em; text-transform: uppercase;
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.1px, 0.856cqw, 16.6px);
+  letter-spacing: 0.13em; text-transform: uppercase;
 }
 .pr-name {
   font-family: var(--display); font-weight: 300;
   font-size: clamp(26px, 2.6cqw, 48px); line-height: 1.04; letter-spacing: -0.022em;
   margin-top: var(--s2); text-wrap: balance;
 }
-.pr-blurb { margin-top: var(--s3); font-size: clamp(13.5px, 0.96cqw, 19px); line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
+.pr-blurb { margin-top: var(--s3); font-size: clamp(14.3px, 1.018cqw, 20.1px); line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
 .pr-tiles-head { margin-top: var(--s5); }
 .pr-tiles { margin-top: var(--s3); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
 .tile {
@@ -513,22 +595,22 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   background: rgba(243, 247, 251, 0.028);
   transition: background 0.22s var(--ease), transform 0.22s var(--ease);
 }
-.tile:hover { background: rgba(243, 247, 251, 0.075); transform: translateY(-3px); }
+.tile:active { background: rgba(243, 247, 251, 0.075); }
 .tile.pending { border-top-color: var(--fg-4); background: rgba(243, 247, 251, 0.014); }
 .tile .t-n {
-  font-family: var(--label); font-weight: 500; font-size: clamp(8.5px, 0.55cqw, 10.5px);
-  letter-spacing: 0.2em; color: var(--fg-4);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.759cqw, 14.5px);
+  letter-spacing: 0.13em; color: var(--fg-4);
 }
 .tile .t-client {
   font-family: var(--display); font-weight: 500;
-  font-size: clamp(14px, 1.08cqw, 20px); line-height: 1.15; letter-spacing: -0.014em; color: var(--fg);
+  font-size: clamp(14.8px, 1.145cqw, 21.2px); line-height: 1.15; letter-spacing: -0.014em; color: var(--fg);
 }
 .tile.pending .t-client { color: var(--fg-3); }
-.tile .t-title { font-size: clamp(11.5px, 0.78cqw, 14px); color: var(--fg-2); line-height: 1.35; }
+.tile .t-title { font-size: clamp(13.1px, 0.889cqw, 16.0px); color: var(--fg-2); line-height: 1.35; }
 .tile .t-metric {
   margin-top: auto; padding-top: var(--s2);
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--tile-accent);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--tile-accent);
 }
 .tile.pending .t-metric { color: var(--fg-4); }
 
@@ -560,34 +642,35 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   margin-top: var(--s2);
 }
 .ts-metric {
-  font-family: var(--label); font-weight: 500; font-size: clamp(11px, 0.82cqw, 15px);
-  letter-spacing: 0.16em; text-transform: uppercase; margin-top: var(--s3);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.935cqw, 17.1px);
+  letter-spacing: 0.13em; text-transform: uppercase; margin-top: var(--s3);
 }
-#tileSheet .body { margin-top: var(--s4); font-size: clamp(13px, 0.92cqw, 17px); }
+#tileSheet .body { margin-top: var(--s4); font-size: clamp(13.8px, 0.975cqw, 18.0px); }
 #tileClose {
   position: absolute; top: var(--s5); right: var(--s6);
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
-#tileClose:hover { color: var(--fg); }
+#tileClose:active { color: var(--fg); }
 
 .pr-sect { margin-top: var(--s4); }
 .pr-sect h4 {
-  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58cqw, 11px);
-  letter-spacing: 0.24em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
   margin-bottom: var(--s2);
 }
-.pr-sect p { font-size: clamp(12px, 0.82cqw, 15.5px); line-height: 1.62; color: var(--fg-2); max-width: 58ch; }
+.pr-sect p { font-size: clamp(13.7px, 0.935cqw, 17.7px); line-height: 1.62; color: var(--fg-2); max-width: 58ch; }
 .pr-sect ul { list-style: none; display: flex; flex-direction: column; gap: var(--s2); }
-.pr-sect li { font-size: clamp(12px, 0.82cqw, 15.5px); color: var(--fg-2); }
+.pr-sect li { font-size: clamp(13.7px, 0.935cqw, 17.7px); color: var(--fg-2); }
 
 #v-explore .foot {
-  flex: none; margin-top: var(--s5);
+  flex: none; margin-top: var(--s4);
+  padding-top: var(--s4); border-top: 1px solid var(--hair);
   display: flex; align-items: center; gap: var(--s5);
 }
 #v-explore .foot .hint {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
-  letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 #seenCount { color: var(--blue-lift); }
 
@@ -600,18 +683,21 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   width: 46%; max-width: 700px;
   display: flex; flex-direction: column; justify-content: center;
 }
+/* The panel hugs the question rather than filling the column, so the plate
+   and the 3D still read around it. */
+#v-diag .qpanel { display: flex; flex-direction: column; }
 .qmeta { display: flex; align-items: baseline; gap: var(--s3); margin-bottom: var(--s2); }
 .qmeta .pool-tag {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9.5px, 0.62cqw, 12px);
-  letter-spacing: 0.24em; text-transform: uppercase;
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.1px, 0.856cqw, 16.6px);
+  letter-spacing: 0.13em; text-transform: uppercase;
 }
 .qmeta .count {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
-  letter-spacing: 0.18em; color: var(--fg-4); margin-left: auto;
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.13em; color: var(--fg-4); margin-left: auto;
 }
 .qkind {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
-  letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 .qtext {
   font-family: var(--display); font-weight: 300;
@@ -635,23 +721,23 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   background: var(--blue); transform: scaleY(0); transform-origin: center;
   transition: transform 0.28s var(--ease-mech);
 }
-.opt:hover { padding-left: var(--s3); }
-.opt:hover::before { transform: scaleY(1); }
+.opt:active { padding-left: var(--s3); }
+.opt:active::before { transform: scaleY(1); }
 .opt .key {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.58cqw, 11px);
-  letter-spacing: 0.14em; color: var(--fg-4); transition: color 0.22s var(--ease);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.13em; color: var(--blue-lift); transition: color 0.22s var(--ease);
 }
-.opt:hover .key { color: var(--blue-lift); }
-.opt .lab { font-size: clamp(14px, 1.02cqw, 21px); font-weight: 400; color: var(--fg); }
-.opt .sub { font-size: clamp(11.5px, 0.76cqw, 14px); color: var(--fg-3); margin-top: 4px; line-height: 1.45; }
+.opt:active .key { color: var(--blue-lift); }
+.opt .lab { font-size: clamp(14.8px, 1.081cqw, 22.3px); font-weight: 400; color: var(--fg); }
+.opt .sub { font-size: clamp(15.5px, 1.02cqw, 19px); color: var(--fg-2); margin-top: 5px; line-height: 1.58; }
 
 .qfoot { margin-top: var(--s4); display: flex; align-items: center; gap: var(--s5); }
 .link-quiet {
-  font-family: var(--label); font-weight: 500; font-size: clamp(9px, 0.6cqw, 11.5px);
-  letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
   transition: color 0.2s var(--ease);
 }
-.link-quiet:hover { color: var(--blue-lift); }
+.link-quiet:active { color: var(--blue-lift); }
 
 #explainBox { margin-top: var(--s3); display: none; }
 #explainBox.on { display: block; }
@@ -659,7 +745,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   width: 100%; height: 76px; resize: none;
   background: transparent; border: none; border-bottom: 1px solid var(--hair);
   color: var(--fg); font-family: var(--body); font-weight: 300;
-  font-size: clamp(13px, 0.9cqw, 16px); padding: var(--s2) 0; line-height: 1.5;
+  font-size: clamp(14.8px, 1.026cqw, 18.2px); padding: var(--s2) 0; line-height: 1.5;
 }
 #explainBox textarea::placeholder { color: var(--fg-4); }
 #explainBox textarea:focus { outline: none; border-bottom-color: var(--blue); }
@@ -668,12 +754,20 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   pointer-events: auto; position: absolute; left: var(--pad-x); bottom: var(--pad-b);
   display: flex; gap: var(--s3);
 }
+/* These labels sit directly on the brightest part of the plate, where they
+   measured 3.38:1. Their own soft scrim rather than washing out the artwork. */
+#v-diag .prog::before {
+  content: ''; position: absolute; z-index: -1;
+  inset: -18px -26px -22px -26px; border-radius: 18px;
+  background: radial-gradient(120% 150% at 50% 50%,
+    rgba(0, 26, 45, 0.86) 0%, rgba(0, 26, 45, 0.62) 55%, rgba(0, 26, 45, 0) 100%);
+}
 .cluster { display: flex; flex-direction: column; gap: var(--s1); }
 .cluster .ticks { display: flex; gap: 3px; }
 .cluster .ticks i { width: 16px; height: 2px; background: var(--fg-4); display: block; transition: background 0.3s var(--ease); }
 .cluster .lb {
-  font-family: var(--label); font-weight: 400; font-size: clamp(8px, 0.52cqw, 10px);
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg-4); white-space: nowrap;
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.718cqw, 13.8px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4); white-space: nowrap;
   transition: color 0.3s var(--ease);
 }
 .cluster.active .lb { color: var(--fg-2); }
@@ -696,12 +790,12 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .beat:not(#beat1)::before {
   content: ''; position: absolute; z-index: -1;
   inset: calc(var(--pad-t) * -1) calc(var(--pad-x) * -1) calc(var(--pad-b) * -1);
-  background: linear-gradient(180deg, rgba(9, 18, 33, 0.94) 0%, rgba(8, 16, 30, 0.88) 58%, rgba(7, 13, 25, 0.55) 100%);
+  background: linear-gradient(180deg, rgba(0, 36, 63, 0.94) 0%, rgba(0, 40, 70, 0.88) 58%, rgba(0, 45, 76, 0.55) 100%);
 }
 #beat1::before {
   content: ''; position: absolute; z-index: -1;
   inset: calc(var(--pad-t) * -1) calc(var(--pad-x) * -1) calc(var(--pad-b) * -1);
-  background: radial-gradient(84% 74% at 50% 36%, rgba(9, 18, 33, 0.90) 0%, rgba(8, 15, 28, 0.66) 55%, rgba(6, 12, 22, 0.20) 100%);
+  background: radial-gradient(84% 74% at 50% 36%, rgba(0, 36, 63, 0.90) 0%, rgba(0, 40, 70, 0.66) 55%, rgba(0, 45, 76, 0.20) 100%);
 }
 
 .beat-nav {
@@ -724,26 +818,26 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 }
 #beat1 .arch-tag {
   font-family: var(--body); font-weight: 300; font-style: normal;
-  font-size: clamp(15px, 1.1cqw, 22px); color: var(--blue-lift); margin-top: var(--s3);
+  font-size: clamp(15.9px, 1.166cqw, 23.3px); color: var(--blue-lift); margin-top: var(--s3);
 }
 #beat1 .arch-cols {
   display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--s5);
   align-items: start;
 }
-#beat1 .arch-body { font-size: clamp(12.5px, 0.84cqw, 16px); }
+#beat1 .arch-body { font-size: clamp(14.2px, 0.958cqw, 18.2px); }
 #beat1 .arch-risk {
   padding-left: var(--s3); border-left: 2px solid var(--blue);
-  font-size: clamp(12.5px, 0.86cqw, 16px); line-height: 1.6; color: var(--fg-2);
+  font-size: clamp(14.2px, 0.98cqw, 18.2px); line-height: 1.6; color: var(--fg-2);
 }
 
 /* beat 2 — benchmark */
 .bench-head { text-align: left; }
 .bench-head .d-m { margin-top: var(--s2); }
-.bench-praise { margin-top: var(--s3); font-size: clamp(13px, 0.94cqw, 18px); max-width: 68ch; }
+.bench-praise { margin-top: var(--s3); font-size: clamp(13.8px, 0.996cqw, 19.1px); max-width: 68ch; }
 .bench-praise b { color: var(--blue-lift); font-weight: 500; }
 .bench-note {
-  font-family: var(--label); font-weight: 400; font-size: clamp(8.5px, 0.56cqw, 10.5px);
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-4);
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.773cqw, 14.5px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4);
   margin-top: var(--s3);
 }
 .bench-list { display: flex; flex-direction: column; }
@@ -752,10 +846,10 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   padding: var(--s3) 0; border-bottom: 1px solid var(--hair);
 }
 .bench-row:first-child { border-top: 1px solid var(--hair); }
-.bench-row .nm { font-size: clamp(13px, 0.92cqw, 17px); color: var(--fg); }
+.bench-row .nm { font-size: clamp(13.8px, 0.975cqw, 18.0px); color: var(--fg); }
 .bench-row .bd {
-  font-family: var(--label); font-weight: 400; font-size: clamp(8.5px, 0.56cqw, 10.5px);
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-4); margin-top: 3px;
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.773cqw, 14.5px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4); margin-top: 3px;
 }
 .track { position: relative; height: 6px; background: rgba(243, 247, 251, 0.07); }
 .track .fill { position: absolute; inset: 0 auto 0 0; width: 0; transition: width 1.1s var(--ease-mech); }
@@ -763,10 +857,10 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .track .bmark::after {
   content: 'BENCHMARK'; position: absolute; top: -15px; left: 4px;
   font-family: var(--label); font-weight: 500; font-size: 7.5px;
-  letter-spacing: 0.18em; color: var(--fg-3);
+  letter-spacing: 0.13em; color: var(--fg-3);
 }
 .bench-row .val {
-  font-family: var(--label); font-weight: 500; font-size: clamp(10px, 0.68cqw, 13px);
+  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.857cqw, 16.4px);
   letter-spacing: 0.1em; text-align: right; color: var(--fg-2);
 }
 .delta-up { color: var(--blue-lift); }
@@ -785,18 +879,18 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .fc-col { padding-left: var(--s4); border-left: 1px solid var(--hair); min-width: 0; }
 .fc-col:first-child { padding-left: 0; border-left: none; }
 .fc-col h4 {
-  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58cqw, 11px);
-  letter-spacing: 0.24em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 .fc-col.hot h4 { color: var(--blue-lift); }
-.fc-col p { font-size: clamp(12px, 0.82cqw, 15px); line-height: 1.6; color: var(--fg-3); margin: var(--s3) 0 var(--s4); }
+.fc-col p { font-size: clamp(13.7px, 0.935cqw, 17.1px); line-height: 1.6; color: var(--fg-3); margin: var(--s3) 0 var(--s4); }
 .fc-col ul { list-style: none; display: flex; flex-direction: column; gap: var(--s2); }
-.fc-col li { display: flex; align-items: center; gap: var(--s2); font-size: clamp(13px, 0.9cqw, 16px); }
+.fc-col li { display: flex; align-items: center; gap: var(--s2); font-size: clamp(14.8px, 1.026cqw, 18.2px); }
 .fc-col li i { width: 7px; height: 7px; flex: none; }
 .fc-proof { margin-top: var(--s4); }
 .fc-proof-label {
-  font-family: var(--label); font-weight: 600; font-size: clamp(8.5px, 0.56cqw, 10.5px);
-  letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.773cqw, 14.5px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
   margin-bottom: var(--s2);
 }
 .fc-proof .tile { border-top-width: 2px; }
@@ -806,18 +900,18 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .retrieve li {
   display: grid; grid-template-columns: 2.4em 1fr; gap: var(--s2); align-items: baseline;
   padding: var(--s2) 0; border-bottom: 1px solid var(--hair);
-  font-size: clamp(13px, 0.9cqw, 17px); color: var(--fg-2);
+  font-size: clamp(13.8px, 0.954cqw, 18.0px); color: var(--fg-2);
 }
 .retrieve li:first-child { border-top: 1px solid var(--hair); }
 .retrieve .r-n {
-  font-family: var(--label); font-weight: 600; font-size: clamp(9px, 0.58cqw, 11px);
+  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.8cqw, 15.2px);
   letter-spacing: 0.12em; color: var(--blue-lift);
 }
 .retrieve b { color: var(--fg); font-weight: 500; }
 
 .fc-empty {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-4);
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4);
 }
 
 /* beat 4 — role */
@@ -827,20 +921,20 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 }
 .role-morph { margin: var(--s4) 0 var(--s3); }
 .role-morph .from {
-  font-family: var(--label); font-weight: 400; font-size: clamp(10px, 0.68cqw, 13px);
-  letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-3);
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.857cqw, 16.4px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 .role-morph .to {
   font-family: var(--display); font-weight: 300;
   font-size: clamp(26px, 2.8cqw, 52px); line-height: 1.04; letter-spacing: -0.022em;
   color: var(--blue-lift); margin-top: var(--s1);
 }
-.role-change { font-size: clamp(13px, 0.94cqw, 18px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
-.role-focus { font-size: clamp(13px, 0.94cqw, 18px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
+.role-change { font-size: clamp(13.8px, 0.996cqw, 19.1px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
+.role-focus { font-size: clamp(13.8px, 0.996cqw, 19.1px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
 .role-focus b { font-weight: 500; }
 .role-src {
   margin-top: var(--s4); font-family: var(--label); font-weight: 400;
-  font-size: clamp(8.5px, 0.56cqw, 10.5px); letter-spacing: 0.2em;
+  font-size: clamp(13.0px, 0.773cqw, 14.5px); letter-spacing: 0.13em;
   text-transform: uppercase; color: var(--fg-4);
 }
 .role-aside { border-left: 1px solid var(--hair); padding-left: var(--s5); }
@@ -849,10 +943,10 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 /* beat 5 — proof */
 .pending-note {
   margin-top: var(--s4); padding-left: var(--s3); border-left: 2px solid var(--blue-deep);
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.6cqw, 11px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.828cqw, 15.2px);
   letter-spacing: 0.08em; line-height: 1.9; color: var(--fg-3);
 }
-.pending-note b { color: var(--blue-lift); letter-spacing: 0.18em; }
+.pending-note b { color: var(--blue-lift); letter-spacing: 0.13em; }
 
 /* ---------- delivery ---------------------------------------- */
 
@@ -951,8 +1045,8 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .socket.locked .badge-glyph { opacity: 0; }
 
 .scan-state {
-  font-family: var(--label); font-weight: 600; font-size: clamp(10px, 0.7cqw, 13px);
-  letter-spacing: 0.28em; text-transform: uppercase; color: var(--fg-2);
+  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.882cqw, 16.4px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-2);
   display: inline-flex; align-items: center; gap: var(--s2);
 }
 .scan-state::before {
@@ -988,7 +1082,7 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 .manual-form.on { display: block; animation: rise 0.44s var(--ease) both; }
 .manual-form label {
   display: block; font-family: var(--label); font-weight: 500;
-  font-size: clamp(9px, 0.58cqw, 11px); letter-spacing: 0.22em;
+  font-size: clamp(13.0px, 0.8cqw, 15.2px); letter-spacing: 0.13em;
   text-transform: uppercase; color: var(--fg-3); margin-bottom: var(--s4);
 }
 .manual-form .mf-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
@@ -996,24 +1090,25 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
   display: block; width: 100%; margin-top: var(--s1);
   background: transparent; border: none; border-bottom: 1px solid var(--hair);
   color: var(--fg); font-family: var(--body); font-weight: 300;
-  font-size: clamp(14px, 1cqw, 18px); letter-spacing: normal; text-transform: none;
+  font-size: clamp(14.8px, 1.06cqw, 19.1px); letter-spacing: normal; text-transform: none;
   padding: var(--s2) 0;
 }
 .manual-form input::placeholder { color: var(--fg-4); }
 .manual-form input:focus { outline: none; border-bottom-color: var(--blue); }
 .mf-actions { display: flex; gap: var(--s5); align-items: center; margin-top: var(--s3); }
 .mf-error {
-  font-family: var(--label); font-weight: 400; font-size: clamp(9px, 0.58cqw, 11px);
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
   letter-spacing: 0.12em; color: #E0736B; margin-top: var(--s2); min-height: 14px;
 }
 
 .demo-trigger {
+  min-height: 44px; padding: 0 var(--s3);
   margin-top: var(--s6); font-family: var(--label); font-weight: 400;
-  font-size: clamp(8.5px, 0.56cqw, 10.5px); letter-spacing: 0.22em;
+  font-size: clamp(13.0px, 0.773cqw, 14.5px); letter-spacing: 0.13em;
   text-transform: uppercase; color: var(--fg-4);
   transition: color 0.2s var(--ease);
 }
-.demo-trigger:hover { color: var(--fg-3); }
+.demo-trigger:active { color: var(--fg-3); }
 
 /* ---------- done -------------------------------------------- */
 
@@ -1022,15 +1117,15 @@ p.body { color: var(--fg-2); font-size: clamp(12.5px, 0.86cqw, 16px); line-heigh
 #v-done .qr {
   width: 116px; height: 116px; margin: var(--s5) auto var(--s4);
   display: grid; place-items: center;
-  font-family: var(--label); font-weight: 500; font-size: 8.5px;
-  letter-spacing: 0.2em; color: var(--fg-3);
+  font-family: var(--label); font-weight: 500; font-size: 13px;
+  letter-spacing: 0.13em; color: var(--fg-3);
   background:
     repeating-linear-gradient(90deg, rgba(243, 247, 251, 0.11) 0 4px, transparent 4px 8px),
     repeating-linear-gradient(0deg, rgba(243, 247, 251, 0.11) 0 4px, transparent 4px 8px);
 }
 #v-done .reset-note {
   margin-top: var(--s5); font-family: var(--label); font-weight: 400;
-  font-size: clamp(9px, 0.58cqw, 11px); letter-spacing: 0.24em;
+  font-size: clamp(13.0px, 0.8cqw, 15.2px); letter-spacing: 0.13em;
   text-transform: uppercase; color: var(--fg-4);
 }
 

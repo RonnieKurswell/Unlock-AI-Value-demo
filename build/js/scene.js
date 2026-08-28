@@ -52,7 +52,9 @@ export class HiveScene {
     this.renderer.toneMappingExposure = 1.16;
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x05070B, 0.034);
+    /* Matches the lifted CSS ground; at the old near-black the 3D sat visibly
+       darker than the page around it. */
+    this.scene.fog = new THREE.FogExp2(0x00243F, 0.034);
 
     this.camera = new THREE.PerspectiveCamera(38, 16 / 9, 0.1, 200);
     this.camera.position.set(0, 1.7, 13.8);

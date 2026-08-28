@@ -65,6 +65,10 @@ function show(view) {
   if (film) {
     if (view === 'attract') {
       try { film.currentTime = 0; } catch (e) { /* not seekable yet */ }
+      /* Half speed. Anshul's note was that background imagery overpowers the
+         text; slowing it drops it to ambient without losing the motion that
+         stops someone walking past. */
+      film.playbackRate = 0.5;
       const p = film.play();
       if (p && p.catch) p.catch(() => { /* autoplay refused; poster stands in */ });
     } else {
@@ -153,6 +157,10 @@ scene.onRoom = ([a, b]) => {
 
 /* Build it up front so a fast tap never lands on an empty explore screen,
    then re-rasterise once the webfonts are in. */
+// Debug handle, matching hexboard.js's window.__board. The scene is otherwise
+// module-scoped and unreachable from the console.
+window.__scene = scene;
+
 scene.buildHex(hexOrder());
 document.fonts.ready.then(() => {
   scene.rebuildHex(hexOrder());
@@ -164,9 +172,9 @@ function renderPool(poolId) {
   if (!p) return;
   S.read.add(poolId);
 
-  $('prRule').style.background = p.hex;
+  $('prRule').style.background = p.hexInk || p.hex;
   $('prVerb').textContent = p.verb;
-  $('prVerb').style.color = p.hex;
+  $('prVerb').style.color = p.hexInk || p.hex;   /* sits on a light panel */
   $('prName').textContent = p.name;
   $('prBlurb').textContent = p.blurb;
 
@@ -174,7 +182,7 @@ function renderPool(poolId) {
   facts.innerHTML = '';
   (p.facts || []).forEach(f => {
     const li = el('li', null, f);
-    li.style.setProperty('--seg', p.hex);
+    li.style.setProperty('--seg', p.hexInk || p.hex);   /* on a light panel */
     facts.appendChild(li);
   });
 
@@ -277,7 +285,7 @@ function renderQuestion() {
   const p = POOL[q.pool];
 
   $('qPool').textContent = p.name;
-  $('qPool').style.color = p.hex;
+  $('qPool').style.color = p.hexInk || p.hex;   /* the tag sits on the panel */
   $('qCount').textContent = `${String(S.qi + 1).padStart(2, '0')} / ${FLAT.length}`;
   $('qKind').textContent = q.kind;
   $('qText').textContent = q.q;
