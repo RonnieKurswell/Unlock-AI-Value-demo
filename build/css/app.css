@@ -165,6 +165,10 @@ input, textarea { font: inherit; }
   background-image: url('../images/bg-explore.jpg');
   opacity: 1;
 }
+#stage[data-view='intro'] #bg {
+  background-image: url('../images/bg-intro.jpg');
+  opacity: 1;
+}
 #stage[data-view='diag'] #bg {
   background-image: url('../images/bg-diag.jpg');
   opacity: 1;
@@ -306,6 +310,12 @@ input, textarea { font: inherit; }
   letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 
+/* Brand line is --fg-3 everywhere else, which clears AA on the darker plates.
+   Over the framework screen's pale one it reached only 3.94:1 even with the
+   top scrim, so it takes the brightest token there rather than pushing the
+   scrim darker and dulling the artwork. */
+#stage[data-view='intro'] .brand span { color: var(--fg); }
+
 /* ---------- views ------------------------------------------- */
 
 #views { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
@@ -347,39 +357,78 @@ input, textarea { font: inherit; }
    3.79:1. Raising the focus scrim's opacity cannot fix that; it needs more
    alpha at the left edge. Full height, so there is no horizontal edge to
    catch the eye the way a boxed backdrop did. */
+/* The overview carries no copy of its own — the framework screen does that now.
+   It only has to settle the artwork under the two bottom chrome items, so a
+   bottom band rather than darkening the whole left of the plate. */
 #v-explore:not(.focus) .copy-scrim {
   opacity: 1;
-  background:
-    linear-gradient(90deg,
-      rgba(0, 26, 45, 0.80) 0%, rgba(0, 26, 45, 0.68) 26%,
-      rgba(0, 26, 45, 0.30) 52%, rgba(0, 26, 45, 0) 68%),
-    linear-gradient(0deg,
-      rgba(0, 26, 45, 0.55) 0%, rgba(0, 26, 45, 0.18) 12%,
-      rgba(0, 26, 45, 0) 22%);
+  background: linear-gradient(0deg,
+    rgba(0, 26, 45, 0.74) 0%, rgba(0, 26, 45, 0.32) 12%, rgba(0, 26, 45, 0) 24%);
 }
 
-/* ---------- overview intro ---------- */
-#v-explore .ov-intro {
-  position: absolute; left: var(--pad-x); top: var(--pad-t);
-  width: 30%; max-width: 520px;
+/* ---------- framework screen ----------------------------------
+   Its own step between attract and the hexagon. Anshul's note was that
+   visitors are asked to choose a value pool with no idea what the six are or
+   whose model this is; folding that onto the hexagon screen made one screen
+   do two jobs. Read once, then straight into the interaction.
+   ------------------------------------------------------------- */
+#v-intro { display: none; place-items: center; }
+#v-intro.on { display: grid; }
+/* This plate is the palest in the build and it is not even: under the brand
+   line alone it runs from luminance 0.15 to 0.75. Light chrome measured
+   1.02:1 there and dark chrome 2.46:1 — no fixed text colour clears a ground
+   that swings that far, so the band gets a settled ground of its own. It
+   fades out well above the panel, so the artwork stays bright. */
+#v-intro::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 20%;
+  background: linear-gradient(180deg,
+    rgba(0, 26, 45, 0.80) 0%, rgba(0, 26, 45, 0.46) 42%, rgba(0, 26, 45, 0) 100%);
   pointer-events: none;
-  transition: opacity 0.4s var(--ease);
 }
-
-#v-explore.focus .ov-intro { opacity: 0; }
-#v-explore .ov-intro .label { color: var(--fg); }
-#v-explore .ov-title {
+.fw-panel {
+  width: 62%; max-width: 1180px;
+  pointer-events: auto;
+  animation: rise 0.6s var(--ease) both;
+}
+.fw-title {
   font-family: var(--display); font-weight: 400;
-  font-size: clamp(24px, 1.85cqw, 36px);
-  line-height: 1.16; letter-spacing: -0.012em;
+  font-size: clamp(28px, 2.3cqw, 46px);
+  line-height: 1.14; letter-spacing: -0.014em;
   color: var(--fg);
   margin: var(--s3) 0 var(--s3);
 }
-#v-explore .ov-lede {
-  font-size: clamp(15px, 1.02cqw, 19px);
-  line-height: 1.58;
-  color: var(--fg-2);
+.fw-lede {
+  font-size: clamp(16px, 1.08cqw, 20px);
+  line-height: 1.58; color: var(--fg-2);
+  max-width: 62ch;
 }
+/* Two columns, so all six read as one map rather than a list to work through. */
+.fw-grid {
+  list-style: none; margin: var(--s5) 0 var(--s5);
+  display: grid; grid-template-columns: 1fr 1fr;
+  column-gap: var(--s6); row-gap: 0;
+}
+.fw-grid li {
+  display: grid; gap: 3px;
+  padding: var(--s3) 0;
+  border-top: 1px solid var(--hair);
+}
+.fw-verb {
+  font-family: var(--label); font-weight: 600;
+  font-size: clamp(13px, 0.82cqw, 15px);
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--blue-lift);
+}
+.fw-name {
+  font-size: clamp(16px, 1.12cqw, 21px);
+  line-height: 1.3; color: var(--fg);
+}
+.fw-gist {
+  font-size: clamp(14px, 0.96cqw, 18px);
+  line-height: 1.5; color: var(--fg-2);
+}
+.fw-go { margin-top: var(--s2); }
+
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
 /* ---------- type primitives --------------------------------- */

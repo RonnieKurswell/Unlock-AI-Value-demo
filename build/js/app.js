@@ -49,8 +49,10 @@ window.__kiosk = { scene, state: S };
    ROUTER
    ============================================================= */
 
-const VIEWS = { attract: 'v-attract', explore: 'v-explore', diag: 'v-diag', identify: 'v-identify', wrap: 'v-wrap', done: 'v-done' };
-const SCENE_STATE = { attract: 'attract', explore: 'explore', diag: 'diagnostic', identify: 'delivery', wrap: 'results', done: 'delivery' };
+const VIEWS = { attract: 'v-attract', intro: 'v-intro', explore: 'v-explore', diag: 'v-diag', identify: 'v-identify', wrap: 'v-wrap', done: 'v-done' };
+/* The framework screen is a reading moment, so it takes the bare state: no
+   ring, no floor grid, nothing turning behind the panel. */
+const SCENE_STATE = { attract: 'attract', intro: 'delivery', explore: 'explore', diag: 'diagnostic', identify: 'delivery', wrap: 'results', done: 'delivery' };
 const BEAT_SCENE = i => (i === 0 ? 'results' : 'resultsQuiet');
 
 function show(view) {
@@ -86,7 +88,8 @@ function show(view) {
    ATTRACT
    ============================================================= */
 
-$('v-attract').addEventListener('pointerdown', () => start());
+$('v-attract').addEventListener('pointerdown', () => show('intro'));
+$('introGo').addEventListener('click', () => start());
 
 function start() {
   reset(false);
@@ -593,7 +596,8 @@ const typing = () => ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagN
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') return closeTile();
-  if (S.view === 'attract' && (e.key === 'Enter' || e.key === ' ')) return start();
+  if (S.view === 'attract' && (e.key === 'Enter' || e.key === ' ')) return show('intro');
+  if (S.view === 'intro' && (e.key === 'Enter' || e.key === ' ')) return start();
   if (S.view === 'explore') return exploreKeys(e);
   if (S.view === 'diag' && /^[1-5]$/.test(e.key) && !typing()) return answer(Number(e.key) - 1);
   if (S.view === 'wrap' && (e.key === 'Enter' || e.key === ' ')) {

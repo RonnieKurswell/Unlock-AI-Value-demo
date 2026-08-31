@@ -234,11 +234,18 @@ SCREEN = [
  ("Attract", "Subhead", "Three minutes. Six value pools. One blueprint."),
  ("Attract", "Touch cue", "Touch to begin"),
  ("All screens", "Brand line", "Unlock AI Value in Insurance"),
- ("Explore — overview", "Eyebrow", "An Infosys framework"),
- ("Explore — overview", "Heading", "Six pools of AI value in insurance"),
- ("Explore — overview", "Lede", "Infosys' own model, not an industry standard. Each pool is somewhere "
-                                "AI creates measurable value for carriers \u2014 and somewhere programmes "
-                                "commonly stall."),
+ ("Framework screen", "Eyebrow", "An Infosys framework"),
+ ("Framework screen", "Headline", "Six pools of AI value in insurance"),
+ ("Framework screen", "Lede", "Infosys' own model for insurance, not an industry standard. Each pool "
+                              "is somewhere AI creates measurable value for carriers \u2014 and somewhere "
+                              "programmes commonly stall."),
+ ("Framework screen", "Gist \u2014 AI Strategy & Engineering", "One operating model, instead of pilots scattered across the business"),
+ ("Framework screen", "Gist \u2014 Data for AI", "Policy, claims and treaty data made AI-ready and audit-ready"),
+ ("Framework screen", "Gist \u2014 Process AI", "Whole journeys redesigned, not task-level automation inside old ones"),
+ ("Framework screen", "Gist \u2014 Agentic Legacy Modernization", "Core platforms modernised module by module, while the book stays live"),
+ ("Framework screen", "Gist \u2014 Physical AI", "Telematics, IoT and drone data as a pricing and claims input"),
+ ("Framework screen", "Gist \u2014 AI Trust", "Explainability, bias testing and audit trails built in from the start"),
+ ("Framework screen", "Button", "Explore the six pools"),
  ("Explore", "Instruction", "Tap a value pool to explore"),
  ("Diagnostic", "Progress", "01 / 18"),
  ("Identify", "Headline", "Tap your badge"),
