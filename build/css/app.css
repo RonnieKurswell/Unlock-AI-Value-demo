@@ -1015,26 +1015,6 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .link-quiet:active { color: var(--blue-lift); }
 
 
-#v-diag .prog {
-  pointer-events: auto; position: absolute; left: var(--pad-x); bottom: var(--pad-b);
-  display: flex; gap: var(--s3);
-}
-/* These labels sit directly on the brightest part of the plate, where they
-   measured 3.38:1. Their own soft scrim rather than washing out the artwork. */
-#v-diag .prog::before {
-  content: ''; position: absolute; z-index: -1;
-  inset: -18px -26px -22px -26px; border-radius: 18px;
-  background: radial-gradient(120% 150% at 50% 50%,
-    rgba(0, 26, 45, 0.86) 0%, rgba(0, 26, 45, 0.62) 55%, rgba(0, 26, 45, 0) 100%);
-}
-.cluster { display: flex; flex-direction: column; gap: var(--s1); }
-.cluster .ticks { display: flex; gap: 3px; }
-.cluster .ticks i {
-  width: 30px; height: 3px; border-radius: 2px;
-  background: var(--fg-4); display: block;
-  transition: background 0.3s var(--ease), transform 0.3s var(--ease);
-}
-.cluster.active .ticks i { transform: scaleY(1.6); }
 /* Titles gone: the panel already names the pool and counts the questions, so
    down here they were saying it a third time. What is left is a six-step
    position indicator. */

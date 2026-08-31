@@ -162,7 +162,6 @@ function reset(toAttract = true) {
   ORDER.forEach(id => { S.scores[id] = 0; });
   scene.resetTiles();
   scene.clearHex();
-  renderProgress();
   resetDelivery();
   if (toAttract) show('attract');
 }
@@ -310,31 +309,6 @@ $('beginDiag').onclick = startDiagnostic;
    DIAGNOSTIC
    ============================================================= */
 
-function renderProgress() {
-  const g = $('progClusters');
-  g.innerHTML = '';
-  ORDER.forEach(pid => {
-    const c = el('div', 'cluster');
-    c.dataset.pool = pid;
-    const ticks = el('div', 'ticks');
-    for (let i = 0; i < QUESTIONS[pid].length; i++) ticks.appendChild(el('i'));
-    c.appendChild(ticks);
-    g.appendChild(c);
-  });
-}
-
-function paintProgress() {
-  const cur = FLAT[S.qi];
-  ORDER.forEach(pid => {
-    const c = $('progClusters').querySelector(`[data-pool="${pid}"]`);
-    if (!c) return;
-    c.classList.toggle('active', !!cur && cur.pool === pid);
-    [...c.querySelectorAll('i')].forEach((tick, i) => {
-      tick.style.background = S.answers[`${pid}:${i}`] != null ? POOL[pid].hex : 'var(--fg-4)';
-    });
-  });
-}
-
 /* ---------- maturity slider ----------------------------------
    Snaps to the question's stops. Nothing here knows how many stops there are;
    it reads q.opts, so a pool with a different number still works.
@@ -448,7 +422,6 @@ function renderQuestion() {
     foot.appendChild(back);
   }
 
-  paintProgress();
   scene.focus(q.pool);
 }
 
@@ -764,7 +737,6 @@ addEventListener('resize', () => {
 });
 fitFrame();
 
-renderProgress();
 renderPool(POOLS[0].id);
 paintDots(-1);
 $('backToFramework').addEventListener('click', () => scene.clearHex());
