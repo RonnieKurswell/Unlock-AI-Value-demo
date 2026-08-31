@@ -340,6 +340,46 @@ input, textarea { font: inherit; }
   transition: opacity 520ms var(--ease);
 }
 #v-explore.focus .copy-scrim { opacity: 1; }
+/* The overview needs its own, stronger gradient. The focus scrim tops out at
+   0.52 alpha because the copy there sits on a white panel and only the footer
+   chrome needs help. In overview the intro sits straight on the plate, whose
+   left side is luminance 0.18 — the eyebrow measured 2.38:1 and the lede
+   3.79:1. Raising the focus scrim's opacity cannot fix that; it needs more
+   alpha at the left edge. Full height, so there is no horizontal edge to
+   catch the eye the way a boxed backdrop did. */
+#v-explore:not(.focus) .copy-scrim {
+  opacity: 1;
+  background:
+    linear-gradient(90deg,
+      rgba(0, 26, 45, 0.80) 0%, rgba(0, 26, 45, 0.68) 26%,
+      rgba(0, 26, 45, 0.30) 52%, rgba(0, 26, 45, 0) 68%),
+    linear-gradient(0deg,
+      rgba(0, 26, 45, 0.55) 0%, rgba(0, 26, 45, 0.18) 12%,
+      rgba(0, 26, 45, 0) 22%);
+}
+
+/* ---------- overview intro ---------- */
+#v-explore .ov-intro {
+  position: absolute; left: var(--pad-x); top: var(--pad-t);
+  width: 30%; max-width: 520px;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+
+#v-explore.focus .ov-intro { opacity: 0; }
+#v-explore .ov-intro .label { color: var(--fg); }
+#v-explore .ov-title {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(24px, 1.85cqw, 36px);
+  line-height: 1.16; letter-spacing: -0.012em;
+  color: var(--fg);
+  margin: var(--s3) 0 var(--s3);
+}
+#v-explore .ov-lede {
+  font-size: clamp(15px, 1.02cqw, 19px);
+  line-height: 1.58;
+  color: var(--fg-2);
+}
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
 /* ---------- type primitives --------------------------------- */
