@@ -727,11 +727,20 @@ function bumpIdle() {
 
 /* The overlay is authored at 1920x1080; this scales it to whatever the stage
    actually is. Uniform, so the composition is identical at every size. */
+/* The stage is the whole window now, so the 16:9 design surface has to be
+   fitted inside it rather than assumed to match: scale by whichever axis runs
+   out first, then centre. On a 16:9 display this is exactly what it was
+   before; on anything else the background fills the window and the
+   composition sits in the middle of it. */
 function fitFrame() {
   const stage = $('stage');
   const frame = $('frame');
   if (!stage || !frame || !stage.clientWidth) return;
-  frame.style.setProperty('--k', stage.clientWidth / 1920);
+  const w = stage.clientWidth, h = stage.clientHeight;
+  const k = Math.min(w / 1920, h / 1080);
+  frame.style.setProperty('--k', k);
+  frame.style.setProperty('--fx', `${Math.round((w - 1920 * k) / 2)}px`);
+  frame.style.setProperty('--fy', `${Math.round((h - 1080 * k) / 2)}px`);
 }
 /* Three triggers, deliberately redundant, because each one alone has a hole.
    A window resize event can fire before the stage's new box is computed, so it
