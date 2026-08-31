@@ -95,7 +95,7 @@ def line(t, style=None, r=[1]):
     r[0] += 1
     return r[0]
 
-line("Unlock AI Value — content for client review", "h1")
+line("Unlock AI Value: content for client review", "h1")
 line(f"Insurance kiosk · exported {datetime.date.today():%d %B %Y} from the build's content model", "flag")
 line("")
 line("What this is", "h2")
@@ -104,13 +104,13 @@ line("")
 line("How to give us changes", "h2")
 line("Three columns on the right of every sheet, shaded green:")
 line("    Approved? (Y/N)      leave blank if you have not looked at the row yet")
-line("    Revised copy         paste the wording you want instead — full replacement, not a note")
+line("    Revised copy         paste the wording you want instead. Full replacement, not a note")
 line("    Client comments      anything that needs a conversation rather than a rewrite")
 line("Do not edit the left-hand columns. We diff against them to find what moved.")
 line("")
 line("Where we still need content from Infosys", "h2")
 line("These are gaps in the build today, not questions about wording. Highlighted amber on their sheets.")
-line("    1.  Six of the eighteen proof tiles have no case study — marked 'Infosys to supply'. Physical AI has no case studies at all; AI Trust has one of three; Agentic Legacy Modernization has two of three. See 'Proof tiles'.")
+line("    1.  Six of the eighteen proof tiles have no case study, marked 'Infosys to supply'. Physical AI has no case studies at all; AI Trust has one of three; Agentic Legacy Modernization has two of three. See 'Proof tiles'.")
 line("    2.  Benchmark medians are illustrative placeholders, not Infosys research. See 'Benchmark'.")
 line("    3.  The QR code on the final screen points nowhere yet. We need the destination URL.")
 line("    4.  The five-year forecast columns present today's case studies under future-dated headings. Flag if that framing is a problem.")
@@ -118,9 +118,9 @@ line("")
 line("Sheet guide", "h2")
 for t, d in [
     ("Diagnostic questions", "18 questions, 5 answers each (90 rows). Answer wording and the score behind each answer."),
-    ("Value pools",          "The six pools — name, verb, description, three supporting facts."),
+    ("Value pools",          "The six pools: name, verb, description, three supporting facts."),
     ("Proof tiles",          "18 case-study tiles, 3 per pool. Six are unfilled."),
-    ("Score band feedback",  "30 report blocks — what each score band tells a visitor, and the recommended move."),
+    ("Score band feedback",  "30 report blocks. What each score band tells a visitor, and the recommended move."),
     ("Archetypes",           "Five overall positions a visitor can land in."),
     ("Role futures",         "How each role changes, matched from the badge."),
     ("Benchmark",            "Industry median per pool. Placeholder data."),
@@ -148,7 +148,7 @@ sheet("Diagnostic questions",
       [20, 8, 20, 52, 11, 4, 26, 46, 6, 13, 42, 34], rows,
       notes=["18 questions, 3 per pool, 5 answers each. Score drives the result: 4 = most mature, 0 = no capability. "
              "The question text appears once per group of five answers.",
-             "If you change an answer, keep it to about three words — the kiosk renders it at display size."])
+             "If you change an answer, keep it to about three words, because the kiosk renders it at display size."])
 
 # ---------- 3. Value pools ----------
 rows = [[NAME[p["id"]], p["verb"], " / ".join(p["lines"]), p["blurb"],
@@ -157,7 +157,7 @@ rows = [[NAME[p["id"]], p["verb"], " / ".join(p["lines"]), p["blurb"],
 sheet("Value pools",
       ["Value pool", "Verb", "Board label", "Description", "Fact 1", "Fact 2", "Fact 3"] + REVIEW,
       [22, 14, 26, 60, 40, 40, 40, 13, 42, 34], rows,
-      notes=["Shown when a visitor taps a pool on the hexagon. Platform names here are load-bearing — flag any that are wrong or renamed."])
+      notes=["Shown when a visitor taps a pool on the hexagon. Platform names here are load-bearing, so flag any that are wrong or renamed."])
 
 # ---------- 4. Proof tiles ----------
 rows = []
@@ -170,7 +170,7 @@ for pid in ORDER:
 ws = sheet("Proof tiles",
       ["Value pool", "Status", "Client", "Tile title", "Headline metric", "Detail"] + REVIEW + ["_p"],
       [22, 15, 20, 28, 30, 66, 13, 42, 34, 3], rows, pending_col=9,
-      notes=["Three per pool. Amber rows have no case study — we need client name, metric and one or two lines of detail, "
+      notes=["Three per pool. Amber rows have no case study. We need client name, metric and one or two lines of detail, "
              "or permission to drop the tile.",
              "Named carriers appear on a public show floor. Confirm each one is cleared for use."])
 ws.column_dimensions["J"].hidden = True
@@ -183,7 +183,7 @@ for pid in ORDER:
 sheet("Score band feedback",
       ["Value pool", "Band", "Score range", "What we tell them ('the read')", "What we recommend ('the move')"] + REVIEW,
       [22, 15, 11, 62, 72, 13, 42, 34], rows,
-      notes=["The report body. A visitor sees one row per pool — whichever band their score falls into. 12 is the max per pool.",
+      notes=["The report body. A visitor sees one row per pool, whichever band their score falls into. 12 is the max per pool.",
              "This is where Infosys is making a recommendation to a prospect, so it is the highest-risk copy on the kiosk."])
 
 # ---------- 6. Archetypes ----------
@@ -199,7 +199,7 @@ rows = [[", ".join(r["match"]), r["from"], r["to"],
          ", ".join(NAME[f] for f in r["focus"]), r["change"], "", "", ""]
         for r in D["ROLES"]]
 rd = D["ROLE_DEFAULT"]
-rows.append(["(fallback — no keyword match)", rd["from"], rd["to"],
+rows.append(["(fallback, no keyword match)", rd["from"], rd["to"],
              ", ".join(NAME[f] for f in rd["focus"]), rd["change"], "", "", ""])
 sheet("Role futures",
       ["Badge keyword match", "Role today", "Role in five years", "Focus pools", "How the role changes"] + REVIEW,
@@ -239,12 +239,12 @@ SCREEN = [
  ("Framework screen", "Lede", "Infosys' own model for insurance, not an industry standard. Each pool "
                               "is somewhere AI creates measurable value for carriers, and somewhere "
                               "programmes commonly stall."),
- ("Framework screen", "Gist \u2014 AI Strategy & Engineering", "One operating model, instead of pilots scattered across the business"),
- ("Framework screen", "Gist \u2014 Data for AI", "Policy, claims and treaty data made AI-ready and audit-ready"),
- ("Framework screen", "Gist \u2014 Process AI", "Whole journeys redesigned, not task-level automation inside old ones"),
- ("Framework screen", "Gist \u2014 Agentic Legacy Modernization", "Core platforms modernised module by module, while the book stays live"),
- ("Framework screen", "Gist \u2014 Physical AI", "Telematics, IoT and drone data as a pricing and claims input"),
- ("Framework screen", "Gist \u2014 AI Trust", "Explainability, bias testing and audit trails built in from the start"),
+ ("Framework screen", "Gist: AI Strategy & Engineering", "One operating model, instead of pilots scattered across the business"),
+ ("Framework screen", "Gist: Data for AI", "Policy, claims and treaty data made AI-ready and audit-ready"),
+ ("Framework screen", "Gist: Process AI", "Whole journeys redesigned, not task-level automation inside old ones"),
+ ("Framework screen", "Gist: Agentic Legacy Modernization", "Core platforms modernised module by module, while the book stays live"),
+ ("Framework screen", "Gist: Physical AI", "Telematics, IoT and drone data as a pricing and claims input"),
+ ("Framework screen", "Gist: AI Trust", "Explainability, bias testing and audit trails built in from the start"),
  ("Framework screen", "Button", "Explore the six pools"),
  ("Explore", "Instruction", "Tap a value pool to explore"),
  ("Diagnostic", "Progress", "01 / 18"),
@@ -261,7 +261,7 @@ SCREEN = [
  ("Results 3", "Source note", "Matched from your badge · playbook workforce transformation table"),
  ("Results 3", "Eyebrow", "The human constraint"),
  ("Results 3", "Body", "The people most affected by AI are the domain experts who make it work. A team can have the model and "
-                       "still not trust it over decades of manual judgment — which is why the carriers that scale it own "
+                       "still not trust it over decades of manual judgment, which is why the carriers that scale it own "
                        "governance at board level and reward AI-enabled outcomes."),
  ("Results 4", "Eyebrow", "Five-year view"),
  ("Results 4", "Headline", "Where the gap goes"),

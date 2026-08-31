@@ -383,7 +383,7 @@ function composeNarrative() {
   const top = ranked[0], low = ranked[ranked.length - 1];
   const tb = bandOf(S.scores[top]), lb = bandOf(S.scores[low]);
   const notes = Object.entries(S.notes).filter(([, v]) => v && v.trim());
-  let out = `Strongest: ${POOL[top].name}. Binding constraint: ${POOL[low].name} — ${BAND_COPY[low][lb].read.toLowerCase().replace(/\.$/, '')}. `;
+  let out = `Strongest: ${POOL[top].name}. Binding constraint: ${POOL[low].name}, ${BAND_COPY[low][lb].read.toLowerCase().replace(/\.$/, '')}. `;
   out += BAND_COPY[low][lb].move;
   if (notes.length) out += ` Your own note is carried into the report.`;
   return out;
@@ -406,11 +406,11 @@ function buildWrapped() {
   const level = ORDER.filter(id => S.scores[id] === BENCHMARK_MEDIAN[id]);
   const praise = $('benchPraise');
   if (ahead.length >= 3) {
-    praise.innerHTML = `You are ahead of the benchmark in <b>${ahead.length} of 6</b> pools — ${POOL[ahead[0]].name} most of all. That is where your advantage compounds.`;
+    praise.innerHTML = `You are ahead of the benchmark in <b>${ahead.length} of 6</b> pools, ${POOL[ahead[0]].name} most of all. That is where your advantage compounds.`;
   } else if (ahead.length) {
     praise.innerHTML = `<b>${POOL[ahead[0]].name}</b> is ahead of the benchmark. Strength there is what funds the rest.`;
   } else if (level.length) {
-    praise.innerHTML = `You are level with the benchmark on <b>${level.length} of 6</b> — no ground lost, and the gaps are addressable.`;
+    praise.innerHTML = `You are level with the benchmark on <b>${level.length} of 6</b>. No ground lost, and the gaps are addressable.`;
   } else {
     praise.textContent = 'Every pool is below the benchmark, which means the first move is a sequencing decision rather than a technology one.';
   }
@@ -483,7 +483,7 @@ function paintRole(i) {
   const f = POOL[focusPool(r)];
   const el2 = $('roleFocus');
   if (el2 && f) {
-    el2.innerHTML = `Your focus area is <b style="color:${f.hex}">${f.name}</b> — the pool where your answers and your role intersect.`;
+    el2.innerHTML = `Your focus area is <b style="color:${f.hex}">${f.name}</b>, the pool where your answers and your role intersect.`;
   }
 }
 

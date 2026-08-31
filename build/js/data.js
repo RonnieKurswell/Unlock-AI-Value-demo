@@ -160,7 +160,7 @@ export const TILES = {
     { pending: true, title: 'Telematics into pricing', metric: 'Infosys to supply',
       detail: 'The playbook\u2019s Physical AI section carries an unfilled case study placeholder and the use case register has no Physical AI row. Infosys to supply.' },
     { pending: true, title: 'Drone claims inspection', metric: 'Infosys to supply',
-      detail: 'Described in the playbook as a capability \u2014 catastrophe damage validated in hours rather than weeks \u2014 but with no client engagement documented.' },
+      detail: 'Described in the playbook as a capability, catastrophe damage validated in hours rather than weeks, but with no client engagement documented.' },
     { pending: true, title: 'Digital twin exposure modelling', metric: 'Infosys to supply',
       detail: 'Digital twins of insured properties and fleets appear in the playbook narrative with no supporting engagement.' }
   ],
