@@ -15,7 +15,13 @@
        re-encoded down to 312KB so the build stays offline-friendly. Sits behind
        the canvas, which is alpha:true, so the room gradient still shows through
        and still changes per pool. -->
+  <!-- #bg is a probe: CSS gives it the plate for the current state, it is never
+       painted, and app.js cross-fades #bgA / #bgB to whatever it resolves to.
+       background-image cannot be transitioned, which is why swapping pool used
+       to cut straight to the next image. -->
   <div id="bg" aria-hidden="true"></div>
+  <div id="bgA" aria-hidden="true"></div>
+  <div id="bgB" aria-hidden="true"></div>
 
   <!-- Attract only. Muted and playsinline so it can autoplay, and postered with
        the still plate so nothing flashes before the first frame decodes. app.js

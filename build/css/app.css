@@ -67,6 +67,8 @@
   --pad-b: clamp(26px, 4.20cqw, 76px);
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* Expo-out: leaves fast, lands slowly. Entrances only. */
+  --ease-in-out-soft: cubic-bezier(0.16, 1, 0.30, 1);
   --ease-mech: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
@@ -154,35 +156,42 @@ input, textarea { font: inherit; }
    over the room gradient, so the default is a normal blend at full strength.
    Screen blending at 0.24-0.55 was what made the new plates read dull and grey:
    it lifts blacks and desaturates everything it touches. */
+/* #bg is now a probe, never painted. It still carries every per-screen
+   background-image rule below, so CSS stays the single source of truth for
+   which plate belongs to which state; app.js reads its resolved value and
+   cross-fades the two real layers. Swapping background-image on one element
+   cannot be animated, which is why changing pool used to blip. */
 #bg {
   position: absolute; inset: 0;
   background: center / cover no-repeat;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 700ms var(--ease), background-image 0ms;
 }
+#bgA, #bgB {
+  position: absolute; inset: 0;
+  background: center / cover no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 900ms var(--ease-in-out-soft);
+}
+#bgA.on, #bgB.on { opacity: 1; }
 
 /* Attract carries the whole screen: the 3D ring and the floor grid are off here,
    so the plate is the composition. */
 #stage[data-view='attract'] #bg {
   background-image: url('../images/bg-attract.jpg');
-  opacity: 1;
 }
 #stage[data-view='explore'] #bg {
   background-image: url('../images/bg-explore.jpg');
-  opacity: 1;
 }
 #stage[data-view='intro'] #bg {
   background-image: url('../images/bg-intro.jpg');
-  opacity: 1;
 }
 #stage[data-view='diag'] #bg {
   background-image: url('../images/bg-diag.jpg');
-  opacity: 1;
 }
 #stage[data-view='identify'] #bg {
   background-image: url('../images/bg-identify.jpg');
-  opacity: 1;
 }
 /* Opening a pool swaps to that pool's own plate — Khai's artwork, exported from
    the Figma file. Each is composed with its form on the right, behind the slabs,
@@ -199,19 +208,16 @@ input, textarea { font: inherit; }
    meant to sit over the room gradient. Screen blending at 0.30 washed them out
    and greyed their darks, so the pool case blends normally at full strength.
    Every other screen keeps screen blending — those plates are still textures. */
-#stage[data-view='explore'][data-pool] #bg { opacity: 1; }
 
 /* Nitin's note: soft, near-plain, blue on blue. Each beat gets its own plate,
    each built around where that beat puts its copy — so the pattern is always
    somewhere the reading is not. */
-#stage[data-view='wrap'] #bg { opacity: 1; }
 #stage[data-view='wrap'][data-beat='1'] #bg { background-image: url('../images/bg-beat1.jpg'); }
 #stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/bg-beat2.jpg'); }
 #stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/bg-beat3.jpg'); }
 #stage[data-view='wrap'][data-beat='4'] #bg { background-image: url('../images/bg-beat4.jpg'); }
 #stage[data-view='done'] #bg {
   background-image: url('../images/bg-done.jpg');
-  opacity: 1;
 }
 
 /* Attract's background film, and the 20% black over it. Both sit above #bg and
@@ -259,11 +265,9 @@ input, textarea { font: inherit; }
    pushing the scrim so dark the film stops reading as motion. */
 #v-attract .label { color: var(--fg); }
 
-#stage[data-view='attract'] #bgVideo,
-#stage[data-view='attract'] #bgVideoScrim { opacity: 1; }
-
-/* The still plate is the video's poster, so it must not also paint over it. */
-#stage[data-view='attract'] #bg { opacity: 0; }
+/* The film is retained but no longer shown: it was the one dark screen left in
+   the build, and a bright plate matches the rest of the set. The 3D motes still
+   drift over it, so the screen is not static. */
 
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
@@ -336,7 +340,8 @@ input, textarea { font: inherit; }
    Over the framework screen's pale one it reached only 3.94:1 even with the
    top scrim, so it takes the brightest token there rather than pushing the
    scrim darker and dulling the artwork. */
-#stage[data-view='intro'] .brand span { color: var(--fg); }
+#stage[data-view='intro'] .brand span,
+#stage[data-view='attract'] .brand span { color: var(--fg); }
 
 /* ---------- views ------------------------------------------- */
 
@@ -350,8 +355,11 @@ input, textarea { font: inherit; }
 /* Restoring this: it was dropped when the framework block was rewritten, so
    every `animation: rise` in the file had been referencing a keyframe that no
    longer existed and nothing was animating at all. */
-@keyframes rise   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-@keyframes riseIn { from { opacity: 0; transform: translateY(11px); } to { opacity: 1; transform: none; } }
+@keyframes rise   { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes riseIn { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+/* Cards travel a little further and settle, so six of them arriving in sequence
+   reads as dealing rather than blinking. */
+@keyframes cardIn { from { opacity: 0; transform: translateY(26px) scale(0.965); } to { opacity: 1; transform: none; } }
 
 .view.on > * { animation: rise 0.7s var(--ease) both; }
 
@@ -376,16 +384,27 @@ input, textarea { font: inherit; }
    diagnostic rebuilds its options per question, so that one replays for free
    on every question.
    ------------------------------------------------------------- */
-.stagger > * { animation: riseIn 0.62s var(--ease) both; }
+.stagger > * { animation: riseIn 0.72s var(--ease-in-out-soft) both; }
 .stagger > *:nth-child(1) { animation-delay: 0.04s; }
-.stagger > *:nth-child(2) { animation-delay: 0.10s; }
-.stagger > *:nth-child(3) { animation-delay: 0.16s; }
-.stagger > *:nth-child(4) { animation-delay: 0.22s; }
-.stagger > *:nth-child(5) { animation-delay: 0.28s; }
-.stagger > *:nth-child(6) { animation-delay: 0.34s; }
-.stagger > *:nth-child(7) { animation-delay: 0.40s; }
-.stagger > *:nth-child(8) { animation-delay: 0.46s; }
+.stagger > *:nth-child(2) { animation-delay: 0.13s; }
+.stagger > *:nth-child(3) { animation-delay: 0.22s; }
+.stagger > *:nth-child(4) { animation-delay: 0.31s; }
+.stagger > *:nth-child(5) { animation-delay: 0.40s; }
+.stagger > *:nth-child(6) { animation-delay: 0.49s; }
+.stagger > *:nth-child(7) { animation-delay: 0.58s; }
+.stagger > *:nth-child(8) { animation-delay: 0.67s; }
+.stagger > *:nth-child(9) { animation-delay: 0.76s; }
+.stagger > *:nth-child(10) { animation-delay: 0.85s; }
 
+/* The six pool cards deal out one at a time. 110ms apart is slow enough to
+   read as a sequence and short enough that the last one is not a wait. */
+.fw-grid.stagger > * { animation: cardIn 0.78s var(--ease-in-out-soft) both; }
+.fw-grid.stagger > *:nth-child(1) { animation-delay: 0.12s; }
+.fw-grid.stagger > *:nth-child(2) { animation-delay: 0.23s; }
+.fw-grid.stagger > *:nth-child(3) { animation-delay: 0.34s; }
+.fw-grid.stagger > *:nth-child(4) { animation-delay: 0.45s; }
+.fw-grid.stagger > *:nth-child(5) { animation-delay: 0.56s; }
+.fw-grid.stagger > *:nth-child(6) { animation-delay: 0.67s; }
 
 @media (prefers-reduced-motion: reduce) {
   .stagger > * { animation: none; }
@@ -595,6 +614,16 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* Centred. The old plate had a horizon the copy had to clear; the current
    one does not. */
 #v-attract { display: none; place-items: center; }
+/* The new plate's brightest areas are its corners, and the brand line sits in
+   one of them — it measured 1.01:1 there, invisible. A top band settles it
+   without touching the dark centre the headline needs. Same pattern as the
+   framework screen. */
+#v-attract::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 18%;
+  background: linear-gradient(180deg,
+    rgba(0, 22, 40, 0.84) 0%, rgba(0, 22, 40, 0.44) 46%, rgba(0, 22, 40, 0) 100%);
+  pointer-events: none;
+}
 #v-attract.on { display: grid; }
 #v-attract .statement { max-width: none; }
 #v-attract .d-xl { max-width: 21ch; margin: var(--s3) auto 0; }

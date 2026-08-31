@@ -55,28 +55,64 @@ const VIEWS = { attract: 'v-attract', intro: 'v-intro', explore: 'v-explore', di
 const SCENE_STATE = { attract: 'attract', intro: 'delivery', explore: 'explore', diag: 'diagnostic', identify: 'delivery', wrap: 'results', done: 'delivery' };
 const BEAT_SCENE = i => (i === 0 ? 'results' : 'resultsQuiet');
 
+/* ---------- background plates ---------------------------------
+   CSS decides which plate belongs to which state, on the #bg probe. This reads
+   the resolved value and cross-fades between two real layers, because
+   background-image is not an animatable property — changing it on one element
+   is what made switching pool blip to the next image.
+   ------------------------------------------------------------- */
+let plateFront = null;
+
+function syncPlate() {
+  const want = getComputedStyle($('bg')).backgroundImage;
+  const a = $('bgA'), b = $('bgB');
+  const front = plateFront || a;
+  if (front.dataset.src === want) return;
+
+  if (!want || want === 'none') {          // a state with no plate of its own
+    a.classList.remove('on');
+    b.classList.remove('on');
+    a.dataset.src = b.dataset.src = 'none';
+    return;
+  }
+  const back = front === a ? b : a;
+  back.style.backgroundImage = want;
+  back.dataset.src = want;
+  void back.offsetHeight;                  // so the opacity transition runs
+  back.classList.add('on');
+  front.classList.remove('on');
+  plateFront = back;
+}
+
+/* Decoded up front, so the first cross-fade into a plate is not a pop. */
+function preloadPlates() {
+  const seen = new Set();
+  for (const sheet of document.styleSheets) {
+    let rules;
+    try { rules = sheet.cssRules; } catch (e) { continue; }
+    for (const r of rules) {
+      const m = r.style && r.style.backgroundImage && r.style.backgroundImage.match(/url\(["']?([^"')]+)/);
+      if (m && !seen.has(m[1])) { seen.add(m[1]); new Image().src = m[1]; }
+    }
+  }
+  return seen.size;
+}
+preloadPlates();
+
 function show(view) {
   // Drives the per-screen background plate in CSS.
   $('stage').dataset.view = view;
+  syncPlate();
 
   /* Attract's film runs only while attract is showing. Left playing it would
      decode behind every other screen for nothing, and on a kiosk that runs all
      day that is real heat and power. Rewound on the way in so each visitor sees
      it from the top. */
+  /* The film is kept in the build but no longer shown: it was the last dark
+     screen, and attract now carries a bright plate like every other screen.
+     Paused everywhere so it is not decoding behind anything. */
   const film = $('bgVideo');
-  if (film) {
-    if (view === 'attract') {
-      try { film.currentTime = 0; } catch (e) { /* not seekable yet */ }
-      /* Half speed. Anshul's note was that background imagery overpowers the
-         text; slowing it drops it to ambient without losing the motion that
-         stops someone walking past. */
-      film.playbackRate = 0.5;
-      const p = film.play();
-      if (p && p.catch) p.catch(() => { /* autoplay refused; poster stands in */ });
-    } else {
-      film.pause();
-    }
-  }
+  if (film) film.pause();
   S.view = view;
   Object.values(VIEWS).forEach(id => $(id).classList.remove('on'));
   $(VIEWS[view]).classList.add('on');
@@ -140,6 +176,7 @@ scene.onHexSelect = (id, i) => {
   view.style.setProperty('--seg', POOL[id].hex);
   // Drives that pool's own background plate in CSS.
   $('stage').dataset.pool = id;
+  syncPlate();
   paintDots(i);
 };
 
@@ -149,6 +186,7 @@ scene.onHexClear = () => {
   view.classList.remove('focus');
   view.style.removeProperty('--seg');
   delete $('stage').dataset.pool;
+  syncPlate();
   paintDots(-1);
 };
 
@@ -595,6 +633,7 @@ function setBeat(i) {
   S.beat = i;
   // Each beat has its own plate, composed around where its copy sits.
   $('stage').dataset.beat = String(i + 1);
+  syncPlate();
   [1, 2, 3, 4].forEach(n => $('beat' + n).classList.toggle('on', n === i + 1));
   document.querySelectorAll('.beat-pips').forEach(nav => {
     [...nav.querySelectorAll('i')].forEach((pip, k) => pip.classList.toggle('on', k <= i));
