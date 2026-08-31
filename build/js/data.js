@@ -188,235 +188,127 @@ export const ORDER = POOLS.map(p => p.id);
 /* -------------------------------------------------------------
    DIAGNOSTIC — 18 questions, 3 per pool, three-word answers.
    Each pool's third question offers an optional free-text escape.
+/* -------------------------------------------------------------
+   DIAGNOSTIC — six questions, one per value pool.
+
+   Was 18 questions, three per pool, answered by tapping one of five options.
+   Anshul's notes were that five options is too many and 18 questions is long
+   against GCC's 12. Cutting options is the trap: with one question per pool
+   the option count IS the number of reachable scores, and BAND_COPY holds five
+   written blocks per pool. Three options would have left a third of the
+   reviewed report copy unreachable.
+
+   So: one question per pool, answered on a slider that snaps to five labelled
+   stops. One interaction, all five bands still in play, and the option copy
+   that teaches a visitor what maturity actually looks like is preserved as the
+   stop descriptions.
+
+   `opts` keeps its shape — [label, detail, score] — but now runs ASCENDING,
+   lowest maturity first, because a slider reads left to right. Scores are
+   0/25/50/75/100 against MAX_POOL_SCORE = 100.
+
+   Each question keeps the free-text escape: one answer now carries a whole
+   pool, so the room to say "none of these" matters more, not less.
    ------------------------------------------------------------- */
 
 export const QUESTIONS = {
   strategy: [
     {
-      kind: 'Funding & prioritisation',
-      q: 'How are AI initiatives funded and prioritised across your lines of business?',
-      opts: [
-        ['Enterprise AI factory', 'One governed roadmap, shared funding across LOBs', 4],
-        ['Central team funds', 'A digital function funds core pilots centrally', 3],
-        ['Each business separately', 'Underwriting, claims and actuarial buy their own', 2],
-        ['Opportunistic, case-by-case', 'Whoever has budget runs a proof of concept', 1],
-        ['No formal process', 'No prioritisation mechanism exists', 0]
-      ]
-    },
-    {
-      kind: 'Path to production',
-      q: 'What sits between an AI proof of concept and enterprise production?',
-      opts: [
-        ['Shared engineering platform', 'Common platform with guardrails and reuse', 4],
-        ['Cloud services, custom pipelines', 'Standard services, but every LOB rebuilds', 3],
-        ['Fragmented vendor stacks', 'Manual glue code between disconnected tools', 2],
-        ['Bespoke every time', 'Each deployment is a fresh long build', 1],
-        ['Nothing reaches production', 'No model has gone live in core insurance', 0]
-      ]
-    },
-    {
-      kind: 'Inference cost governance',
+      kind: 'Getting AI into production',
       allowExplain: true,
-      q: 'Who owns the token and inference cost of AI in production?',
+      q: 'How far has AI got beyond experiments in your business?',
       opts: [
-        ['AI FinOps discipline', 'Cost modelled per workflow, routed by task', 4],
-        ['Tracked, not governed', 'Spend is visible but nobody optimises it', 3],
-        ['Visible at invoice', 'Discovered monthly when the bill arrives', 2],
-        ['Nobody tracks it', 'Unattributed and growing', 1],
-        ['Not yet relevant', 'Nothing at production scale yet', 0]
+        ['Nothing in production', 'No AI model has gone live in core insurance', 0],
+        ['A few proofs of concept', 'Pilots run, but nothing reaches production', 25],
+        ['Each business builds its own', 'Underwriting, claims and actuarial fund separately', 50],
+        ['One team funds the core', 'A digital function funds and governs central pilots', 75],
+        ['An enterprise AI factory', 'One governed roadmap and shared funding across every line', 100]
       ]
     }
   ],
   data: [
     {
-      kind: 'Unstructured documents',
-      q: 'How do loss runs, treaties, medical files and adjuster notes reach your models?',
-      opts: [
-        ['Automated extraction pipeline', 'Indexed, searchable, entity-linked at ingest', 4],
-        ['OCR plus manual review', 'Text extracted, humans still verify everything', 3],
-        ['Staff transcribe manually', 'Underwriters and adjusters retype into core', 2],
-        ['Locked in PDFs', 'Archived but never indexed', 1],
-        ['No capability yet', 'Unstructured documents are not processed', 0]
-      ]
-    },
-    {
-      kind: 'Cross-system retrieval',
-      q: 'A model needs a policyholder’s full history across systems. How long does that take?',
-      opts: [
-        ['Real-time self-service', 'Unified data products served over APIs', 4],
-        ['Days via ticket', 'Request an extract and wait for batch', 3],
-        ['Manual mainframe joins', 'Direct legacy queries stitched by hand', 2],
-        ['Blocked by silos', 'Departmental boundaries prevent access', 1],
-        ['Not currently possible', 'Cross-system integration does not exist', 0]
-      ]
-    },
-    {
-      kind: 'Lineage & audit trail',
+      kind: 'Data readiness',
       allowExplain: true,
-      q: 'Can you show a regulator exactly which data fed a given underwriting decision?',
+      q: 'How ready is your data for AI to actually use?',
       opts: [
-        ['Full automated lineage', 'Fingerprinted end to end, audit-ready', 4],
-        ['Reconstructable with effort', 'Possible, but takes weeks of manual work', 3],
-        ['Partial, system by system', 'Some systems log it, others do not', 2],
-        ['Not reliably', 'We would struggle to evidence it', 1],
-        ['No lineage exists', 'No traceability at all', 0]
+        ['Not processed at all', 'Policy, claims and treaty documents are never indexed', 0],
+        ['Locked in PDFs', 'Archived, but nothing can search or read them', 25],
+        ['People retype it', 'Underwriters and adjusters key documents into core systems', 50],
+        ['Extracted, humans verify', 'Text is pulled out automatically, staff still check everything', 75],
+        ['Automated and audit-ready', 'Indexed and entity-linked at ingest, with lineage a regulator can follow', 100]
       ]
     }
   ],
   process: [
     {
-      kind: 'Pre-bind submission',
-      q: 'How much of pre-bind submission qualification happens without a human?',
-      opts: [
-        ['Autonomous triage, auto-decline', 'Out-of-appetite risks declined before the desk', 4],
-        ['AI summarises, human qualifies', 'Assisted reading, manual decision', 3],
-        ['RPA handles entry', 'Scripts move data, people still qualify', 2],
-        ['Hours per submission', 'One to two hours just to assess completeness', 1],
-        ['Entirely manual intake', 'No digital assistance at all', 0]
-      ]
-    },
-    {
-      kind: 'FNOL to settlement',
-      q: 'How touchless is First Notice of Loss through to settlement on routine claims?',
-      opts: [
-        ['Straight-through settlement', 'Coverage verified and routine claims settled', 4],
-        ['AI triage, human decides', 'Severity scored, reserves recommended', 3],
-        ['Digital intake, manual adjudication', 'Web forms front a manual process', 2],
-        ['Manual across systems', 'Adjusters work step by step, system to system', 1],
-        ['Paper-based process', 'Physical files and manual handoffs', 0]
-      ]
-    },
-    {
-      kind: 'Workflow redesign',
+      kind: 'How much of the journey AI runs',
       allowExplain: true,
-      q: 'Was the workflow redesigned around AI, or was AI added to the existing one?',
+      q: 'How much of a full claims or underwriting journey does AI run?',
       opts: [
-        ['End-to-end redesign', 'The whole journey was rebuilt around agents', 4],
-        ['Redesigned in places', 'Some journeys reworked, others untouched', 3],
-        ['AI bolted on', 'Same process, one step now assisted', 2],
-        ['Task automation only', 'Individual tasks automated in isolation', 1],
-        ['No change yet', 'Process is unchanged', 0]
+        ['None of it', 'Core workflows are manual from end to end', 0],
+        ['Isolated tasks', 'Automation sits inside a workflow nobody redesigned', 25],
+        ['One journey rebuilt', 'A single journey has been mapped and rebuilt around AI', 50],
+        ['Several journeys', 'Submission to bound, or FNOL to settlement, runs on agents', 75],
+        ['Agents alongside people', 'Whole journeys redesigned, with agents working next to underwriters', 100]
       ]
     }
   ],
   legacy: [
     {
-      kind: 'Core platform drag',
-      q: 'How much does your core policy platform slow a new product launch?',
-      opts: [
-        ['Weeks, not months', 'Logic exposed as APIs, launches are routine', 4],
-        ['Wrappers, fragile core', 'Modern APIs over brittle rating algorithms', 3],
-        ['Twelve months plus', 'Technical debt sets the pace of the roadmap', 2],
-        ['Leadership avoids touching', 'Change is considered too risky to attempt', 1],
-        ['No audit exists', 'We have not mapped the estate at all', 0]
-      ]
-    },
-    {
-      kind: 'Embedded business logic',
-      q: 'How well is your rating, filing and exception logic documented?',
-      opts: [
-        ['AI-mapped, machine readable', 'Rules and schemas extracted automatically', 4],
-        ['Partial, seniors know', 'Some documentation, rest is institutional memory', 3],
-        ['Few veterans remaining', 'Knowledge sits with people close to retirement', 2],
-        ['Undocumented black box', 'Must be reverse-engineered line by line', 1],
-        ['Nobody knows', 'The logic is effectively lost', 0]
-      ]
-    },
-    {
-      kind: 'Modernisation route',
+      kind: 'The core platforms underneath',
       allowExplain: true,
-      q: 'What is your modernisation route?',
+      q: 'How are you handling the core platforms AI needs to reach?',
       opts: [
-        ['Progressive, validated increments', 'Module by module, verified against legacy', 4],
-        ['Phased by module', 'Sequenced plan, partially underway', 3],
-        ['Big-bang replacement', 'One large cutover programme planned', 2],
-        ['Stalled business case', 'Approved in principle, never funded', 1],
-        ['No plan', 'Nothing scoped', 0]
+        ['Frozen and untouchable', 'Rating logic nobody fully understands, too risky to change', 0],
+        ['Documented, not moving', 'The rules are written down but the platform is unchanged', 25],
+        ['Rewriting by hand', 'Modernisation is under way module by module, manually', 50],
+        ['AI recovers the intent', 'AI reads the legacy logic and rebuilds it as specification', 75],
+        ['Modernising while live', 'Module by module, with the book of business still trading', 100]
       ]
     }
   ],
   physical: [
     {
-      kind: 'Sensor ingestion',
-      q: 'Does telematics and property IoT data reach your pricing models?',
-      opts: [
-        ['Streams into pricing', 'Continuous telemetry drives dynamic pricing', 4],
-        ['Auto telematics only', 'Motor uses it, commercial property in pilot', 3],
-        ['Pilots running', 'Small trials, nothing in production pricing', 2],
-        ['Collected, unused', 'Data arrives but never reaches a model', 1],
-        ['No sensor data', 'No ingestion of physical signals', 0]
-      ]
-    },
-    {
-      kind: 'Claims inspection',
-      q: 'How is physical damage assessed after a loss event?',
-      opts: [
-        ['Drone and vision assessment', 'Imagery scored automatically within hours', 4],
-        ['Mobile app pilot', 'Policyholder photo capture being trialled', 3],
-        ['Photos, manual review', 'Images uploaded for an adjuster to read', 2],
-        ['Physical inspection only', 'Someone has to attend the site', 1],
-        ['Not applicable', 'No physical damage in our book', 0]
-      ]
-    },
-    {
-      kind: 'Digital twins',
+      kind: 'Sensor and telematics data',
       allowExplain: true,
-      q: 'Can you simulate exposure on an insured asset before a loss occurs?',
+      q: 'What happens to the data from telematics, IoT and drones?',
       opts: [
-        ['Digital twins live', 'Loss scenarios modelled on live asset data', 4],
-        ['Modelling in pilot', 'Twin concepts being tested on a segment', 3],
-        ['Static exposure models', 'Periodic actuarial modelling only', 2],
-        ['Post-loss analysis', 'We only look after the claim', 1],
-        ['No capability', 'Not modelled', 0]
+        ['We do not collect it', 'No sensor or telematics feed exists', 0],
+        ['Collected but unused', 'It lands somewhere and nothing reads it', 25],
+        ['A reporting by-product', 'It shows up in reports after the fact', 50],
+        ['Feeds one price', 'One feed is engineered into pricing as a real input', 75],
+        ['A first-class input', 'Pricing and claims use it live, with digital twins for exposure', 100]
       ]
     }
   ],
   trust: [
     {
-      kind: 'Regulatory readiness',
-      q: 'Could an AI underwriting decision survive an NAIC or EU AI Act review today?',
-      opts: [
-        ['Governance by design', 'Multi-gate verification built into the lifecycle', 4],
-        ['Legal review, manual monitoring', 'Compliance sign-off, drift watched by hand', 3],
-        ['Ad-hoc reviews only', 'Reviewed when someone remembers to ask', 2],
-        ['Would not survive', 'We could not evidence the decision', 1],
-        ['No AI in decisions', 'No models in regulated decisions yet', 0]
-      ]
-    },
-    {
-      kind: 'Bias & fairness',
-      q: 'When is fairness tested on a pricing or underwriting model?',
-      opts: [
-        ['Before deployment, continuously', 'Tested in training and monitored after', 4],
-        ['At deployment only', 'Checked once, then left alone', 3],
-        ['When challenged', 'Only after a complaint or query', 2],
-        ['Not tested', 'No fairness testing in place', 1],
-        ['Not applicable', 'No models affecting customers', 0]
-      ]
-    },
-    {
-      kind: 'Explainability',
+      kind: 'Explaining an AI decision',
       allowExplain: true,
-      q: 'Can an underwriter trace the reasoning behind an AI risk score?',
+      q: 'Could you explain an AI-driven decision to a regulator today?',
       opts: [
-        ['Full feature attribution', 'Scorecards generated for every decision', 4],
-        ['Key inputs documented', 'Main drivers known, interactions opaque', 3],
-        ['Black-box vendor model', 'Limited visibility into vendor scoring', 2],
-        ['No explainability', 'Nothing available to underwriters or regulators', 1],
-        ['Not applicable', 'No AI risk scoring', 0]
+        ['No', 'Nothing is documented and nothing is testable', 0],
+        ['Only after the fact', 'We could reconstruct it slowly, by hand', 25],
+        ['Checked at the end', 'Bias and explainability are a final gate before release', 50],
+        ['Built into the model', 'Explainability and bias testing sit in the architecture', 75],
+        ['Ready on demand', 'Audit trails and bias testing from the start, ready for NAIC and the EU AI Act', 100]
       ]
     }
   ]
 };
 
-export const MAX_POOL_SCORE = 12; // 3 questions x 4
+/* One question per pool, answered on a slider with five stops at
+   0/25/50/75/100. A 0-100 scale rather than 0-4 so the benchmark medians stay
+   whole numbers when rescaled and the chart keeps its spread. */
+export const MAX_POOL_SCORE = 100;
 export const BANDS = ['Absent', 'Emerging', 'Developing', 'Established', 'Leading'];
 export function bandOf(score) {
-  if (score <= 2) return 0;
-  if (score <= 5) return 1;
-  if (score <= 8) return 2;
-  if (score <= 10) return 3;
-  return 4;
+  if (score <= 12) return 0;   /* Absent      — stop 0   */
+  if (score <= 37) return 1;   /* Emerging    — stop 25  */
+  if (score <= 62) return 2;   /* Developing  — stop 50  */
+  if (score <= 87) return 3;   /* Established — stop 75  */
+  return 4;                    /* Leading     — stop 100 */
 }
 
 /* -------------------------------------------------------------
@@ -535,7 +427,10 @@ export function classifyArchetype(scores) {
 
 export const BENCHMARK_STATUS = 'Illustrative industry benchmark · pending Infosys data';
 
-export const BENCHMARK_MEDIAN = { strategy: 6, data: 6, process: 7, legacy: 5, physical: 4, trust: 6 };
+/* Rescaled proportionally from the old /12 values, so the illustrative spread
+   survives. Only medians that coincide with a stop can ever be matched exactly
+   by "level with the benchmark"; the rest read as ahead or behind. */
+export const BENCHMARK_MEDIAN = { strategy: 50, data: 50, process: 58, legacy: 42, physical: 33, trust: 50 };
 
 /* -------------------------------------------------------------
    WORKFORCE ROLE EVOLUTION — verbatim structure from the

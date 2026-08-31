@@ -273,7 +273,7 @@ function renderProgress() {
     const c = el('div', 'cluster');
     c.dataset.pool = pid;
     const ticks = el('div', 'ticks');
-    for (let i = 0; i < 3; i++) ticks.appendChild(el('i'));
+    for (let i = 0; i < QUESTIONS[pid].length; i++) ticks.appendChild(el('i'));
     c.appendChild(ticks);
     c.appendChild(el('div', 'lb', POOL[pid].lines[0]));
     g.appendChild(c);
@@ -292,6 +292,95 @@ function paintProgress() {
   });
 }
 
+/* ---------- maturity slider ----------------------------------
+   Snaps to the question's stops. Nothing here knows how many stops there are;
+   it reads q.opts, so a pool with a different number still works.
+   ------------------------------------------------------------- */
+const SLIDER = { i: null };
+
+function stopCount(q) { return q.opts.length; }
+
+function paintStop(q, i) {
+  const last = stopCount(q) - 1;
+  i = Math.max(0, Math.min(last, i));
+  SLIDER.i = i;
+  const pct = (i / last) * 100;
+  $('msFill').style.width = `${pct}%`;
+  $('msThumb').style.left = `${pct}%`;
+  $('msThumb').classList.add('set');
+  $('msHint').classList.add('gone');
+  $('msLabel').textContent = q.opts[i][0];
+  $('msDetail').textContent = q.opts[i][1];
+  [...$('msTicks').children].forEach((t, k) => t.classList.toggle('on', k <= i));
+  const sl = $('qSlider');
+  sl.setAttribute('aria-valuenow', String(i));
+  sl.setAttribute('aria-valuetext', `${q.opts[i][0]}. ${q.opts[i][1]}`);
+  $('qNext').disabled = false;
+}
+
+function buildSlider(q) {
+  const last = stopCount(q) - 1;
+  const ticks = $('msTicks');
+  ticks.innerHTML = '';
+  q.opts.forEach(() => ticks.appendChild(el('i')));
+  $('msLo').textContent = q.opts[0][0];
+  $('msHi').textContent = q.opts[last][0];
+  $('qSlider').setAttribute('aria-valuemax', String(last));
+
+  // unset by default; a previous answer is restored when stepping back
+  SLIDER.i = null;
+  $('msFill').style.width = '0%';
+  $('msThumb').classList.remove('set');
+  $('msHint').classList.remove('gone');
+  $('msLabel').textContent = '';
+  $('msDetail').textContent = '';
+  $('qSlider').setAttribute('aria-valuenow', '-1');
+  $('qSlider').removeAttribute('aria-valuetext');
+  $('qNext').disabled = true;
+
+  const prev = S.answers[`${q.pool}:${q.subIndex}`];
+  if (prev != null) paintStop(q, prev);
+}
+
+/* The track lives inside #frame, which is CSS-scaled. getBoundingClientRect
+   and pointer coordinates are both in viewport space, so the ratio holds at
+   any scale — the trap that broke hexagon picking earlier. */
+function stopFromPointer(e, q) {
+  const r = $('msTrack').getBoundingClientRect();
+  const t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  return Math.round(t * (stopCount(q) - 1));
+}
+
+let msDragging = false;
+$('msTrack').addEventListener('pointerdown', e => {
+  const q = FLAT[S.qi]; if (!q) return;
+  msDragging = true;
+  try { $('msTrack').setPointerCapture(e.pointerId); } catch (err) { /* not captureable */ }
+  paintStop(q, stopFromPointer(e, q));
+});
+$('msTrack').addEventListener('pointermove', e => {
+  if (!msDragging) return;
+  const q = FLAT[S.qi]; if (!q) return;
+  paintStop(q, stopFromPointer(e, q));
+});
+['pointerup', 'pointercancel'].forEach(ev =>
+  $('msTrack').addEventListener(ev, () => { msDragging = false; }));
+
+$('qSlider').addEventListener('keydown', e => {
+  const q = FLAT[S.qi]; if (!q) return;
+  const cur = SLIDER.i == null ? -1 : SLIDER.i;
+  const K = {
+    ArrowRight: cur + 1, ArrowUp: cur + 1,
+    ArrowLeft: cur <= 0 ? 0 : cur - 1, ArrowDown: cur <= 0 ? 0 : cur - 1,
+    Home: 0, End: stopCount(q) - 1
+  };
+  if (e.key in K) { e.preventDefault(); paintStop(q, K[e.key]); }
+});
+
+$('qNext').addEventListener('click', () => {
+  if (SLIDER.i != null) answer(SLIDER.i);
+});
+
 function renderQuestion() {
   const q = FLAT[S.qi];
   if (!q) return finish();
@@ -306,14 +395,7 @@ function renderQuestion() {
   $('qKind').textContent = q.kind;
   $('qText').textContent = q.q;
 
-  const box = $('qOpts');
-  box.innerHTML = '';
-  q.opts.forEach((o, i) => {
-    const b = el('button', 'opt');
-    b.innerHTML = `<div class="key">${i + 1}</div><div><div class="lab">${o[0]}</div><div class="sub">${o[1]}</div></div>`;
-    b.onclick = () => answer(i);
-    box.appendChild(b);
-  });
+  buildSlider(q);
 
   const foot = $('qFoot');
   foot.innerHTML = '';

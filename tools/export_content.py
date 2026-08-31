@@ -143,12 +143,16 @@ for pid in ORDER:
                 oi, lab, desc, score, "", "", ""
             ])
 sheet("Diagnostic questions",
-      ["Value pool", "Q ref", "Theme", "Question", "Free-text option?", "#",
-       "Answer (shown large)", "Answer detail (shown small)", "Score"] + REVIEW,
-      [20, 8, 20, 52, 11, 4, 26, 46, 6, 13, 42, 34], rows,
-      notes=["18 questions, 3 per pool, 5 answers each. Score drives the result: 4 = most mature, 0 = no capability. "
-             "The question text appears once per group of five answers.",
-             "If you change an answer, keep it to about three words, because the kiosk renders it at display size."])
+      ["Value pool", "Q ref", "Theme", "Question", "Free-text option?", "Stop",
+       "Stop label (shown large)", "Stop detail (shown small)", "Score"] + REVIEW,
+      [20, 8, 22, 52, 11, 5, 26, 52, 6, 13, 42, 34], rows,
+      notes=["Six questions, one per value pool, each answered on a slider that snaps to five stops. "
+             "Was 18 questions with five tap-options each; Anshul asked for fewer of both.",
+             "The five stops run from least to most mature, left to right, scoring 0 / 25 / 50 / 75 / 100. "
+             "Those five scores are exactly the five report bands, so every stop has its own report copy "
+             "on the 'Score band feedback' sheet.",
+             "Stop labels are the large text on the slider, so keep them to about three or four words. "
+             "The detail line below updates as the visitor drags."])
 
 # ---------- 3. Value pools ----------
 rows = [[NAME[p["id"]], p["verb"], " / ".join(p["lines"]), p["blurb"],

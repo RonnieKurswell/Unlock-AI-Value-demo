@@ -175,7 +175,32 @@
           <div class="qprog" aria-hidden="true"><i id="qProgFill"></i></div>
           <div class="qkind" id="qKind">&nbsp;</div>
           <h2 class="qtext" id="qText">&nbsp;</h2>
-          <div class="opts" id="qOpts"></div>
+          <!-- One slider per pool, snapping to five labelled stops. It starts
+               unset on purpose: a default in the middle would register every
+               disengaged visitor as "Developing" and make the benchmark
+               meaningless. Committing is a separate tap, because a drag
+               necessarily passes through the other stops. -->
+          <div class="mslider" id="qSlider" role="slider" tabindex="0"
+               aria-valuemin="0" aria-valuemax="4" aria-valuenow="-1"
+               aria-label="Where are you today?">
+            <div class="ms-ends">
+              <span id="msLo"></span>
+              <span id="msHi"></span>
+            </div>
+            <div class="ms-track" id="msTrack">
+              <div class="ms-fill" id="msFill"></div>
+              <div class="ms-ticks" id="msTicks"></div>
+              <div class="ms-thumb" id="msThumb"></div>
+            </div>
+            <div class="ms-read">
+              <div class="ms-hint" id="msHint">Drag along the line to answer</div>
+              <div class="ms-label" id="msLabel"></div>
+              <div class="ms-detail" id="msDetail"></div>
+            </div>
+          </div>
+          <div class="qnext-row">
+            <button class="btn primary" id="qNext" disabled>Next <span class="arrow">→</span></button>
+          </div>
           <div class="qfoot" id="qFoot"></div>
           <div id="explainBox">
             <textarea id="explainText" placeholder="Optional. Anything the options above do not capture."></textarea>

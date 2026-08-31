@@ -386,15 +386,9 @@ input, textarea { font: inherit; }
 .stagger > *:nth-child(7) { animation-delay: 0.40s; }
 .stagger > *:nth-child(8) { animation-delay: 0.46s; }
 
-.opt { animation: riseIn 0.5s var(--ease) both; }
-.opt:nth-child(1) { animation-delay: 0.06s; }
-.opt:nth-child(2) { animation-delay: 0.12s; }
-.opt:nth-child(3) { animation-delay: 0.18s; }
-.opt:nth-child(4) { animation-delay: 0.24s; }
-.opt:nth-child(5) { animation-delay: 0.30s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .stagger > *, .opt { animation: none; }
+  .stagger > * { animation: none; }
 }
 /* Explore drives its own two modes with opacity transitions. `rise` uses
    fill-mode both, so its final opacity:1 would outrank those rules and both
@@ -899,36 +893,92 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 }
 
 /* options: rows separated by one hairline, no boxes */
-.opts { display: flex; flex-direction: column; }
-.opt {
-  width: 100%; text-align: left;
-  display: grid; grid-template-columns: 2.4em 1fr; align-items: baseline; gap: var(--s3);
-  padding: var(--s3) var(--s2) var(--s3) 0;
-  border-bottom: 1px solid var(--hair);
-  position: relative;
-  transition: padding-left 0.22s var(--ease);
-}
-.opt:first-child { border-top: 1px solid var(--hair); }
-.opt::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
-  background: var(--blue); transform: scaleY(0); transform-origin: center;
-  transition: transform 0.28s var(--ease-mech);
-}
-.opt:active { padding-left: var(--s3); }
-.opt:active::before { transform: scaleY(1); }
-.opt .key {
-  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.8cqw, 15.2px);
-  letter-spacing: 0.13em; color: var(--blue-lift); transition: color 0.22s var(--ease);
-}
-.opt:active .key { color: var(--blue-lift); }
-.opt .lab { font-size: clamp(14.8px, 1.081cqw, 22.3px); font-weight: 400; color: var(--fg); }
-.opt .sub { font-size: clamp(15.5px, 1.02cqw, 19px); color: var(--fg-2); margin-top: 5px; line-height: 1.58; }
+/* ---------- maturity slider -----------------------------------
+   Replaces the five tap-options. The five stops carry the same copy, so the
+   expert anchoring survives; what changes is that it takes one interaction
+   instead of five competing targets, and it reads as an instrument.
+   ------------------------------------------------------------- */
+.mslider { margin-top: var(--s4); outline: none; }
+.mslider:focus-visible .ms-track::before { box-shadow: 0 0 0 2px var(--blue-lift); }
 
+.ms-ends {
+  display: flex; justify-content: space-between; gap: var(--s4);
+  font-family: var(--label); font-weight: 500;
+  font-size: clamp(13px, 0.8cqw, 15px);
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--fg-4);
+}
+.ms-ends span:last-child { text-align: right; }
+
+/* 56px tall so the whole strip is the touch target; the rail it draws is 6px. */
+.ms-track {
+  position: relative; height: 56px; margin: var(--s1) 0 var(--s2);
+  cursor: pointer; touch-action: none;
+}
+.ms-track::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 50%;
+  height: 6px; margin-top: -3px; border-radius: 3px;
+  background: rgba(184, 212, 236, 0.20);
+}
+.ms-fill {
+  position: absolute; left: 0; top: 50%; width: 0;
+  height: 6px; margin-top: -3px; border-radius: 3px;
+  background: var(--blue-lift);
+  transition: width 0.18s var(--ease);
+}
+.ms-ticks {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  pointer-events: none;
+}
+.ms-ticks i {
+  display: block; width: 12px; height: 12px; border-radius: 50%;
+  background: rgba(184, 212, 236, 0.34);
+  transition: background 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.ms-ticks i.on { background: var(--blue-lift); }
+.ms-thumb {
+  position: absolute; top: 50%; left: 0;
+  width: 34px; height: 34px; border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.2);
+  background: var(--fg);
+  box-shadow: 0 4px 16px rgba(0, 10, 22, 0.5), 0 0 0 6px rgba(110, 200, 255, 0.18);
+  opacity: 0; pointer-events: none;
+  transition: left 0.18s var(--ease), transform 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+.ms-thumb.set { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+/* Reserves the height of a two-line reading, so the panel does not jump as
+   the visitor drags between stops with different description lengths. */
+.ms-read { min-height: 5.4em; }
+.ms-hint {
+  font-size: clamp(14px, 0.96cqw, 17px);
+  color: var(--fg-4);
+}
+.ms-hint.gone { display: none; }
+.ms-label {
+  font-size: clamp(16.6px, 1.15cqw, 22.3px);
+  line-height: 1.3; color: var(--fg);
+}
+.ms-detail {
+  font-size: clamp(15.5px, 1.02cqw, 19px);
+  line-height: 1.58; color: var(--fg-2); margin-top: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-fill, .ms-thumb, .ms-ticks i { transition: none; }
+}
+
+.qnext-row { margin-top: var(--s3); }
+.qnext-row .btn.primary[disabled] { opacity: 0.34; pointer-events: none; }
 .qfoot { margin-top: var(--s4); display: flex; align-items: center; gap: var(--s5); }
 .link-quiet {
   font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
   letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
   transition: color 0.2s var(--ease);
+  /* Real targets on a touchscreen, so they get the 44px minimum rather than
+     hugging their text at 23.8px. */
+  min-height: 44px; display: inline-flex; align-items: center; padding: 0 4px;
 }
 .link-quiet:active { color: var(--blue-lift); }
 
