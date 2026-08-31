@@ -684,6 +684,10 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-size: clamp(14.2px, 1.026cqw, 18.2px); color: var(--fg-2);
 }
 .pr-facts li:first-child { border-top: 1px solid var(--hair); }
+/* The footer below carries its own top rule, so a bottom border on the last
+   fact drew a second line a few pixels above it. Rules go between the facts
+   only. */
+.pr-facts li:last-child { border-bottom: none; }
 /* Pointy-top hexagon marker, the same silhouette as the framework board.
    It pops in per item as the list renders, then a second hexagon pings out
    of it on a slow loop — enough movement to read as alive, not enough to
