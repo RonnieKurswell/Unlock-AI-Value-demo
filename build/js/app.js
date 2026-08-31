@@ -107,11 +107,19 @@ function show(view) {
      decode behind every other screen for nothing, and on a kiosk that runs all
      day that is real heat and power. Rewound on the way in so each visitor sees
      it from the top. */
-  /* The film is kept in the build but no longer shown: it was the last dark
-     screen, and attract now carries a bright plate like every other screen.
-     Paused everywhere so it is not decoding behind anything. */
+  /* The film plays on attract only. Left running it would decode behind every
+     other screen for nothing, and on a kiosk that runs all day that is real
+     heat. Rewound on the way in so each visitor sees it from the top. */
   const film = $('bgVideo');
-  if (film) film.pause();
+  if (film) {
+    if (view === 'attract') {
+      try { film.currentTime = 0; } catch (e) { /* not seekable yet */ }
+      const p = film.play();
+      if (p && p.catch) p.catch(() => { /* autoplay refused; the poster stands in */ });
+    } else {
+      film.pause();
+    }
+  }
   S.view = view;
   Object.values(VIEWS).forEach(id => $(id).classList.remove('on'));
   $(VIEWS[view]).classList.add('on');

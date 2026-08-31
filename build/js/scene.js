@@ -79,6 +79,7 @@ export class HiveScene {
     this._tiles();
     this._core();
     this._dust();
+    this._drift();
 
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2(-2, -2);
@@ -223,6 +224,55 @@ export class HiveScene {
     this.hive.add(this.coreHalo);
 
     this.coreFlare = 0; this.coreFlareTarget = 0;
+  }
+
+  /* A slow ambient layer, attached to the camera rather than the world.
+     The camera travels a long way between screens — attract frames far wider
+     than the diagnostic — so world-space drifters would leave frame on some
+     states and swamp others. Parented to the camera they are framed
+     identically everywhere, which is what "motion on every screen" needs.
+     Hexagon outlines, additive, barely there. Positions are hand-placed to
+     stay out of the middle where the copy and the board live. */
+  _drift() {
+    this.scene.add(this.camera);          // camera children only render if it is in the graph
+
+    const pts = [];
+    for (let i = 0; i <= 6; i++) {
+      const a = Math.PI / 6 + (i % 6) * Math.PI / 3;   // pointy-top, closed loop
+      pts.push(new THREE.Vector3(Math.cos(a), Math.sin(a), 0));
+    }
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+
+    /* At z = -9 with a 38 degree fov the visible half-height is 3.1 and the
+       half-width 5.5, so these sit just inside the edges. */
+    const PLACE = [
+      [-4.9,  2.30, 0.85, 0.16], [-5.35, -1.95, 1.15, 0.13], [-3.25, -2.60, 0.60, 0.18],
+      [ 4.80, 2.50, 0.95, 0.15], [ 5.30, -2.10, 1.25, 0.12], [ 3.40, -2.70, 0.62, 0.17],
+      [-4.25, 0.15, 0.50, 0.11], [ 4.45,  0.40, 0.55, 0.11], [-1.45, -2.85, 0.70, 0.14]
+    ];
+    this.drifters = [];
+    const group = new THREE.Group();
+    group.position.z = -9;
+    PLACE.forEach(([x, y, sc, op], i) => {
+      const mat = new THREE.LineBasicMaterial({
+        color: 0x9FD4FF, transparent: true, opacity: op,
+        blending: THREE.AdditiveBlending, depthWrite: false, fog: false
+      });
+      const line = new THREE.Line(geo, mat);
+      line.position.set(x, y, 0);
+      line.scale.setScalar(sc);
+      line.rotation.z = i * 0.7;
+      group.add(line);
+      this.drifters.push({
+        obj: line, baseY: y,
+        spin: (i % 2 ? 1 : -1) * (0.020 + (i % 3) * 0.008),
+        bob: 0.16 + (i % 4) * 0.05,
+        rate: 0.10 + (i % 5) * 0.035,
+        phase: i * 1.9
+      });
+    });
+    this.camera.add(group);
+    this.driftGroup = group;
   }
 
   _dust() {
@@ -941,6 +991,16 @@ export class HiveScene {
     this.groundMat.uniforms.uTime.value = t;
     this.groundMat.uniforms.uFade.value = damp(this.groundMat.uniforms.uFade.value, this.groundFadeTarget, 3, dt);
     this.dustMat.uniforms.uTime.value = t;
+
+    /* Rotate and bob. Slow enough that it reads as ambient rather than as
+       something asking to be looked at. */
+    if (this.drifters) {
+      for (const d of this.drifters) {
+        d.obj.rotation.z += d.spin * dt;
+        d.obj.position.y = d.baseY + Math.sin(t * d.rate + d.phase) * d.bob;
+        d.obj.position.x += Math.cos(t * d.rate * 0.7 + d.phase) * 0.02 * dt;
+      }
+    }
 
     if (this.roomTarget) {
       this.scene.fog.color.lerp(this.roomDeep, 1 - Math.exp(-2.2 * dt));

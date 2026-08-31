@@ -227,18 +227,17 @@ input, textarea { font: inherit; }
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  /* Blurred and desaturated so it reads as depth behind the headline rather
-     than imagery competing with it. Scaled up because blur samples past the
-     edge and would otherwise show a soft border. */
-  filter: blur(9px) saturate(0.72);
-  transform: scale(1.06);
+  /* No blur and no desaturation this time. The old film was unrelated footage
+     that had to be beaten into submission; this one is generated from the
+     attract plate itself, first and last frame identical so the loop does not
+     jump, and its centre is already the dark calm field the headline needs. */
   opacity: 0;
   pointer-events: none;
   transition: opacity 700ms var(--ease);
 }
 #bgVideoScrim {
   position: absolute; inset: 0;
-  background: rgba(0, 0, 0, 0.58);
+  background: rgba(0, 0, 0, 0.18);
   opacity: 0;
   pointer-events: none;
   transition: opacity 700ms var(--ease);
@@ -265,9 +264,9 @@ input, textarea { font: inherit; }
    pushing the scrim so dark the film stops reading as motion. */
 #v-attract .label { color: var(--fg); }
 
-/* The film is retained but no longer shown: it was the one dark screen left in
-   the build, and a bright plate matches the rest of the set. The 3D motes still
-   drift over it, so the screen is not static. */
+/* The plate is the video's poster, so it must not paint over it as well. */
+#stage[data-view='attract'] #bgVideo,
+#stage[data-view='attract'] #bgVideoScrim { opacity: 1; }
 
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
