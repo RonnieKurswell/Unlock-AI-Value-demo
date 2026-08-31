@@ -308,8 +308,23 @@ input, textarea { font: inherit; }
   display: flex; align-items: center;
   padding: clamp(26px, 2.4cqw, 40px) var(--pad-x) 0;
 }
-.brand { display: flex; align-items: center; gap: var(--s2); }
-.brand img { height: clamp(15px, 1.15cqw, 21px); width: auto; }
+/* The brand is also the way out: tapping it starts over. #chrome is
+   pointer-events: none, so it has to opt back in. */
+.brand {
+  display: flex; align-items: center; gap: var(--s2);
+  pointer-events: auto; cursor: pointer;
+  padding: 8px 10px; margin: -8px -10px;
+  border-radius: 10px;
+  transition: background 0.2s var(--ease);
+}
+.brand:active { background: rgba(184, 212, 236, 0.10); }
+.brand:focus-visible { outline: 1px solid var(--blue-lift); outline-offset: 3px; }
+/* brightness(0) crushes the mark to black, invert(1) lifts it to pure white,
+   independent of whatever colours the SVG ships with. */
+.brand img {
+  height: clamp(15px, 1.15cqw, 21px); width: auto;
+  filter: brightness(0) invert(1);
+}
 .brand .div { width: 1px; height: 14px; background: var(--hair); }
 .brand span {
   font-family: var(--label); font-weight: 500;
@@ -332,7 +347,40 @@ input, textarea { font: inherit; }
   display: none; pointer-events: auto;
 }
 .view.on { display: block; }
+/* Restoring this: it was dropped when the framework block was rewritten, so
+   every `animation: rise` in the file had been referencing a keyframe that no
+   longer existed and nothing was animating at all. */
+@keyframes rise   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes riseIn { from { opacity: 0; transform: translateY(11px); } to { opacity: 1; transform: none; } }
+
 .view.on > * { animation: rise 0.7s var(--ease) both; }
+
+/* ---------- staggered entrance --------------------------------
+   A whole screen arriving as one slab reads rigid. Content blocks stagger
+   their own children so a screen assembles instead of appearing. The
+   diagnostic rebuilds its options per question, so that one replays for free
+   on every question.
+   ------------------------------------------------------------- */
+.stagger > * { animation: riseIn 0.62s var(--ease) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.16s; }
+.stagger > *:nth-child(4) { animation-delay: 0.22s; }
+.stagger > *:nth-child(5) { animation-delay: 0.28s; }
+.stagger > *:nth-child(6) { animation-delay: 0.34s; }
+.stagger > *:nth-child(7) { animation-delay: 0.40s; }
+.stagger > *:nth-child(8) { animation-delay: 0.46s; }
+
+.opt { animation: riseIn 0.5s var(--ease) both; }
+.opt:nth-child(1) { animation-delay: 0.06s; }
+.opt:nth-child(2) { animation-delay: 0.12s; }
+.opt:nth-child(3) { animation-delay: 0.18s; }
+.opt:nth-child(4) { animation-delay: 0.24s; }
+.opt:nth-child(5) { animation-delay: 0.30s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger > *, .opt { animation: none; }
+}
 /* Explore drives its own two modes with opacity transitions. `rise` uses
    fill-mode both, so its final opacity:1 would outrank those rules and both
    modes would show at once. */
@@ -526,7 +574,9 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 
 /* ---------- attract ----------------------------------------- */
 
-#v-attract { display: none; place-items: center; padding-bottom: 30cqh; }
+/* Centred. The old plate had a horizon the copy had to clear; the current
+   one does not. */
+#v-attract { display: none; place-items: center; }
 #v-attract.on { display: grid; }
 #v-attract .statement { max-width: none; }
 #v-attract .d-xl { max-width: 21ch; margin: var(--s3) auto 0; }

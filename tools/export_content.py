@@ -237,7 +237,7 @@ SCREEN = [
  ("Framework screen", "Eyebrow", "An Infosys framework"),
  ("Framework screen", "Headline", "Six pools of AI value in insurance"),
  ("Framework screen", "Lede", "Infosys' own model for insurance, not an industry standard. Each pool "
-                              "is somewhere AI creates measurable value for carriers \u2014 and somewhere "
+                              "is somewhere AI creates measurable value for carriers, and somewhere "
                               "programmes commonly stall."),
  ("Framework screen", "Gist \u2014 AI Strategy & Engineering", "One operating model, instead of pilots scattered across the business"),
  ("Framework screen", "Gist \u2014 Data for AI", "Policy, claims and treaty data made AI-ready and audit-ready"),

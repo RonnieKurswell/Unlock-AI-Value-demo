@@ -55,7 +55,7 @@ export const POOLS = [
     blurb: 'Policy, claims and treaty data sit in silos and unindexed PDFs. Infosys makes it AI-ready and audit-ready, with lineage a regulator can actually follow.',
     facts: [
       'Lineage a regulator can follow, decision by decision',
-      'Synthetic data — model training without PII exposure',
+      'Synthetic data for model training, without PII exposure',
       'One trusted record across policy, claims and party data'
     ]
   },
@@ -66,7 +66,7 @@ export const POOLS = [
     verb: 'Transform', edge: 5,
     color: 0xFF7AB0, hex: '#FF7AB0',
     room: ['#122C4E', '#050B16'],
-    blurb: 'Task-level automation inside an unchanged workflow. Infosys redesigns the whole journey — submission to bound, FNOL to settlement — around agents working alongside underwriters.',
+    blurb: 'Task-level automation inside an unchanged workflow. Infosys redesigns the whole journey, submission to bound and FNOL to settlement, around agents working alongside underwriters.',
     facts: [
       'Submission to bound, straight through',
       'FNOL triaged by severity, routine claims settled touchlessly',
@@ -427,24 +427,24 @@ export function bandOf(score) {
 
 export const BAND_COPY = {
   strategy: [
-    { read: 'There is no mechanism deciding where AI investment goes.', move: 'Start with an AI vision anchored to two or three insurance outcomes you already report on — combined ratio, claims cycle time, retention — and one governed intake process.' },
+    { read: 'There is no mechanism deciding where AI investment goes.', move: 'Start with an AI vision anchored to two or three insurance outcomes you already report on, such as combined ratio, claims cycle time and retention, plus one governed intake process.' },
     { read: 'Individual teams are experimenting, but nothing compounds beyond a business unit.', move: 'Establish an enterprise AI operating model with shared governance and value tracking so the second use case is cheaper than the first.' },
     { read: 'Direction exists, but architecture and cost still fragment by line of business.', move: 'Consolidate onto a shared engineering platform and make token consumption a design decision, not an invoice surprise.' },
-    { read: 'A real operating model is in place and use cases replicate across LOBs.', move: 'Add AI FinOps discipline — right-size models per task and route simple requests to smaller models to protect unit economics as volume grows.' },
+    { read: 'A real operating model is in place and use cases replicate across LOBs.', move: 'Add AI FinOps discipline: right-size models per task and route simple requests to smaller models to protect unit economics as volume grows.' },
     { read: 'You are running an AI factory: governed intake, shared platform, tracked value.', move: 'Push into AI-assisted delivery on the core estate itself, where the largest remaining engineering cost sits.' }
   ],
   data: [
     { read: 'Data is not in a state any production model could rely on.', move: 'Begin with one AI-ready data product for a single high-value journey rather than an enterprise-wide programme.' },
-    { read: 'Data exists but reaching it is slow, manual and unevidenced.', move: 'Index the unstructured estate — loss runs, treaties, adjuster notes — and instrument lineage from day one.' },
+    { read: 'Data exists but reaching it is slow, manual and unevidenced.', move: 'Index the unstructured estate of loss runs, treaties and adjuster notes, and instrument lineage from day one.' },
     { read: 'Structured data is workable; unstructured content and audit trail are the gap.', move: 'Add automated extraction and data fingerprinting so a regulator can be shown exactly which data drove a decision.' },
     { read: 'A unified, governed foundation is serving models across lines of business.', move: 'Introduce synthetic data to train on sensitive underwriting and claims scenarios without exposing PII or PHI.' },
     { read: 'Data is a genuine strategic asset: unified, lineage-tracked, queryable.', move: 'Use entity structuring across claimants, brokers and properties to unlock fraud and portfolio signals that single-record views cannot see.' }
   ],
   process: [
-    { read: 'Core workflows are manual end to end.', move: 'Pick one journey — pre-bind submission or FNOL — and map it fully before automating any part of it.' },
+    { read: 'Core workflows are manual end to end.', move: 'Pick one journey, pre-bind submission or FNOL, and map it fully before automating any part of it.' },
     { read: 'Automation exists at the task level and the journey is unchanged.', move: 'Shift the unit of redesign from task to journey. Task-level RPA cannot produce the step-change that justifies the investment.' },
     { read: 'AI is assisting people, but decisions still queue behind humans.', move: 'Introduce straight-through processing on the low-complexity tail so expert time concentrates on genuine exceptions.' },
-    { read: 'Agents and humans are working together across redesigned journeys.', move: 'Extend triage-and-escalate into adjacent processes — servicing and renewals — where the same pattern applies.' },
+    { read: 'Agents and humans are working together across redesigned journeys.', move: 'Extend triage-and-escalate into adjacent processes such as servicing and renewals, where the same pattern applies.' },
     { read: 'Journeys are agent-native, with humans on exceptions and complex risk.', move: 'Instrument decision consistency across teams and geographies; at this maturity, variance is the remaining cost.' }
   ],
   legacy: [
@@ -452,21 +452,21 @@ export const BAND_COPY = {
     { read: 'Legacy constraints are understood but undocumented, and knowledge is walking out the door.', move: 'Extract embedded rating and regulatory logic into machine-readable form while the people who understand it are still available.' },
     { read: 'Modernisation is underway but slow, and technical debt still sets your launch pace.', move: 'Move from big-bang planning to progressive increments validated against the legacy system’s actual behaviour.' },
     { read: 'Logic is being recovered and migrated incrementally with the book live.', move: 'Build a reusable attribute library so each subsequent product line costs less to migrate than the last.' },
-    { read: 'The core is modernising module by module without disrupting the book.', move: 'Redirect the freed capacity into product velocity — the strategic reason modernisation was worth doing.' }
+    { read: 'The core is modernising module by module without disrupting the book.', move: 'Redirect the freed capacity into product velocity, the strategic reason modernisation was worth doing.' }
   ],
   physical: [
     { read: 'Physical risk signals are not part of how you price or settle.', move: 'Identify one line where sensor data already exists and is simply not reaching a model.' },
-    { read: 'Sensor data is being collected but treated as a reporting by-product.', move: 'Engineer one feed — telematics or property IoT — into pricing as a first-class input rather than a post-hoc score.' },
+    { read: 'Sensor data is being collected but treated as a reporting by-product.', move: 'Engineer one feed, telematics or property IoT, into pricing as a first-class input rather than a post-hoc score.' },
     { read: 'Pilots are proving value but have not reached production pricing or claims.', move: 'Move one pilot into the live claims path, where cycle-time gains are immediate and measurable.' },
     { read: 'Physical signals are shaping pricing and accelerating claims validation.', move: 'Add digital twins on your largest commercial exposures to shift from reactive assessment to loss prevention.' },
-    { read: 'Risk assessment is continuous and predictive rather than periodic.', move: 'Extend edge intelligence into product design — usage-based propositions competitors cannot price against.' }
+    { read: 'Risk assessment is continuous and predictive rather than periodic.', move: 'Extend edge intelligence into product design, creating usage-based propositions competitors cannot price against.' }
   ],
   trust: [
     { read: 'There is no governance framework standing between your models and a regulator.', move: 'This is the constraint to fix first. In insurance, defensibility determines whether a model can be deployed at all.' },
     { read: 'Compliance is reviewing AI, but fairness and drift are unmonitored.', move: 'Move fairness testing into training, not sign-off, so proxy discrimination is caught before deployment.' },
     { read: 'Governance exists as a process gate rather than an engineering discipline.', move: 'Build explainability into model architecture so decisions can be justified to a commissioner without reconstruction.' },
     { read: 'Responsible AI is designed in, with monitoring and human checkpoints.', move: 'Formalise model risk committees and version-controlled audit trails to hold up under EU AI Act high-risk classification.' },
-    { read: 'Trust is engineered, not retrofitted — and it is now an advantage.', move: 'Use governance maturity commercially: it is what lets you deploy AI in decisions competitors cannot touch.' }
+    { read: 'Trust is engineered, not retrofitted, and it is now an advantage.', move: 'Use governance maturity commercially: it is what lets you deploy AI in decisions competitors cannot touch.' }
   ]
 };
 
@@ -480,36 +480,36 @@ export const ARCHETYPES = {
     key: 'foundation',
     name: 'Foundation First',
     tag: 'Groundwork before ambition',
-    body: 'You are early across all six pools. That is a sequencing opportunity, not a failing — a governed foundation reaches production faster than a use case with the platform retrofitted underneath.',
+    body: 'You are early across all six pools. That is a sequencing opportunity, not a failing. A governed foundation reaches production faster than a use case with the platform retrofitted underneath.',
     risk: 'The usual failure from here: a visible pilot for momentum, then the data underneath it will not support production.'
   },
   purgatory: {
     key: 'purgatory',
     name: 'Pilot Purgatory',
     tag: 'Proofs that never reach production',
-    body: 'Feasibility is proven. The path from a working proof to a live decision in the core is not. The barrier is rarely the model — it is data readiness, governance, and getting it into an underwriter’s hands.',
+    body: 'Feasibility is proven. The path from a working proof to a live decision in the core is not. The barrier is rarely the model. It is data readiness, governance, and getting it into an underwriter’s hands.',
     risk: 'Each pilot that stalls makes the next business case harder to fund.'
   },
   myopia: {
     key: 'myopia',
     name: 'Point-Solution Myopia',
     tag: 'Local gains that refuse to compound',
-    body: 'Your process maturity is ahead of your foundation. Workflows are genuinely faster, but each tool brought its own pipeline — so value stops at the boundary of the unit that built it.',
+    body: 'Your process maturity is ahead of your foundation. Workflows are genuinely faster, but each tool brought its own pipeline, so value stops at the boundary of the unit that built it.',
     risk: 'Without a shared foundation the next ten use cases each cost what the first one did.'
   },
   platform: {
     key: 'platform',
     name: 'Platform Without Purpose',
     tag: 'Capability built, value unclaimed',
-    body: 'You have invested ahead of the curve on strategy and data. The gap is application — the capability exists but is not yet pointed at where the economics accrue: submission to bound, FNOL to settlement.',
+    body: 'You have invested ahead of the curve on strategy and data. The gap is application. The capability exists but is not yet pointed at where the economics accrue: submission to bound, FNOL to settlement.',
     risk: 'Underutilised platform investment is the hardest kind to defend at budget.'
   },
   compounding: {
     key: 'compounding',
     name: 'Enterprise Compounding',
     tag: 'Each use case makes the next cheaper',
-    body: 'Foundation, application and governance are moving together — AI as an operating model rather than a portfolio of point solutions.',
-    risk: 'From here the constraint is workforce, not technology — whether underwriters trust the models enough to act on them.'
+    body: 'Foundation, application and governance are moving together, with AI as an operating model rather than a portfolio of point solutions.',
+    risk: 'From here the constraint is workforce, not technology: whether underwriters trust the models enough to act on them.'
   }
 };
 
@@ -547,7 +547,7 @@ export const ROLES = [
   {
     match: ['underwrit', 'risk', 'appetite'], focus: ['process', 'data', 'trust'],
     from: 'Underwriter', to: 'AI-Augmented Risk Advisor',
-    change: 'Shifts from data gathering and manual risk assessment to overseeing AI-driven risk models — concentrating human judgment on the complex and novel risks where model confidence is low.'
+    change: 'Shifts from data gathering and manual risk assessment to overseeing AI-driven risk models, concentrating human judgment on the complex and novel risks where model confidence is low.'
   },
   {
     match: ['claim', 'adjust', 'loss', 'fnol'], focus: ['process', 'physical', 'data'],
@@ -557,12 +557,12 @@ export const ROLES = [
   {
     match: ['actuar', 'pricing', 'reserv', 'model'], focus: ['data', 'trust', 'strategy'],
     from: 'Actuary', to: 'AI Model Steward',
-    change: 'Evolves from building models to validating, governing and continuously improving AI pricing and reserving models — with explainability and fairness as core responsibilities.'
+    change: 'Evolves from building models to validating, governing and continuously improving AI pricing and reserving models, with explainability and fairness as core responsibilities.'
   },
   {
     match: ['distribut', 'sales', 'growth', 'agency', 'channel'], focus: ['data', 'process', 'strategy'],
     from: 'Distribution Manager', to: 'AI-Enabled Growth Leader',
-    change: 'Gains real-time performance intelligence, AI-powered lead scoring and agent copilot tools — shifting from reactive support to proactive growth enablement.'
+    change: 'Gains real-time performance intelligence, AI-powered lead scoring and agent copilot tools, shifting from reactive support to proactive growth enablement.'
   },
   {
     match: ['broker', 'agent', 'advis', 'placement'], focus: ['process', 'data', 'legacy'],
@@ -574,7 +574,7 @@ export const ROLES = [
 export const ROLE_DEFAULT = {
   focus: ['strategy', 'trust', 'legacy'],
   from: 'Insurance Leader', to: 'AI Portfolio Owner',
-  change: 'Accountability moves from approving individual AI initiatives to owning an operating model — where governance, value tracking and workforce readiness are the levers that determine whether AI scales.'
+  change: 'Accountability moves from approving individual AI initiatives to owning an operating model, where governance, value tracking and workforce readiness are the levers that determine whether AI scales.'
 };
 
 export function roleFor(title) {
@@ -601,6 +601,6 @@ export function forecast(scores) {
 
 export const FORECAST_LINES = {
   compounding: 'Where your advantage widens. Each use case in a mature pool costs less than the last.',
-  exposed: 'Where the gap grows fastest — not because it degrades, but because the benchmark moves while it stays flat.',
+  exposed: 'Where the gap grows fastest, not because it degrades, but because the benchmark moves while it stays flat.',
   holding: 'Enough capability to move, not to compound. A decision this year changes the five-year position.'
 };

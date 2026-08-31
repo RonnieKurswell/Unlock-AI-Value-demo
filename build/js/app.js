@@ -88,6 +88,15 @@ function show(view) {
    ATTRACT
    ============================================================= */
 
+/* The brand lockup doubles as the way back to the start. On a kiosk someone
+   always walks off mid-run, and the next visitor needs a way to clear it
+   without waiting for the idle timeout. */
+function goHome() { if (S.view !== 'attract') reset(true); }
+$('brandHome').addEventListener('click', goHome);
+$('brandHome').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
+});
+
 $('v-attract').addEventListener('pointerdown', () => show('intro'));
 $('introGo').addEventListener('click', () => start());
 

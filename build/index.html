@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Infosys — Unlock AI Value in Insurance</title>
+<title>Infosys | Unlock AI Value in Insurance</title>
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -41,7 +41,8 @@
   <!-- brand lockup, nothing else -->
   <div id="chrome">
     <div class="bar top">
-      <div class="brand">
+      <div class="brand" id="brandHome" role="button" tabindex="0"
+           aria-label="Start over">
         <img src="images/infosys.svg" alt="Infosys">
         <div class="div"></div>
         <span>Unlock AI Value in Insurance</span>
@@ -75,15 +76,15 @@
          no idea what the six are or whose model it is. It gets its own step:
          the argument down the left, the whole map on the right. -->
     <section class="view" id="v-intro">
-      <div class="fw-lead">
+      <div class="fw-lead stagger">
         <span class="label">An Infosys framework</span>
         <h1 class="fw-title">Six pools of <em>AI value</em> in insurance</h1>
         <p class="fw-lede">Infosys' own model for insurance, not an industry standard.
-          Each pool is somewhere AI creates measurable value for carriers — and
+          Each pool is somewhere AI creates measurable value for carriers, and
           somewhere programmes commonly stall.</p>
         <button class="btn primary fw-go" id="introGo">Explore the six pools <span class="arrow">→</span></button>
       </div>
-      <ul class="fw-grid">
+      <ul class="fw-grid stagger">
         <li class="fw-card">
           <span class="fw-num">01</span>
           <span class="fw-verb">Orchestrate</span>
@@ -133,11 +134,11 @@
       </div>
 
       <div class="col">
-        <div class="pool-read panel" id="poolRead">
+        <div class="pool-read panel stagger" id="poolRead">
           <div class="pr-rule" id="prRule"></div>
-          <div class="pr-verb" id="prVerb">—</div>
-          <h2 class="pr-name" id="prName">—</h2>
-          <p class="pr-blurb" id="prBlurb">—</p>
+          <div class="pr-verb" id="prVerb">&nbsp;</div>
+          <h2 class="pr-name" id="prName">&nbsp;</h2>
+          <p class="pr-blurb" id="prBlurb">&nbsp;</p>
           <ul class="pr-facts" id="prFacts"></ul>
           <!-- Inside the panel: it was failing contrast out on the artwork, and
                Anshul's note was that the diagnostic CTA reads as secondary.
@@ -163,17 +164,17 @@
     <!-- DIAGNOSTIC -->
     <section class="view" id="v-diag">
       <div class="qcol">
-        <div class="panel qpanel">
+        <div class="panel qpanel stagger">
           <div class="qmeta">
-            <span class="pool-tag" id="qPool">—</span>
+            <span class="pool-tag" id="qPool">&nbsp;</span>
             <span class="count" id="qCount">01 / 18</span>
           </div>
-          <div class="qkind" id="qKind">—</div>
-          <h2 class="qtext" id="qText">—</h2>
+          <div class="qkind" id="qKind">&nbsp;</div>
+          <h2 class="qtext" id="qText">&nbsp;</h2>
           <div class="opts" id="qOpts"></div>
           <div class="qfoot" id="qFoot"></div>
           <div id="explainBox">
-            <textarea id="explainText" placeholder="Optional — anything the options above don't capture."></textarea>
+            <textarea id="explainText" placeholder="Optional. Anything the options above do not capture."></textarea>
           </div>
         </div>
       </div>
@@ -238,16 +239,16 @@
     <!-- RESULTS -->
     <section class="view" id="v-wrap">
 
-      <div class="beat" id="beat1">
+      <div class="beat stagger" id="beat1">
         <div class="arch-wrap">
           <div class="b1">
             <span class="label">Your position</span>
-            <h1 class="arch-name" id="archName">—</h1>
-            <p class="arch-tag" id="archTag">—</p>
+            <h1 class="arch-name" id="archName">&nbsp;</h1>
+            <p class="arch-tag" id="archTag">&nbsp;</p>
           </div>
           <div class="arch-cols">
-            <p class="body arch-body" id="archBody">—</p>
-            <div class="arch-risk" id="archRisk">—</div>
+            <p class="body arch-body" id="archBody">&nbsp;</p>
+            <div class="arch-risk" id="archRisk">&nbsp;</div>
           </div>
         </div>
         <div class="beat-nav">
@@ -256,13 +257,13 @@
         </div>
       </div>
 
-      <div class="beat" id="beat2">
+      <div class="beat stagger" id="beat2">
         <div class="bench-wrap">
           <div class="bench-head">
             <span class="label cool">Where you lead, where you lag</span>
             <h2 class="d-m">Against the benchmark</h2>
             <p class="lede bench-praise" id="benchPraise"></p>
-            <div class="bench-note" id="benchNote">—</div>
+            <div class="bench-note" id="benchNote">&nbsp;</div>
           </div>
           <div class="bench-list" id="benchList"></div>
         </div>
@@ -272,21 +273,21 @@
         </div>
       </div>
 
-      <div class="beat" id="beat3">
+      <div class="beat stagger" id="beat3">
         <div class="role-wrap">
           <div>
             <span class="label">And your role</span>
             <div class="role-morph">
-              <div class="from" id="roleFrom">—</div>
-              <div class="to" id="roleTo">—</div>
+              <div class="from" id="roleFrom">&nbsp;</div>
+              <div class="to" id="roleTo">&nbsp;</div>
             </div>
-            <p class="role-change" id="roleChange">—</p>
+            <p class="role-change" id="roleChange">&nbsp;</p>
             <p class="role-focus" id="roleFocus"></p>
             <div class="role-src">Matched from your badge · playbook workforce transformation table</div>
           </div>
           <div class="role-aside">
             <span class="label cool">The human constraint</span>
-            <p class="body">The people most affected by AI are the domain experts who make it work. A team can have the model and still not trust it over decades of manual judgment — which is why the carriers that scale it own governance at board level and reward AI-enabled outcomes.</p>
+            <p class="body">The people most affected by AI are the domain experts who make it work. A team can have the model and still not trust it over decades of manual judgment, which is why the carriers that scale it own governance at board level and reward AI-enabled outcomes.</p>
           </div>
         </div>
         <div class="beat-nav">
@@ -295,7 +296,7 @@
         </div>
       </div>
 
-      <div class="beat" id="beat4">
+      <div class="beat stagger" id="beat4">
         <div class="fc-wrap">
           <div class="fc-head">
             <span class="label cool">Five-year view</span>
@@ -320,7 +321,7 @@
         <span class="label">Report dispatched</span>
         <h2 class="d-l" style="margin-top:var(--s3)">On its way<span id="doneName"></span></h2>
         <div class="qr">QR · PLACEHOLDER</div>
-        <p class="lede">Sent to <span id="doneEmail" style="color:var(--blue-lift)">—</span>. Three ways to get it back:</p>
+        <p class="lede">Sent to <span id="doneEmail" style="color:var(--blue-lift)">&nbsp;</span>. Three ways to get it back:</p>
         <ol class="retrieve">
           <li><span class="r-n">01</span><span>Scan the code above</span></li>
           <li><span class="r-n">02</span><span>Open the email we just sent</span></li>
@@ -337,10 +338,10 @@
     <div class="ts-card" role="dialog" aria-modal="true">
       <button id="tileClose">Close ✕</button>
       <div class="ts-rule" id="tsRule"></div>
-      <span class="label cool" id="tsClient">—</span>
-      <h3 class="ts-title" id="tsTitle">—</h3>
-      <div class="ts-metric" id="tsMetric">—</div>
-      <p class="body" id="tsDetail">—</p>
+      <span class="label cool" id="tsClient">&nbsp;</span>
+      <h3 class="ts-title" id="tsTitle">&nbsp;</h3>
+      <div class="ts-metric" id="tsMetric">&nbsp;</div>
+      <p class="body" id="tsDetail">&nbsp;</p>
       <div class="pending-note" id="tsFlag" hidden></div>
     </div>
   </div><!-- /views -->
