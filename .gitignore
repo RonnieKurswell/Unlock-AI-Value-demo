@@ -8,3 +8,7 @@
 # scratch
 *.log
 node_modules/
+# Excel writes a ~$ lock file next to any open workbook. It is 165 bytes of
+# nothing and it got committed once already.
+~$*
+.DS_Store
