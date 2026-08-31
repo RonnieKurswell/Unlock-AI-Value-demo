@@ -41,10 +41,17 @@
   --fg-4: #9DBCD8;        /*  5.22:1  (was 1.97 — failed AA) */
   --hair: rgba(184, 212, 236, 0.30);
 
-  /* SURFACE CONTEXT — see .panel. */
-  --surface: #FFFFFF;
-  --surface-2: #F2F7FC;
-  --radius: 16px;
+  /* GLASS — see .panel. Tinted from the ground rather than from white, so it
+     reads as the room darkened behind a pane, not as a card laid on top. */
+  /* 0.82, not the 0.74 that looks right in isolation: at 0.74 the pool tag
+     measured 3.85:1 and the question counter 4.47:1 against the plate showing
+     through. The blur and the saturation carry the glass character; the alpha
+     is what carries the text. */
+  --glass: rgba(0, 28, 50, 0.82);
+  --glass-2: rgba(0, 34, 60, 0.70);
+  --glass-line: rgba(184, 216, 245, 0.22);
+  --glass-lip: rgba(255, 255, 255, 0.10);
+  --radius: 20px;
 
   /* spacing scales with the stage, which is always 16:9 and width-driven */
   --s1: clamp(4px, 0.32cqw, 7px);
@@ -80,23 +87,23 @@
    hierarchy, on a light ground.
    ------------------------------------------------------------- */
 .panel {
-  background: var(--surface);
-  color: var(--fg);      /* load-bearing: without it, anything that merely
-                            inherits its colour stays white-on-white */
+  background: var(--glass);
+  /* The blur is doing real work, not decoration: it collapses the plate's
+     local variance so text sits on an even ground instead of on whatever
+     hexagon edge happens to pass behind it. Saturation is nudged up because
+     blurring a bright blue otherwise reads grey. */
+  backdrop-filter: blur(30px) saturate(1.3);
+  -webkit-backdrop-filter: blur(30px) saturate(1.3);
+  border: 1px solid var(--glass-line);
   border-radius: var(--radius);
+  box-shadow:
+    0 26px 70px rgba(0, 10, 22, 0.42),
+    inset 0 1px 0 var(--glass-lip);
   padding: clamp(22px, 2.3cqw, 46px) clamp(24px, 2.6cqw, 52px);
-
-  --fg: #0A1C2E;          /* 17.23:1 on white */
-  --fg-2: #33506D;        /*  8.37:1 */
-  --fg-3: #4A6683;        /*  5.97:1 */
-  --fg-4: #55718C;        /*  4.9:1  — carries meta text, so it has to clear
-                                       body contrast, not just large */
-  --hair: #D3E0EC;
-  --blue: #0079BF;
-  --blue-lift: #00639E;   /*  6.41:1 — accent-as-text needs the darker one */
+  /* No token re-pointing any more — glass keeps the ground's light text, so
+     one set of colours covers the whole build. */
 }
-/* For a panel sitting directly on another panel. */
-.panel.panel-2 { background: var(--surface-2); }
+.panel.panel-2 { background: var(--glass-2); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -367,51 +374,75 @@ input, textarea { font: inherit; }
 }
 
 /* ---------- framework screen ----------------------------------
-   Its own step between attract and the hexagon. Anshul's note was that
-   visitors are asked to choose a value pool with no idea what the six are or
-   whose model this is; folding that onto the hexagon screen made one screen
-   do two jobs. Read once, then straight into the interaction.
+   Its own step between attract and the hexagon. An asymmetric split rather
+   than one centred box: the argument reads down the left, the six pools sit
+   right as a grid of glass cards you can take in at a glance.
    ------------------------------------------------------------- */
-#v-intro { display: none; place-items: center; }
-#v-intro.on { display: grid; }
-/* This plate is the palest in the build and it is not even: under the brand
-   line alone it runs from luminance 0.15 to 0.75. Light chrome measured
-   1.02:1 there and dark chrome 2.46:1 — no fixed text colour clears a ground
-   that swings that far, so the band gets a settled ground of its own. It
-   fades out well above the panel, so the artwork stays bright. */
+#v-intro { display: none; }
+#v-intro.on {
+  display: grid;
+  grid-template-columns: minmax(0, 30%) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--s7);
+}
+/* The lead copy sits straight on the plate, so the plate needs settling under
+   it. Full height and full width of the column, so there is no edge to see. */
 #v-intro::before {
-  content: ''; position: absolute; inset: 0 0 auto 0; height: 20%;
-  background: linear-gradient(180deg,
-    rgba(0, 26, 45, 0.80) 0%, rgba(0, 26, 45, 0.46) 42%, rgba(0, 26, 45, 0) 100%);
+  content: ''; position: absolute; inset: 0;
+  background:
+    linear-gradient(96deg,
+      rgba(0, 22, 40, 0.92) 0%, rgba(0, 22, 40, 0.84) 26%,
+      rgba(0, 22, 40, 0.34) 46%, rgba(0, 22, 40, 0.10) 62%, rgba(0, 22, 40, 0.06) 100%),
+    linear-gradient(180deg,
+      rgba(0, 22, 40, 0.55) 0%, rgba(0, 22, 40, 0.12) 16%, rgba(0, 22, 40, 0) 30%);
   pointer-events: none;
 }
-.fw-panel {
-  width: 62%; max-width: 1180px;
-  pointer-events: auto;
-  animation: rise 0.6s var(--ease) both;
-}
+.fw-lead { position: relative; animation: rise 0.6s var(--ease) both; }
 .fw-title {
-  font-family: var(--display); font-weight: 400;
-  font-size: clamp(28px, 2.3cqw, 46px);
-  line-height: 1.14; letter-spacing: -0.014em;
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(34px, 3.1cqw, 62px);
+  line-height: 1.06; letter-spacing: -0.02em;
   color: var(--fg);
-  margin: var(--s3) 0 var(--s3);
+  margin: var(--s3) 0 var(--s4);
 }
+.fw-title em { font-style: normal; color: var(--blue-lift); }
 .fw-lede {
-  font-size: clamp(16px, 1.08cqw, 20px);
-  line-height: 1.58; color: var(--fg-2);
-  max-width: 62ch;
+  font-size: clamp(15px, 1.02cqw, 19px);
+  line-height: 1.6; color: var(--fg-2);
+  max-width: 40ch;
 }
-/* Two columns, so all six read as one map rather than a list to work through. */
+/* --blue-lift measured 2.44:1 for the eyebrow and 2.82:1 for the button out
+   here on the plate. It is an accent tuned for glass and the 3D, not for
+   small text over artwork; both take the brightest token instead. */
+.fw-lead .label { color: var(--fg); }
+.fw-go { margin-top: var(--s5); color: var(--fg); }
+.fw-go::after { background: var(--blue-lift); }
+
 .fw-grid {
-  list-style: none; margin: var(--s5) 0 var(--s5);
-  display: grid; grid-template-columns: 1fr 1fr;
-  column-gap: var(--s6); row-gap: 0;
+  position: relative;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 0.9cqw, 18px);
+  animation: rise 0.7s var(--ease) 0.08s both;
 }
-.fw-grid li {
-  display: grid; gap: 3px;
-  padding: var(--s3) 0;
-  border-top: 1px solid var(--hair);
+.fw-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: clamp(16px, 1.5cqw, 30px) clamp(16px, 1.4cqw, 28px);
+  background: var(--glass);
+  backdrop-filter: blur(30px) saturate(1.3);
+  -webkit-backdrop-filter: blur(30px) saturate(1.3);
+  border: 1px solid var(--glass-line);
+  border-radius: 18px;
+  box-shadow: 0 18px 44px rgba(0, 10, 22, 0.34), inset 0 1px 0 var(--glass-lip);
+}
+.fw-num {
+  font-family: var(--label); font-weight: 500;
+  font-size: clamp(13px, 0.8cqw, 15px);
+  letter-spacing: 0.13em;
+  color: var(--fg-4);
 }
 .fw-verb {
   font-family: var(--label); font-weight: 600;
@@ -420,16 +451,15 @@ input, textarea { font: inherit; }
   color: var(--blue-lift);
 }
 .fw-name {
-  font-size: clamp(16px, 1.12cqw, 21px);
-  line-height: 1.3; color: var(--fg);
+  font-size: clamp(16px, 1.1cqw, 21px);
+  line-height: 1.24; color: var(--fg);
+  margin-top: 2px;
 }
 .fw-gist {
-  font-size: clamp(14px, 0.96cqw, 18px);
+  font-size: clamp(14px, 0.92cqw, 17px);
   line-height: 1.5; color: var(--fg-2);
+  margin-top: 4px;
 }
-.fw-go { margin-top: var(--s2); }
-
-@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
 /* ---------- type primitives --------------------------------- */
 
@@ -782,7 +812,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 }
 .qmeta .count {
   font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
-  letter-spacing: 0.13em; color: var(--fg-4); margin-left: auto;
+  letter-spacing: 0.13em; color: var(--fg-3); margin-left: auto;
 }
 .qkind {
   font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);

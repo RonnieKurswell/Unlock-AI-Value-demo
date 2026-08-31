@@ -15,12 +15,10 @@
    still carry their original hex, this only overrides it. */
 export const MONO_PALETTE = true;
 
-/* Two values, not one. The stage is dark and the copy panels are light, so a
-   single accent cannot serve both: #5CBDF5 reads on the 3D and disappears on
-   white, #00639E is the reverse. `hex` is the ground/3D value, `hexInk` is for
-   text and rules sitting on a light panel. */
+/* One accent again. The copy panels went from solid white to dark glass, so
+   they carry the same light text as the ground and the second, darker value
+   the white panels needed is no longer used. */
 const MONO_BLUE = '#5CBDF5';   /* 6.76:1 on the ground */
-const MONO_INK  = '#00639E';   /* 6.41:1 on white */
 
 /* Matching room, so the space does not shift hue between pools either. On the
    open-pool screens Khai's artwork covers the room anyway; this keeps the
@@ -179,7 +177,6 @@ export const TILES = {
 if (MONO_PALETTE) {
   for (const p of POOLS) {
     p.hex = MONO_BLUE;
-    p.hexInk = MONO_INK;
     p.color = parseInt(MONO_BLUE.slice(1), 16);
     p.room = [...MONO_ROOM];
   }

@@ -175,9 +175,9 @@ function renderPool(poolId) {
   if (!p) return;
   S.read.add(poolId);
 
-  $('prRule').style.background = p.hexInk || p.hex;
+  $('prRule').style.background = p.hex;
   $('prVerb').textContent = p.verb;
-  $('prVerb').style.color = p.hexInk || p.hex;   /* sits on a light panel */
+  $('prVerb').style.color = p.hex;
   $('prName').textContent = p.name;
   $('prBlurb').textContent = p.blurb;
 
@@ -185,7 +185,7 @@ function renderPool(poolId) {
   facts.innerHTML = '';
   (p.facts || []).forEach(f => {
     const li = el('li', null, f);
-    li.style.setProperty('--seg', p.hexInk || p.hex);   /* on a light panel */
+    li.style.setProperty('--seg', p.hex);
     facts.appendChild(li);
   });
 
@@ -288,7 +288,7 @@ function renderQuestion() {
   const p = POOL[q.pool];
 
   $('qPool').textContent = p.name;
-  $('qPool').style.color = p.hexInk || p.hex;   /* the tag sits on the panel */
+  $('qPool').style.color = p.hex;
   $('qCount').textContent = `${String(S.qi + 1).padStart(2, '0')} / ${FLAT.length}`;
   $('qKind').textContent = q.kind;
   $('qText').textContent = q.q;
