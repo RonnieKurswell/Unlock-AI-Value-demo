@@ -99,6 +99,7 @@ $('brandHome').addEventListener('keydown', e => {
 
 $('v-attract').addEventListener('pointerdown', () => show('intro'));
 $('introGo').addEventListener('click', () => start());
+$('introDiag').addEventListener('click', () => startDiagnostic());
 
 function start() {
   reset(false);
@@ -298,7 +299,10 @@ function renderQuestion() {
 
   $('qPool').textContent = p.name;
   $('qPool').style.color = p.hex;
-  $('qCount').textContent = `${String(S.qi + 1).padStart(2, '0')} / ${FLAT.length}`;
+  /* Spelled out rather than "01 / 18": at kiosk distance a slashed pair
+     reads as a code, not as position in a sequence. */
+  $('qCount').textContent = `Question ${S.qi + 1} of ${FLAT.length}`;
+  $('qProgFill').style.width = `${((S.qi + 1) / FLAT.length) * 100}%`;
   $('qKind').textContent = q.kind;
   $('qText').textContent = q.q;
 

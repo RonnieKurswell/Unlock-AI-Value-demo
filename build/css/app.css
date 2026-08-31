@@ -355,6 +355,21 @@ input, textarea { font: inherit; }
 
 .view.on > * { animation: rise 0.7s var(--ease) both; }
 
+/* Overall progress, at the top of the panel where the eye already is. The
+   per-pool clusters stay in the corner as detail; this is the headline. */
+.qprog {
+  position: relative; height: 5px; border-radius: 3px;
+  background: rgba(184, 212, 236, 0.18);
+  margin: var(--s2) 0 var(--s3);
+  overflow: hidden;
+}
+.qprog i {
+  position: absolute; top: 0; bottom: 0; left: 0;
+  display: block; width: 0;
+  background: var(--blue-lift); border-radius: 3px;
+  transition: width 0.45s var(--ease);
+}
+
 /* ---------- staggered entrance --------------------------------
    A whole screen arriving as one slab reads rigid. Content blocks stagger
    their own children so a screen assembles instead of appearing. The
@@ -463,7 +478,16 @@ input, textarea { font: inherit; }
    here on the plate. It is an accent tuned for glass and the 3D, not for
    small text over artwork; both take the brightest token instead. */
 .fw-lead .label { color: var(--fg); }
-.fw-go { margin-top: var(--s5); color: var(--fg); }
+/* Two ways on: read the pools first, or go straight to the diagnostic.
+   Anshul's note was that the diagnostic read as secondary to the playbook
+   content, so it is offered at the earliest point rather than only after
+   someone has worked through six pools. */
+.fw-actions {
+  margin-top: var(--s5);
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: var(--s4);
+}
+.fw-go { color: var(--fg); }
 .fw-go::after { background: var(--blue-lift); }
 
 .fw-grid {

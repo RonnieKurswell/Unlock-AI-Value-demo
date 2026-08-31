@@ -56,7 +56,7 @@
     <section class="view" id="v-attract">
       <div class="statement">
         <span class="label">AI-First Value Framework</span>
-        <h1 class="d-xl">Are you ready to unlock your <em>AI Value?</em></h1>
+        <h1 class="d-xl">Are you ready to unlock your <em>AI Value</em> in insurance?</h1>
         <p class="sub">Three minutes. Six value pools. One blueprint.</p>
         <div class="touch-cue">
           <span class="touch-dot" aria-hidden="true"><i></i></span>
@@ -82,7 +82,10 @@
         <p class="fw-lede">Infosys' own model for insurance, not an industry standard.
           Each pool is somewhere AI creates measurable value for carriers, and
           somewhere programmes commonly stall.</p>
-        <button class="btn primary fw-go" id="introGo">Explore the six pools <span class="arrow">→</span></button>
+        <div class="fw-actions">
+          <button class="btn primary fw-go" id="introGo">Explore the six pools <span class="arrow">→</span></button>
+          <button class="btn quiet fw-skip" id="introDiag">Start the diagnostic <span class="arrow">→</span></button>
+        </div>
       </div>
       <ul class="fw-grid stagger">
         <li class="fw-card">
@@ -130,7 +133,7 @@
       <!-- Overview: the whole framework, nothing else competing with it. -->
       <div class="hex-hint"><span class="touch-dot"><i></i></span><span>Tap a value pool to explore</span></div>
       <div class="ov-foot">
-        <button class="btn quiet" id="beginDiagOv">Skip to diagnostic <span class="arrow">→</span></button>
+        <button class="btn primary" id="beginDiagOv">Start the diagnostic <span class="arrow">→</span></button>
       </div>
 
       <div class="col">
@@ -167,8 +170,9 @@
         <div class="panel qpanel stagger">
           <div class="qmeta">
             <span class="pool-tag" id="qPool">&nbsp;</span>
-            <span class="count" id="qCount">01 / 18</span>
+            <span class="count" id="qCount">Question 1 of 18</span>
           </div>
+          <div class="qprog" aria-hidden="true"><i id="qProgFill"></i></div>
           <div class="qkind" id="qKind">&nbsp;</div>
           <h2 class="qtext" id="qText">&nbsp;</h2>
           <div class="opts" id="qOpts"></div>
