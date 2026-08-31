@@ -167,7 +167,18 @@
           <span class="touch-dot"><i></i></span> Tap here to see the framework
         </button>
       </div>
-      <div class="pool-dots" id="poolDots" aria-hidden="true"></div>
+      <!-- Arrows either side of the dots. Swiping is not obvious on a kiosk,
+           so the affordance is spelled out and the arrows work as buttons too,
+           for anyone who reads them and still taps. -->
+      <div class="pool-nav" id="poolNav">
+        <button class="pn-arrow" id="poolPrev" aria-label="Previous value pool">
+          <span aria-hidden="true">←</span>
+        </button>
+        <div class="pool-dots" id="poolDots" aria-hidden="true"></div>
+        <button class="pn-arrow" id="poolNext" aria-label="Next value pool">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
     <!-- DIAGNOSTIC -->

@@ -779,12 +779,25 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .ff-arrow { color: var(--seg, var(--blue-lift)); }
 
 /* which of the six is open */
-.pool-dots {
+/* The row now positions; the dots are just the dots. */
+.pool-nav {
   position: absolute; left: var(--pad-x); bottom: var(--pad-b);
-  display: flex; gap: 7px;
+  display: flex; align-items: center; gap: var(--s3);
   opacity: 0; transition: opacity 0.5s var(--ease); pointer-events: none;
 }
-#v-explore.focus .pool-dots { opacity: 1; }
+#v-explore.focus .pool-nav { opacity: 1; }
+#v-explore.focus .pn-arrow { pointer-events: auto; }
+.pn-arrow {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px;      /* real target, not just a glyph */
+  font-size: clamp(16px, 1.1cqw, 21px); line-height: 1;
+  color: var(--fg-3); cursor: pointer;
+  border-radius: 10px;
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+}
+.pn-arrow:active { color: var(--fg); background: rgba(184, 212, 236, 0.12); }
+.pn-arrow:focus-visible { outline: 1px solid var(--blue-lift); outline-offset: 2px; }
+.pool-dots { display: flex; gap: 7px; }
 .pool-dots i {
   width: 16px; height: 2px; background: var(--fg-4);
   transition: background 0.3s var(--ease), width 0.3s var(--ease);

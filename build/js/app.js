@@ -203,6 +203,17 @@ function paintDots(active) {
   [...wrap.children].forEach((d, k) => d.classList.toggle('on', k === active));
 }
 
+/* The arrows do what the swipe does. Wrapping round rather than stopping at
+   the ends, because on a kiosk a dead control reads as broken. */
+function stepPool(delta) {
+  const n = hexOrder().length;
+  const cur = scene.hexSelected;
+  if (cur < 0) return scene.selectHex(0);
+  scene.selectHex(((cur + delta) % n + n) % n);
+}
+$('poolPrev').addEventListener('click', () => stepPool(-1));
+$('poolNext').addEventListener('click', () => stepPool(1));
+
 /* The scene reports the room it is moving to; the stage gradient follows so
    the WebGL fog and the CSS backdrop agree. */
 scene.onRoom = ([a, b]) => {
