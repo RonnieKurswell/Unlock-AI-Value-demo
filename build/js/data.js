@@ -207,15 +207,14 @@ export const ORDER = POOLS.map(p => p.id);
    lowest maturity first, because a slider reads left to right. Scores are
    0/25/50/75/100 against MAX_POOL_SCORE = 100.
 
-   Each question keeps the free-text escape: one answer now carries a whole
-   pool, so the room to say "none of these" matters more, not less.
+   The free-text escape has been removed from the diagnostic, so there is no
+   allowExplain flag any more.
    ------------------------------------------------------------- */
 
 export const QUESTIONS = {
   strategy: [
     {
       kind: 'Getting AI into production',
-      allowExplain: true,
       q: 'How far has AI got beyond experiments in your business?',
       opts: [
         ['Nothing in production', 'No AI model has gone live in core insurance', 0],
@@ -229,7 +228,6 @@ export const QUESTIONS = {
   data: [
     {
       kind: 'Data readiness',
-      allowExplain: true,
       q: 'How ready is your data for AI to actually use?',
       opts: [
         ['Not processed at all', 'Policy, claims and treaty documents are never indexed', 0],
@@ -243,7 +241,6 @@ export const QUESTIONS = {
   process: [
     {
       kind: 'How much of the journey AI runs',
-      allowExplain: true,
       q: 'How much of a full claims or underwriting journey does AI run?',
       opts: [
         ['None of it', 'Core workflows are manual from end to end', 0],
@@ -257,7 +254,6 @@ export const QUESTIONS = {
   legacy: [
     {
       kind: 'The core platforms underneath',
-      allowExplain: true,
       q: 'How are you handling the core platforms AI needs to reach?',
       opts: [
         ['Frozen and untouchable', 'Rating logic nobody fully understands, too risky to change', 0],
@@ -271,7 +267,6 @@ export const QUESTIONS = {
   physical: [
     {
       kind: 'Sensor and telematics data',
-      allowExplain: true,
       q: 'What happens to the data from telematics, IoT and drones?',
       opts: [
         ['We do not collect it', 'No sensor or telematics feed exists', 0],
@@ -285,7 +280,6 @@ export const QUESTIONS = {
   trust: [
     {
       kind: 'Explaining an AI decision',
-      allowExplain: true,
       q: 'Could you explain an AI-driven decision to a regulator today?',
       opts: [
         ['No', 'Nothing is documented and nothing is testable', 0],

@@ -31,7 +31,6 @@ const S = {
   read: new Set(),
   qi: 0,
   answers: {},
-  notes: {},
   scores: {},
   beat: 0,
   role: null,
@@ -149,7 +148,6 @@ function reset(toAttract = true) {
   S.read = new Set();
   S.qi = 0;
   S.answers = {};
-  S.notes = {};
   S.beat = 0;
   S.role = null;
   S.recipient = null;
@@ -313,7 +311,6 @@ function renderProgress() {
     const ticks = el('div', 'ticks');
     for (let i = 0; i < QUESTIONS[pid].length; i++) ticks.appendChild(el('i'));
     c.appendChild(ticks);
-    c.appendChild(el('div', 'lb', POOL[pid].lines[0]));
     g.appendChild(c);
   });
 }
@@ -442,23 +439,10 @@ function renderQuestion() {
     back.onclick = () => { S.qi--; renderQuestion(); };
     foot.appendChild(back);
   }
-  const eb = $('explainBox');
-  eb.classList.remove('on');
-  $('explainText').value = S.notes[q.pool] || '';
-  if (q.allowExplain) {
-    const add = el('button', 'link-quiet', 'Add context in your own words');
-    add.onclick = () => { eb.classList.toggle('on'); if (eb.classList.contains('on')) $('explainText').focus(); };
-    foot.appendChild(add);
-  }
 
   paintProgress();
   scene.focus(q.pool);
 }
-
-$('explainText').addEventListener('input', e => {
-  const q = FLAT[S.qi];
-  if (q) S.notes[q.pool] = e.target.value;
-});
 
 function answer(optIndex) {
   const q = FLAT[S.qi];
@@ -506,10 +490,8 @@ function composeNarrative() {
   const ranked = [...ORDER].sort((a, b) => S.scores[b] - S.scores[a]);
   const top = ranked[0], low = ranked[ranked.length - 1];
   const tb = bandOf(S.scores[top]), lb = bandOf(S.scores[low]);
-  const notes = Object.entries(S.notes).filter(([, v]) => v && v.trim());
   let out = `Strongest: ${POOL[top].name}. Binding constraint: ${POOL[low].name}, ${BAND_COPY[low][lb].read.toLowerCase().replace(/\.$/, '')}. `;
   out += BAND_COPY[low][lb].move;
-  if (notes.length) out += ` Your own note is carried into the report.`;
   return out;
 }
 

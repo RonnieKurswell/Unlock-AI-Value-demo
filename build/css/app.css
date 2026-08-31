@@ -1011,16 +1011,6 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 }
 .link-quiet:active { color: var(--blue-lift); }
 
-#explainBox { margin-top: var(--s3); display: none; }
-#explainBox.on { display: block; }
-#explainBox textarea {
-  width: 100%; height: 76px; resize: none;
-  background: transparent; border: none; border-bottom: 1px solid var(--hair);
-  color: var(--fg); font-family: var(--body); font-weight: 300;
-  font-size: clamp(14.8px, 1.026cqw, 18.2px); padding: var(--s2) 0; line-height: 1.5;
-}
-#explainBox textarea::placeholder { color: var(--fg-4); }
-#explainBox textarea:focus { outline: none; border-bottom-color: var(--blue); }
 
 #v-diag .prog {
   pointer-events: auto; position: absolute; left: var(--pad-x); bottom: var(--pad-b);
@@ -1036,13 +1026,15 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 }
 .cluster { display: flex; flex-direction: column; gap: var(--s1); }
 .cluster .ticks { display: flex; gap: 3px; }
-.cluster .ticks i { width: 16px; height: 2px; background: var(--fg-4); display: block; transition: background 0.3s var(--ease); }
-.cluster .lb {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.718cqw, 13.8px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4); white-space: nowrap;
-  transition: color 0.3s var(--ease);
+.cluster .ticks i {
+  width: 30px; height: 3px; border-radius: 2px;
+  background: var(--fg-4); display: block;
+  transition: background 0.3s var(--ease), transform 0.3s var(--ease);
 }
-.cluster.active .lb { color: var(--fg-2); }
+.cluster.active .ticks i { transform: scaleY(1.6); }
+/* Titles gone: the panel already names the pool and counts the questions, so
+   down here they were saying it a third time. What is left is a six-step
+   position indicator. */
 
 /* ---------- results ----------------------------------------- */
 

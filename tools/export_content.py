@@ -139,13 +139,12 @@ for pid in ORDER:
             rows.append([
                 NAME[pid], ref, q["kind"],
                 q["q"] if oi == 1 else "",
-                "Yes" if q.get("allowExplain") and oi == 1 else "",
                 oi, lab, desc, score, "", "", ""
             ])
 sheet("Diagnostic questions",
-      ["Value pool", "Q ref", "Theme", "Question", "Free-text option?", "Stop",
+      ["Value pool", "Q ref", "Theme", "Question", "Stop",
        "Stop label (shown large)", "Stop detail (shown small)", "Score"] + REVIEW,
-      [20, 8, 22, 52, 11, 5, 26, 52, 6, 13, 42, 34], rows,
+      [20, 8, 22, 54, 5, 26, 52, 6, 13, 42, 34], rows,
       notes=["Six questions, one per value pool, each answered on a slider that snaps to five stops. "
              "Was 18 questions with five tap-options each; Anshul asked for fewer of both.",
              "The five stops run from least to most mature, left to right, scoring 0 / 25 / 50 / 75 / 100. "
