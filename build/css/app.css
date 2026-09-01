@@ -212,6 +212,19 @@ input, textarea { font: inherit; }
 #stage[data-view='identify'] #bg {
   background-image: url('../images/bg-identify.jpg');
 }
+/* The mid-diagnostic proof screen borrows the plate of the pool the case study
+   belongs to, so the interruption still reads as part of that pool rather than
+   as a screen from somewhere else. Falls back to the diagnostic plate before a
+   pool is set. */
+#stage[data-view='proof'] #bg {
+  background-image: url('../images/bg-diag.jpg');
+}
+#stage[data-view='proof'][data-pool='strategy'] #bg { background-image: url('../images/bg-pool-strategy.jpg'); }
+#stage[data-view='proof'][data-pool='data']     #bg { background-image: url('../images/bg-pool-data.jpg'); }
+#stage[data-view='proof'][data-pool='process']  #bg { background-image: url('../images/bg-pool-process.jpg'); }
+#stage[data-view='proof'][data-pool='legacy']   #bg { background-image: url('../images/bg-pool-legacy.jpg'); }
+#stage[data-view='proof'][data-pool='physical'] #bg { background-image: url('../images/bg-pool-physical.jpg'); }
+#stage[data-view='proof'][data-pool='trust']    #bg { background-image: url('../images/bg-pool-trust.jpg'); }
 /* Opening a pool swaps to that pool's own plate — Khai's artwork, exported from
    the Figma file. Each is composed with its form on the right, behind the slabs,
    and its left side dark for the copy column. They are blue rather than
@@ -1027,6 +1040,55 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .qnext-row { margin-top: var(--s3); }
 .qnext-row .btn.primary[disabled] { opacity: 0.34; pointer-events: none; }
 .qfoot { margin-top: var(--s4); display: flex; align-items: center; gap: var(--s5); }
+
+/* ---------- mid-diagnostic proof ------------------------------
+   Its own screen rather than a card bolted under the question. Mid-quiz the
+   visitor has just committed to an answer, so the moment is a beat: one
+   engagement, one number, one Continue. Sits left because it borrows the pool
+   plates, which are composed with their form on the right.
+   ------------------------------------------------------------- */
+#v-proof .copy-scrim {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg,
+      rgba(0, 36, 63, 0.56) 0%, rgba(0, 36, 63, 0.36) 42%, rgba(0, 36, 63, 0) 66%);
+  opacity: 1; pointer-events: none;
+}
+#v-proof .proof-col {
+  pointer-events: auto;
+  position: absolute; top: var(--pad-t); left: var(--pad-x); bottom: var(--pad-b);
+  width: 46%; max-width: 700px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.pf-rule { height: 2px; width: 44px; margin-bottom: var(--s3); background: var(--blue); }
+.pf-title {
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(24px, 2.4cqw, 44px); line-height: 1.06; letter-spacing: -0.022em;
+  margin-top: var(--s2); max-width: 24ch; text-wrap: balance;
+}
+/* The number is the reason this screen exists, so it outranks the title. */
+.pf-metric {
+  font-family: var(--display); font-weight: 300;
+  /* Sized so the longest metric in the register still clears the card on one
+     or two lines. It was breaking "Request-to-bind" across lines at the
+     hyphen, which reads as a typo at kiosk distance. */
+  font-size: clamp(28px, 2.7cqw, 50px); line-height: 1.06; letter-spacing: -0.028em;
+  margin-top: var(--s3); color: var(--blue-lift);
+  text-wrap: balance;
+}
+.pf-detail {
+  margin-top: var(--s3);
+  font-size: clamp(14.3px, 1.018cqw, 20.1px); line-height: 1.55;
+  color: var(--fg-2); max-width: 48ch;
+}
+.pf-foot {
+  margin-top: var(--s5);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
+}
+.pf-count {
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
+}
 .link-quiet {
   font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
   letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
@@ -1406,7 +1468,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   .fc-col { padding-left: 0; border-left: none; }
   .role-wrap, #beat1 .arch-cols { grid-template-columns: 1fr; gap: var(--s4); }
   .role-aside { border-left: none; padding-left: 0; }
-  #v-diag .qcol, #v-explore .col { width: 56%; }
+  #v-diag .qcol, #v-explore .col, #v-proof .proof-col { width: 56%; }
   .pr-tiles { grid-template-columns: 1fr; }
   .manual-form .mf-row { grid-template-columns: 1fr; }
   .bench-row { grid-template-columns: 11em 1fr 5em; gap: var(--s3); }

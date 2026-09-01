@@ -1,6 +1,6 @@
 /* =============================================================
    APPLICATION — kiosk state machine
-   attract → explore → diagnostic(18) → identify → results(5) → done
+   attract → explore → diagnostic(6, proof after every 2nd) → identify → results(5) → done
    ============================================================= */
 
 import { HiveScene } from './scene.js';
@@ -18,6 +18,16 @@ const el = (tag, cls, html) => {
   return n;
 };
 
+/* Staggered entrances are CSS animations, so they only run the first time an
+   element paints. A screen that is shown more than once per visit has to have
+   them restarted by hand. */
+function replay(host) {
+  if (!host) return;
+  host.classList.remove('stagger');
+  void host.offsetWidth;
+  host.classList.add('stagger');
+}
+
 const IDLE_MS = 90_000;
 const DONE_RESET_S = 12;
 
@@ -33,6 +43,8 @@ const S = {
   answers: {},
   scores: {},
   beat: 0,
+  proofShown: new Set(),
+  proofPools: new Set(),
   role: null,
   recipient: null
 };
@@ -48,10 +60,10 @@ window.__kiosk = { scene, state: S };
    ROUTER
    ============================================================= */
 
-const VIEWS = { attract: 'v-attract', intro: 'v-intro', explore: 'v-explore', diag: 'v-diag', identify: 'v-identify', wrap: 'v-wrap', done: 'v-done' };
+const VIEWS = { attract: 'v-attract', intro: 'v-intro', explore: 'v-explore', diag: 'v-diag', proof: 'v-proof', identify: 'v-identify', wrap: 'v-wrap', done: 'v-done' };
 /* The framework screen is a reading moment, so it takes the bare state: no
    ring, no floor grid, nothing turning behind the panel. */
-const SCENE_STATE = { attract: 'attract', intro: 'delivery', explore: 'explore', diag: 'diagnostic', identify: 'delivery', wrap: 'results', done: 'delivery' };
+const SCENE_STATE = { attract: 'attract', intro: 'delivery', explore: 'explore', diag: 'diagnostic', proof: 'delivery', identify: 'delivery', wrap: 'results', done: 'delivery' };
 const BEAT_SCENE = i => (i === 0 ? 'results' : 'resultsQuiet');
 
 /* ---------- background plates ---------------------------------
@@ -157,11 +169,17 @@ function reset(toAttract = true) {
   S.qi = 0;
   S.answers = {};
   S.beat = 0;
+  S.proofShown = new Set();
+  S.proofPools = new Set();
   S.role = null;
   S.recipient = null;
   ORDER.forEach(id => { S.scores[id] = 0; });
   scene.resetTiles();
   scene.clearHex();
+  /* The proof screen borrows a pool's plate, and clearHex only clears this
+     when a hexagon was actually open. Left set, the next visitor's explore
+     overview would open on a pool plate. */
+  delete $('stage').dataset.pool;
   resetDelivery();
   if (toAttract) show('attract');
 }
@@ -311,6 +329,8 @@ function exploreKeys(e) {
    leaves the screen empty except the chrome. */
 function startDiagnostic() {
   S.qi = 0;
+  S.proofShown = new Set();
+  S.proofPools = new Set();
   show('diag');
   renderQuestion();
 }
@@ -450,9 +470,71 @@ function answer(optIndex) {
   scene.ping(q.pool);
 
   S.qi++;
-  if (S.qi >= FLAT.length) finish();
-  else renderQuestion();
+  if (S.qi >= FLAT.length) return finish();
+  /* Proof lands between questions, not after the last one: at the end the
+     report already carries the case studies. */
+  if (PROOF_AFTER.includes(S.qi) && !S.proofShown.has(S.qi)) return showProof(S.qi);
+  renderQuestion();
 }
+
+/* =============================================================
+   PROOF, MID-DIAGNOSTIC
+   Anshul asked for case studies during the questions rather than only in the
+   report, roughly every second question. With six questions that is two
+   beats, after the second and the fourth.
+   ============================================================= */
+
+const PROOF_AFTER = [2, 4];
+
+/* Which engagement to show. Only pools already answered are eligible, because
+   a case study for a pool they have not reached yet gives the answer away. Of
+   those, the lowest scoring one: the case study then reads as what closing
+   that particular gap looks like, rather than as a general brag. Pending tiles
+   are skipped outright — "Infosys to supply" is fine in a report appendix and
+   not fine on a kiosk in front of a client. */
+function pickProof(qi) {
+  const answered = FLAT.slice(0, qi).map(q => q.pool);
+  const pools = [...new Set(answered)].filter(pid => !S.proofPools.has(pid));
+  let best = null;
+  for (const pid of pools) {
+    const tile = (TILES[pid] || []).find(t => !t.pending);
+    if (!tile) continue;
+    const norm = (S.scores[pid] || 0) / MAX_POOL_SCORE;
+    if (!best || norm < best.norm) best = { pid, tile, norm };
+  }
+  return best;
+}
+
+function showProof(qi) {
+  const pick = pickProof(qi);
+  /* No eligible engagement — every answered pool is pending, or its case
+     studies are still with Infosys. Straight on to the next question rather
+     than a screen with nothing on it. */
+  if (!pick) return renderQuestion();
+
+  S.proofShown.add(qi);
+  S.proofPools.add(pick.pid);
+
+  const p = POOL[pick.pid], t = pick.tile;
+  $('pfRule').style.background = p.hex;
+  $('pfEyebrow').textContent = `${p.name} · ${t.client}`;
+  $('pfTitle').textContent = t.title;
+  $('pfMetric').textContent = t.metric;
+  $('pfDetail').textContent = t.detail;
+  $('pfCount').textContent = `${qi} of ${FLAT.length} answered`;
+
+  // Plate before the view: show() reads the resolved background off #bg.
+  $('stage').dataset.pool = pick.pid;
+  show('proof');
+  replay($('v-proof').querySelector('.stagger'));
+}
+
+$('pfNext').addEventListener('click', () => {
+  delete $('stage').dataset.pool;
+  show('diag');
+  renderQuestion();
+  replay($('v-diag').querySelector('.stagger'));
+});
 
 /* =============================================================
    RESULTS
