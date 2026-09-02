@@ -559,7 +559,7 @@ function buildWrapped() {
         <div class="fill" style="background:${p.hex}"></div>
         <div class="bmark" style="left:${(med / MAX_POOL_SCORE) * 100}%"></div>
       </div>
-      <div class="val"><b>${sc}</b>/12 <span class="${d >= 0 ? 'delta-up' : 'delta-dn'}">${d >= 0 ? '+' : ''}${d}</span></div>`;
+      <div class="val"><b>${sc}</b>/${MAX_POOL_SCORE} <span class="${d >= 0 ? 'delta-up' : 'delta-dn'}">${d === 0 ? 'level' : (d > 0 ? '+' : '') + d}</span></div>`;
     list.appendChild(row);
     requestAnimationFrame(() => { row.querySelector('.fill').style.width = `${(sc / MAX_POOL_SCORE) * 100}%`; });
   });
