@@ -25,6 +25,9 @@ Due : **29 September** · look and feel review Thursday 3 Sep
 ## Diagnostic screen — done today
 
 * ✅ Case study **in the question panel**, between the answer and Next, for that question's own pool. Tap opens the full case.
+* ✅ **Email capture replaces the badge tap**, with a confirmation after submitting
+* ✅ **Role beat removed** from the results. Three beats now: position, benchmark, five-year
+* ✅ Benchmark fine print on one line
 * ✅ Standalone mid-quiz proof screen built, then removed when you asked for it on the question instead
 * ✅ Split settled at **50:50** after trying 70:30 and 60:40
 * ✅ Slider spans the panel, same width as the progress bar, case study and action row
@@ -62,7 +65,7 @@ Due : **29 September** · look and feel review Thursday 3 Sep
 * ⬜ Hexagon still the PowerPoint-looking one ⚠️
 * ⬜ QR still reads "QR · PLACEHOLDER", no destination URL
 * ⬜ Email backend is Jamil's, brief not sent
-* ⬜ Two configs, NFC and no-NFC. No-NFC first
+* ✅ **NFC removed.** Email only, one field, with a confirmation before the report rolls. An NFC build stays a separate config if AI Day New York wants it
 * ⬜ Anshul's consolidated feedback after the Deepak meeting never arrived
 
 ---
