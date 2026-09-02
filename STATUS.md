@@ -32,8 +32,8 @@ Due : **29 September** · look and feel review Thursday 3 Sep · framework visua
 * ✅ 18 questions → 6, one drag slider per pool, five labelled stops
 * ✅ Transitions and staggered entrances on every screen
 * ✅ Fills the window on non-16:9 displays, no more black bars
-* ✅ **Case study on each question screen**, for that question's own pool, tap to read the full case
-* ✅ **Diagnostic rebalanced 30:70.** Board shrunk and lifted, question grew, slider capped so the drag is not an arm's length
+* ✅ **Case study in each question panel**, between the answer and Next, for that question's own pool, tap to read the full case
+* ✅ **Diagnostic rebalanced 40:60.** Board smaller, question grew, slider capped so the drag is not an arm's length
 * ⬜ Diagnostic CTA still not centred. Two of them, neither is the focal point. ⚠️
 * ⬜ Framework intro screen: retain but redesign, flagged as maybe redundant with the pool screen
 * ⬜ Physical AI's question carries no case study, because there is no case study to carry ⚠️

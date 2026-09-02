@@ -176,7 +176,7 @@ ws = sheet("Proof tiles",
       [22, 15, 20, 28, 30, 66, 13, 42, 34, 3], rows, pending_col=9,
       notes=["Three per pool. Amber rows have no case study. We need client name, metric and one or two lines of detail, "
              "or permission to drop the tile.",
-             "One of these appears on each diagnostic question screen, next to the question for its own value pool, "
+             "One of these appears in each diagnostic question panel, between the answer and Next, for that question's own value pool, "
              "per Anshul's note that proof should land while someone is still answering. The first cleared tile in "
              "each pool is used, and amber rows are skipped, so Physical AI currently shows no case study at all "
              "on its question.",

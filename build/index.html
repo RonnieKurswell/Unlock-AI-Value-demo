@@ -187,20 +187,6 @@
 
     <!-- DIAGNOSTIC -->
     <section class="view" id="v-diag">
-      <!-- The proof for the pool being asked about, alongside the question
-           rather than after it. Anshul wanted case studies during the
-           diagnostic; putting one on the question screen itself means it is
-           read while the question is being considered, not as an interruption
-           between two of them. Hidden on pools with no cleared case study, so
-           it is genuinely optional. -->
-      <button class="qcase panel" id="qCase" hidden>
-        <span class="qc-rule" id="qcRule"></span>
-        <span class="label cool" id="qcEyebrow">&nbsp;</span>
-        <span class="qc-metric" id="qcMetric">&nbsp;</span>
-        <span class="qc-title" id="qcTitle">&nbsp;</span>
-        <span class="qc-more">Read the case <span class="arrow">→</span></span>
-      </button>
-
       <div class="qcol">
         <div class="panel qpanel stagger">
           <div class="qmeta">
@@ -233,6 +219,22 @@
               <div class="ms-detail" id="msDetail"></div>
             </div>
           </div>
+          <!-- The proof for the pool being asked about, in the panel with the
+               question rather than on a screen of its own after it. Anshul
+               wanted case studies during the diagnostic; here it is read while
+               the question is being considered. Between the answer and Next, so
+               it sits in the beat where someone has just decided and is about
+               to move on. Hidden on pools with no cleared case study, which
+               makes it genuinely optional. -->
+          <button class="qcase" id="qCase" hidden>
+            <span class="qc-bar" id="qcRule"></span>
+            <span class="qc-read">
+              <span class="qc-metric" id="qcMetric">&nbsp;</span>
+              <span class="qc-sub"><b id="qcEyebrow">&nbsp;</b><span id="qcTitle">&nbsp;</span></span>
+            </span>
+            <span class="qc-more">Read the case <span class="arrow">→</span></span>
+          </button>
+
           <div class="qnext-row">
             <button class="btn primary" id="qNext" disabled>Next <span class="arrow">→</span></button>
           </div>

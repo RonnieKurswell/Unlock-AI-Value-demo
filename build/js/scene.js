@@ -588,16 +588,15 @@ export class HiveScene {
     if (this.state === 'diagnostic') {
       /* The questions own the right of the frame, so the board is centred in
          what is left and sized to fit it, rather than filling the whole stage.
-         The column takes two thirds now: an even split gave the board more
-         room than it needs to read, and the width it gives back is what the
-         case study card sits in. The board also lifts, because that card is
-         directly under it. */
-      const colFrac = Math.min(this.canvas.clientWidth * 0.66, 1180) /
+         The column takes 60%: an even split gave the board more room than it
+         needs to read, and two thirds took too much away. The case study lives
+         in the panel now, so nothing sits under the board and it centres. */
+      const colFrac = Math.min(this.canvas.clientWidth * 0.60, 1080) /
                       (this.canvas.clientWidth || 1);
       const freeW = worldW * (1 - colFrac);
       T.x = -(worldW * colFrac) / 2;
-      T.y = worldH * 0.13;
-      T.scale = Math.min((worldH * 0.52) / boardH, (freeW * 0.90) / boardW);
+      T.y = worldH * 0.02;
+      T.scale = Math.min((worldH * 0.68) / boardH, (freeW * 0.90) / boardW);
       T.roll = nearestTurn(0, T.roll);
       T.labelFlip = 0;
       return T;

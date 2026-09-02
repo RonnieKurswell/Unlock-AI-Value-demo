@@ -463,7 +463,7 @@ function renderQuestionCase(pid) {
 
   const p = POOL[pid];
   $('qcRule').style.background = p.hex;
-  // The panel above already names the pool, so the card only carries who.
+  // The panel above already names the pool, so the strip only carries who.
   $('qcEyebrow').textContent = tile.client;
   $('qcMetric').textContent = tile.metric;
   $('qcTitle').textContent = tile.title;

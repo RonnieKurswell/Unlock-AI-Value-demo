@@ -919,47 +919,54 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* ---------- diagnostic -------------------------------------- */
 
 #v-diag { pointer-events: none; }
-/* Was an even split with the board. The hexagon does not need half the screen
-   to read, and the room it gives back is where the case study goes. */
+/* Was an even split with the board. Two thirds turned out to be too much of a
+   swing, so the board keeps a real 40% and the questions take the rest. */
 #v-diag .qcol {
   pointer-events: auto;
   position: absolute; top: var(--pad-t); right: var(--pad-x); bottom: var(--pad-b);
-  width: 66%; max-width: 1180px;
+  width: 60%; max-width: 1080px;
   display: flex; flex-direction: column; justify-content: center;
 }
 
-/* ---------- case study, on the question screen ----------------
-   Sits under the board in the width the smaller hexagon gives back. It is a
-   summary, not the whole case: metric first because that is what carries at
-   kiosk distance, and tapping opens the same detail sheet the pool screens
-   use. Hidden outright on a pool with no cleared case study. */
-#v-diag .qcase {
-  pointer-events: auto;
-  position: absolute; left: var(--pad-x); bottom: var(--pad-b);
-  width: 27%; max-width: 460px;
-  display: flex; flex-direction: column; align-items: flex-start;
-  text-align: left; gap: var(--s1);
-  padding: clamp(16px, 1.5cqw, 30px) clamp(18px, 1.7cqw, 34px) clamp(18px, 1.7cqw, 34px);
-  transition: background 0.22s var(--ease), transform 0.22s var(--ease);
+/* ---------- case study, inside the question panel --------------
+   A strip rather than a card, sitting between the answer and Next: someone has
+   just decided and is about to move on, which is the moment a proof point is
+   worth reading. Metric first because that is what carries at kiosk distance,
+   and tapping opens the same detail sheet the pool screens use. Hidden outright
+   on a pool with no cleared case study. */
+.qcase {
+  margin-top: var(--s4);
+  display: flex; align-items: center; gap: clamp(14px, 1.2cqw, 24px);
+  text-align: left; width: 100%;
+  padding: clamp(12px, 1.05cqw, 21px) clamp(14px, 1.25cqw, 25px);
+  background: rgba(243, 247, 251, 0.045);
+  border-radius: calc(var(--radius) * 0.5);
+  transition: background 0.22s var(--ease);
 }
-#v-diag .qcase[hidden] { display: none; }
-#v-diag .qcase:active { transform: translateY(1px); }
-.qc-rule { height: 2px; width: 34px; background: var(--blue); margin-bottom: var(--s2); }
+.qcase[hidden] { display: none; }
+.qcase:active { background: rgba(243, 247, 251, 0.095); }
+/* The pool's colour, as an edge rather than a fill: at this size a coloured
+   panel competes with the slider for attention. */
+.qc-bar { flex: none; width: 3px; align-self: stretch; min-height: 34px; background: var(--blue); border-radius: 2px; }
+.qc-read { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .qc-metric {
   font-family: var(--display); font-weight: 300;
-  font-size: clamp(21px, 1.72cqw, 33px); line-height: 1.1; letter-spacing: -0.022em;
-  color: var(--blue-lift); margin-top: 2px; text-wrap: balance;
+  font-size: clamp(19px, 1.42cqw, 27px); line-height: 1.14; letter-spacing: -0.018em;
+  color: var(--blue-lift);
 }
-.qc-title {
-  font-size: clamp(13.6px, 0.93cqw, 18px); line-height: 1.4; color: var(--fg-2);
-  margin-top: 2px;
+.qc-sub {
+  display: flex; flex-wrap: wrap; gap: 0 8px;
+  font-size: clamp(13.4px, 0.9cqw, 17.3px); line-height: 1.35; color: var(--fg-3);
 }
+.qc-sub b { font-weight: 500; color: var(--fg-2); }
+.qc-sub b::after { content: ' ·'; color: var(--fg-4); font-weight: 400; }
 .qc-more {
-  margin-top: var(--s3);
+  margin-left: auto; flex: none;
   font-family: var(--label); font-weight: 500; font-size: clamp(13px, 0.8cqw, 15.2px);
   letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
-  display: inline-flex; align-items: center; gap: 8px; min-height: 30px;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
 }
+
 /* The panel hugs the question rather than filling the column, so the plate
    and the 3D still read around it. */
 #v-diag .qpanel { display: flex; flex-direction: column; }
