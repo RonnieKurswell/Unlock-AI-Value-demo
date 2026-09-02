@@ -924,12 +924,12 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* ---------- diagnostic -------------------------------------- */
 
 #v-diag { pointer-events: none; }
-/* Was an even split with the board. Two thirds turned out to be too much of a
-   swing, so the board keeps a real 40% and the questions take the rest. */
+/* An even split, after trying 70 and 60. Both left the panel wider than its
+   content wanted to be, which is what read as awkward. */
 #v-diag .qcol {
   pointer-events: auto;
   position: absolute; top: var(--pad-t); right: var(--pad-x); bottom: var(--pad-b);
-  width: 60%; max-width: 1080px;
+  width: 50%; max-width: 900px;
   display: flex; flex-direction: column; justify-content: center;
 }
 
@@ -1013,9 +1013,11 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    expert anchoring survives; what changes is that it takes one interaction
    instead of five competing targets, and it reads as an instrument.
    ------------------------------------------------------------- */
-/* Capped rather than filling the wider column: across the full 1080px the
-   drag from one end to the other is most of an arm's length on a 55in panel. */
-.mslider { margin-top: var(--s5); outline: none; max-width: 840px; }
+/* Full width of the panel, so it lines up with the progress bar above it and
+   the case study below. The cap it used to carry was there because a 1080px
+   column made the drag most of an arm's length; at an even split the panel is
+   narrow enough that the whole width is a comfortable reach. */
+.mslider { margin-top: var(--s5); outline: none; }
 .mslider:focus-visible .ms-track::before { box-shadow: 0 0 0 2px var(--blue-lift); }
 
 /* Scale anchors, not headings. They were set exactly like the pool name, so
