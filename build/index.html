@@ -189,12 +189,12 @@
     <section class="view" id="v-diag">
       <div class="qcol">
         <div class="panel qpanel stagger">
+          <div class="qprog" aria-hidden="true"><i id="qProgFill"></i></div>
           <div class="qmeta">
             <span class="pool-tag" id="qPool">&nbsp;</span>
-            <span class="count" id="qCount">Question 1 of 18</span>
+            <span class="qkind" id="qKind">&nbsp;</span>
+            <span class="count" id="qCount">Question 1 of 6</span>
           </div>
-          <div class="qprog" aria-hidden="true"><i id="qProgFill"></i></div>
-          <div class="qkind" id="qKind">&nbsp;</div>
           <h2 class="qtext" id="qText">&nbsp;</h2>
           <!-- One slider per pool, snapping to five labelled stops. It starts
                unset on purpose: a default in the middle would register every
@@ -235,10 +235,10 @@
             <span class="qc-more">Read the case <span class="arrow">→</span></span>
           </button>
 
-          <div class="qnext-row">
+          <div class="qactions">
+            <button class="btn quiet" id="qBack" hidden><span class="arrow back">←</span> Back</button>
             <button class="btn primary" id="qNext" disabled>Next <span class="arrow">→</span></button>
           </div>
-          <div class="qfoot" id="qFoot"></div>
         </div>
       </div>
     </section>

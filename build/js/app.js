@@ -422,6 +422,10 @@ $('qNext').addEventListener('click', () => {
   if (SLIDER.i != null) answer(SLIDER.i);
 });
 
+$('qBack').addEventListener('click', () => {
+  if (S.qi > 0) { S.qi--; renderQuestion(); }
+});
+
 function renderQuestion() {
   const q = FLAT[S.qi];
   if (!q) return finish();
@@ -439,13 +443,9 @@ function renderQuestion() {
   buildSlider(q);
   renderQuestionCase(q.pool);
 
-  const foot = $('qFoot');
-  foot.innerHTML = '';
-  if (S.qi > 0) {
-    const back = el('button', 'link-quiet', '← Back');
-    back.onclick = () => { S.qi--; renderQuestion(); };
-    foot.appendChild(back);
-  }
+  // Static, in the action row. It used to be built fresh on every question,
+  // which meant a listener per render and no fixed place on the screen.
+  $('qBack').hidden = S.qi === 0;
 
   scene.focus(q.pool);
 }

@@ -384,16 +384,21 @@ input, textarea { font: inherit; }
 
 /* Overall progress, at the top of the panel where the eye already is. The
    per-pool clusters stay in the corner as detail; this is the headline. */
+/* Thinner, and above the meta row rather than under it. Underneath, its fill
+   stopped somewhere inside the theme text and read as an underline of the
+   words rather than as progress through the questions. */
 .qprog {
-  position: relative; height: 5px; border-radius: 3px;
-  background: rgba(184, 212, 236, 0.18);
-  margin: var(--s2) 0 var(--s3);
+  position: relative; height: 3px; border-radius: 2px;
+  background: rgba(184, 212, 236, 0.16);
+  margin: 0 0 var(--s4);
   overflow: hidden;
 }
+/* --blue, not --blue-lift. The lift is reserved for the slider and Next, so
+   there are two bright blues on the screen instead of six. */
 .qprog i {
   position: absolute; top: 0; bottom: 0; left: 0;
   display: block; width: 0;
-  background: var(--blue-lift); border-radius: 3px;
+  background: var(--blue); border-radius: 2px;
   transition: width 0.45s var(--ease);
 }
 
@@ -935,7 +940,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    and tapping opens the same detail sheet the pool screens use. Hidden outright
    on a pool with no cleared case study. */
 .qcase {
-  margin-top: var(--s4);
+  margin-top: var(--s5);
   display: flex; align-items: center; gap: clamp(14px, 1.2cqw, 24px);
   text-align: left; width: 100%;
   padding: clamp(12px, 1.05cqw, 21px) clamp(14px, 1.25cqw, 25px);
@@ -947,12 +952,14 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .qcase:active { background: rgba(243, 247, 251, 0.095); }
 /* The pool's colour, as an edge rather than a fill: at this size a coloured
    panel competes with the slider for attention. */
-.qc-bar { flex: none; width: 3px; align-self: stretch; min-height: 34px; background: var(--blue); border-radius: 2px; }
+.qc-bar { flex: none; width: 2px; align-self: stretch; min-height: 30px; background: var(--blue); border-radius: 2px; }
 .qc-read { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+/* White, not blue. Blue-lift is the instrument and the primary action; a
+   coloured number here read as a second headline competing with the question. */
 .qc-metric {
   font-family: var(--display); font-weight: 300;
-  font-size: clamp(19px, 1.42cqw, 27px); line-height: 1.14; letter-spacing: -0.018em;
-  color: var(--blue-lift);
+  font-size: clamp(18px, 1.28cqw, 24px); line-height: 1.16; letter-spacing: -0.018em;
+  color: var(--fg);
 }
 .qc-sub {
   display: flex; flex-wrap: wrap; gap: 0 8px;
@@ -962,33 +969,42 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .qc-sub b::after { content: ' ·'; color: var(--fg-4); font-weight: 400; }
 .qc-more {
   margin-left: auto; flex: none;
-  font-family: var(--label); font-weight: 500; font-size: clamp(13px, 0.8cqw, 15.2px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
-  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  font-size: clamp(13.4px, 0.9cqw, 17.3px); color: var(--fg-3);
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px;
 }
+.qcase:active .qc-more { color: var(--blue-lift); }
 
-/* The panel hugs the question rather than filling the column, so the plate
-   and the 3D still read around it. */
-#v-diag .qpanel { display: flex; flex-direction: column; }
-.qmeta { display: flex; align-items: baseline; gap: var(--s3); margin-bottom: var(--s2); }
+/* One height for all six questions, with the action row pinned to the bottom.
+   Questions run to one line or two and one pool has no case study, so the panel
+   used to change height and move Next with it; on a kiosk the hand should find
+   the same place six times. The slack lands in the reading area under the
+   slider, which is the one part of the panel that is meant to be quiet. */
+#v-diag .qpanel { display: flex; flex-direction: column; min-height: 74cqh; }
+#v-diag .mslider { margin-bottom: auto; }
+/* One row: which pool, what it is about, where you are. The theme used to be a
+   second uppercase heading of its own directly above the question, saying in
+   two words what the question says in a sentence. */
+.qmeta { display: flex; align-items: baseline; gap: var(--s3); }
 .qmeta .pool-tag {
   font-family: var(--label); font-weight: 500; font-size: clamp(13.1px, 0.856cqw, 16.6px);
   letter-spacing: 0.13em; text-transform: uppercase;
 }
+/* Sentence case on purpose. Seven uppercase letterspaced labels on one screen
+   is what "everything is shouting" looks like; this is now one of three. */
+.qkind {
+  font-size: clamp(13.4px, 0.9cqw, 17.3px); color: var(--fg-4);
+}
+.qkind::before { content: '·'; margin-right: 0.55em; color: var(--fg-4); }
 .qmeta .count {
   font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
   letter-spacing: 0.13em; color: var(--fg-3); margin-left: auto;
-}
-.qkind {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
 .qtext {
   font-family: var(--display); font-weight: 300;
   /* Grown with the column. At 26ch the question was leaving a third of the
      panel empty to its right. */
   font-size: clamp(23px, 2.35cqw, 44px); line-height: 1.1; letter-spacing: -0.02em;
-  margin: var(--s2) 0 var(--s4); max-width: 32ch; text-wrap: balance;
+  margin: var(--s4) 0 0; max-width: 32ch; text-wrap: balance;
 }
 
 /* options: rows separated by one hairline, no boxes */
@@ -999,14 +1015,14 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    ------------------------------------------------------------- */
 /* Capped rather than filling the wider column: across the full 1080px the
    drag from one end to the other is most of an arm's length on a 55in panel. */
-.mslider { margin-top: var(--s4); outline: none; max-width: 840px; }
+.mslider { margin-top: var(--s5); outline: none; max-width: 840px; }
 .mslider:focus-visible .ms-track::before { box-shadow: 0 0 0 2px var(--blue-lift); }
 
+/* Scale anchors, not headings. They were set exactly like the pool name, so
+   the eye had no way to tell a label from a heading. */
 .ms-ends {
   display: flex; justify-content: space-between; gap: var(--s4);
-  font-family: var(--label); font-weight: 500;
-  font-size: clamp(13px, 0.8cqw, 15px);
-  letter-spacing: 0.13em; text-transform: uppercase;
+  font-size: clamp(13.4px, 0.9cqw, 17.3px); line-height: 1.3;
   color: var(--fg-4);
 }
 .ms-ends span:last-child { text-align: right; }
@@ -1049,9 +1065,10 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 }
 .ms-thumb.set { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-/* Reserves the height of a two-line reading, so the panel does not jump as
-   the visitor drags between stops with different description lengths. */
-.ms-read { min-height: 5.4em; }
+/* Reserves the tallest reading in the whole question set, measured rather than
+   guessed: "Nothing in production" plus its detail runs to 89px at 16px, which
+   is 5.58em. At the old 5.4em the panel grew by 3px on that one stop. */
+.ms-read { min-height: 5.7em; }
 .ms-hint {
   font-size: clamp(14px, 0.96cqw, 17px);
   color: var(--fg-4);
@@ -1070,19 +1087,19 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   .ms-fill, .ms-thumb, .ms-ticks i { transition: none; }
 }
 
-.qnext-row { margin-top: var(--s3); }
-.qnext-row .btn.primary[disabled] { opacity: 0.34; pointer-events: none; }
-.qfoot { margin-top: var(--s4); display: flex; align-items: center; gap: var(--s5); }
-
-.link-quiet {
-  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
-  transition: color 0.2s var(--ease);
-  /* Real targets on a touchscreen, so they get the 44px minimum rather than
-     hugging their text at 23.8px. */
-  min-height: 44px; display: inline-flex; align-items: center; padding: 0 4px;
+/* Back and Next were two stacked left-aligned links of nearly equal weight, so
+   neither read as the way forward. One row, a rule to separate the action from
+   the reading, back on the left, forward on the right where a right-handed
+   visitor's hand already is. */
+.qactions {
+  margin-top: var(--s5); padding-top: var(--s4);
+  border-top: 1px solid var(--hair);
+  display: flex; align-items: center; gap: var(--s4);
 }
-.link-quiet:active { color: var(--blue-lift); }
+.qactions .btn.primary { margin-left: auto; }
+.qactions .btn.primary[disabled] { opacity: 0.34; pointer-events: none; }
+.qactions .btn[hidden] { display: none; }
+.btn .arrow.back { font-size: 1.15em; }
 
 
 /* Titles gone: the panel already names the pool and counts the questions, so
