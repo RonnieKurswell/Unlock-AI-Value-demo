@@ -979,7 +979,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    used to change height and move Next with it; on a kiosk the hand should find
    the same place six times. The slack lands in the reading area under the
    slider, which is the one part of the panel that is meant to be quiet. */
-#v-diag .qpanel { display: flex; flex-direction: column; min-height: 74cqh; }
+#v-diag .qpanel { display: flex; flex-direction: column; min-height: 77cqh; }
 #v-diag .mslider { margin-bottom: auto; }
 /* One row: which pool, what it is about, where you are. The theme used to be a
    second uppercase heading of its own directly above the question, saying in
@@ -1004,7 +1004,15 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   /* Grown with the column. At 26ch the question was leaving a third of the
      panel empty to its right. */
   font-size: clamp(23px, 2.35cqw, 44px); line-height: 1.1; letter-spacing: -0.02em;
-  margin: var(--s4) 0 0; max-width: 32ch; text-wrap: balance;
+  /* A clear step down from the meta row above it. At --s4 the gap was smaller
+     than the question's own line height, so the row read as part of it rather
+     than as the label it is. The panel is a fixed height with its slack under
+     the slider, so this comes out of the quiet space and Next does not move. */
+  margin: var(--s6) 0 0; max-width: 32ch; text-wrap: balance;
+  /* Two lines reserved. Five of the six questions wrap to two and one does not,
+     which moved everything below it by a line and left Next a few pixels out
+     of place between questions. */
+  min-height: 2.2em;
 }
 
 /* options: rows separated by one hairline, no boxes */
