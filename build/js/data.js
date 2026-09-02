@@ -455,9 +455,6 @@ export function benchmarkFinePrint() {
   return s.citation ? `${s.credit} ${s.citation}` : s.credit;
 }
 
-/* Kept for the surfaces that want the short label rather than the full note. */
-export const BENCHMARK_STATUS = 'Illustrative industry benchmark · Gartner figures pending';
-
 /* Rescaled proportionally from the old /12 values, so the illustrative spread
    survives. Only medians that coincide with a stop can ever be matched exactly
    by "level with the benchmark"; the rest read as ahead or behind. */

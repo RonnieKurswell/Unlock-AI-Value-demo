@@ -1191,36 +1191,41 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .bench-head .d-m { margin-top: var(--s2); }
 .bench-praise { margin-top: var(--s3); font-size: clamp(13.8px, 0.996cqw, 19.1px); max-width: 68ch; }
 .bench-praise b { color: var(--blue-lift); font-weight: 500; }
-.bench-note {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.773cqw, 14.5px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4);
-  margin-top: var(--s3);
-}
 .bench-list { display: flex; flex-direction: column; }
+/* Tighter, and the right column narrower now that it carries a delta and a
+   small raw score rather than two stacked lines. */
 .bench-row {
-  display: grid; grid-template-columns: 15em 1fr 6em; align-items: center; gap: var(--s4);
-  padding: clamp(9px, 0.82cqw, 17px) 0; border-bottom: 1px solid var(--hair);
+  display: grid; grid-template-columns: 13.5em 1fr 6.2em; align-items: center; gap: var(--s4);
+  padding: clamp(8px, 0.7cqw, 15px) 0; border-bottom: 1px solid var(--hair);
 }
 .bench-row:first-child { border-top: 1px solid var(--hair); }
-.bench-row .nm { font-size: clamp(13.8px, 0.975cqw, 18.0px); color: var(--fg); }
+.bench-row .nm { font-size: clamp(13.6px, 0.92cqw, 17.2px); line-height: 1.25; color: var(--fg); }
+/* Sentence case. Six uppercase band labels stacked down the left was a column
+   of shouting next to the names they belong to. */
 .bench-row .bd {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.773cqw, 14.5px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4); margin-top: 3px;
+  font-size: clamp(13.0px, 0.82cqw, 15.4px); color: var(--fg-4); margin-top: 1px;
 }
 .track { position: relative; height: 6px; background: rgba(243, 247, 251, 0.07); }
 .track .fill { position: absolute; inset: 0 auto 0 0; width: 0; transition: width 1.1s var(--ease-mech); }
 .track .bmark { position: absolute; top: -7px; bottom: -7px; width: 1px; background: var(--fg-3); }
-.track .bmark::after {
-  content: 'BENCHMARK'; position: absolute; top: -22px; left: 6px;
+.track .bmark.labelled::after {
+  content: 'BENCHMARK'; position: absolute; top: -21px; left: 6px;
   font-family: var(--label); font-weight: 500; font-size: 13px;
   letter-spacing: 0.11em; color: var(--fg-3); white-space: nowrap;
 }
-.bench-row .val {
-  font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.857cqw, 16.4px);
-  letter-spacing: 0.1em; text-align: right; color: var(--fg-2);
+/* The delta is what this screen is for, so it is the number that carries. The
+   raw score sits under it, quiet, for anyone who wants the absolute. */
+.bench-row .val { text-align: right; }
+.bench-row .val b {
+  display: block; font-family: var(--display); font-weight: 300;
+  font-size: clamp(19px, 1.32cqw, 25px); line-height: 1.1; letter-spacing: -0.015em;
+}
+.bench-row .val .raw {
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 14.6px);
+  letter-spacing: 0.1em; color: var(--fg-3);
 }
 .delta-up { color: var(--blue-lift); }
-.delta-dn { color: var(--fg-4); }
+.delta-dn { color: var(--fg-3); }
 
 /* beat 3 — forecast, columns divided by rules not boxes */
 /* head and content share one column, left-aligned on the same edge.

@@ -6,7 +6,7 @@
 import { HiveScene } from './scene.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
-  classifyArchetype, BENCHMARK_MEDIAN, BENCHMARK_STATUS, benchmarkFinePrint,
+  classifyArchetype, BENCHMARK_MEDIAN, benchmarkFinePrint,
   ROLES, ROLE_DEFAULT,
   TILES, forecast, FORECAST_LINES, hexOrder
 } from './data.js';
@@ -535,35 +535,40 @@ function buildWrapped() {
   document.querySelectorAll('.beat-pips').forEach(n => { n.innerHTML = pips; });
 
   /* benchmark */
-  $('benchNote').textContent = BENCHMARK_STATUS;
   /* Where the baseline came from and what it was used for. Both surfaces read
-     the same string, so the credit can never say two different things. */
+     the same string, so the credit can never say two different things. The
+     short status label it used to sit next to is gone: it said the same thing
+     in shouting caps directly above the rows. */
   $('benchSource').textContent = benchmarkFinePrint();
 
   const ahead = ORDER.filter(id => S.scores[id] > BENCHMARK_MEDIAN[id]);
   const level = ORDER.filter(id => S.scores[id] === BENCHMARK_MEDIAN[id]);
   const praise = $('benchPraise');
   if (ahead.length >= 3) {
-    praise.innerHTML = `You are ahead of the benchmark in <b>${ahead.length} of 6</b> pools, ${POOL[ahead[0]].name} most of all. That is where your advantage compounds.`;
+    praise.innerHTML = `Ahead in <b>${ahead.length} of 6</b> pools, ${POOL[ahead[0]].name} most of all.`;
   } else if (ahead.length) {
-    praise.innerHTML = `<b>${POOL[ahead[0]].name}</b> is ahead of the benchmark. Strength there is what funds the rest.`;
+    praise.innerHTML = `<b>${POOL[ahead[0]].name}</b> is your one pool ahead. Strength there funds the rest.`;
   } else if (level.length) {
-    praise.innerHTML = `You are level with the benchmark on <b>${level.length} of 6</b>. No ground lost, and the gaps are addressable.`;
+    praise.innerHTML = `Level on <b>${level.length} of 6</b>. No ground lost, and the gaps are addressable.`;
   } else {
-    praise.textContent = 'Every pool is below the benchmark, which means the first move is a sequencing decision rather than a technology one.';
+    praise.textContent = 'Every pool sits below, which makes the first move a sequencing decision rather than a technology one.';
   }
   const list = $('benchList');
   list.innerHTML = '';
-  [...ORDER].sort((a, b) => S.scores[b] - S.scores[a]).forEach(id => {
+  [...ORDER].sort((a, b) => S.scores[b] - S.scores[a]).forEach((id, i) => {
     const p = POOL[id], sc = S.scores[id], med = BENCHMARK_MEDIAN[id], d = sc - med;
+    const first = i === 0;
     const row = el('div', 'bench-row');
     row.innerHTML = `
       <div><div class="nm">${p.name}</div><div class="bd">${BANDS[bandOf(sc)]}</div></div>
       <div class="track">
         <div class="fill" style="background:${p.hex}"></div>
-        <div class="bmark" style="left:${(med / MAX_POOL_SCORE) * 100}%"></div>
+        <div class="bmark${first ? ' labelled' : ''}" style="left:${(med / MAX_POOL_SCORE) * 100}%"></div>
       </div>
-      <div class="val"><b>${sc}</b>/${MAX_POOL_SCORE} <span class="${d >= 0 ? 'delta-up' : 'delta-dn'}">${d === 0 ? 'level' : (d > 0 ? '+' : '') + d}</span></div>`;
+      <div class="val">
+        <b class="${d >= 0 ? 'delta-up' : 'delta-dn'}">${d === 0 ? 'level' : (d > 0 ? '+' : '') + d}</b>
+        <span class="raw">${sc}/${MAX_POOL_SCORE}</span>
+      </div>`;
     list.appendChild(row);
     requestAnimationFrame(() => { row.querySelector('.fill').style.width = `${(sc / MAX_POOL_SCORE) * 100}%`; });
   });

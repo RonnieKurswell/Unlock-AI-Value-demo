@@ -227,8 +227,7 @@ rows = [[NAME[pid], D["BENCHMARK_MEDIAN"][pid], D["MAX_POOL_SCORE"], "", "", "",
 ws = sheet("Benchmark",
       ["Value pool", "Gartner baseline (placeholder today)", "Max score"] + REVIEW + ["_p"],
       [24, 26, 11, 13, 42, 34, 3], rows, pending_col=6,
-      notes=[f"Kiosk currently labels this: \"{D['BENCHMARK_STATUS']}\"",
-             f"Fine print on the results screen and the final screen currently reads: \"{D['BENCHMARK_FINE_PRINT']}\"",
+      notes=[f"Fine print on the results screen and the final screen currently reads: \"{D['BENCHMARK_FINE_PRINT']}\"",
              "Every figure in this sheet is a placeholder we invented for layout. None of them is Gartner data and the "
              "screen does not claim otherwise.",
              "To go live we need three things from a Gartner seat: these six figures on the 0-100 scale, the exact "
