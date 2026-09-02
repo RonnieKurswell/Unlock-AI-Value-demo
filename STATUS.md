@@ -57,7 +57,7 @@ Due : **29 September** · look and feel review Thursday 3 Sep
 
 * ✅ **Carrier names masked.** All 13 mentions replaced with descriptors, per Anshul's instruction that case studies carry no client references. Nothing to chase unless he clears specific names, in which case the mapping is kept locally
 * ⬜ **6 of 18 case study tiles empty.** Physical AI has zero, so its question shows no case study at all ⚠️
-* ⬜ Benchmark numbers are internal R&D. Anshul wants ISG, Gartner, Forrester, HFS, WEF ⚠️
+* ⬜ **Benchmark: Gartner agreed as the source (Huw).** Fine print is built and live on the results and final screens. Still needed, all three from a Gartner seat: the six baseline figures, the exact reference to cite, and confirmation their reprint terms allow attribution on a public kiosk ⚠️
 * ⬜ All 15 backgrounds are placeholder. John and Evelyn producing the real set ⚠️
 * ⬜ Hexagon still the PowerPoint-looking one ⚠️
 * ⬜ QR still reads "QR · PLACEHOLDER", no destination URL

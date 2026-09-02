@@ -414,12 +414,49 @@ export function classifyArchetype(scores) {
 }
 
 /* -------------------------------------------------------------
-   Benchmark medians are ILLUSTRATIVE placeholders — Infosys
-   has not supplied benchmark data. Every surface that shows them
-   must carry the provisional label. Do not present as research.
+   BENCHMARK
+
+   Huw's call: the industry baseline is sourced from Gartner.
+
+   The six numbers below are NOT Gartner's. They are the original
+   illustrative placeholders, and they stay labelled as such until
+   Infosys supplies the real figures from a Gartner seat. Nothing
+   public carries an AI maturity median per Infosys value pool, so
+   these cannot be looked up; someone with Gartner access has to
+   pull them.
+
+   To go live, three things are needed and all three are external:
+     1. the six baseline figures, on this 0-100 scale
+     2. the exact reference: report title, author, publication date
+     3. Gartner's permission to attribute on a public kiosk, since
+        their reprint terms govern client-facing use
+
+   When those land: fill CITATION, set pending to false, replace
+   BENCHMARK_MEDIAN. Every surface reads from these constants, so
+   that is the whole change.
    ------------------------------------------------------------- */
 
-export const BENCHMARK_STATUS = 'Illustrative industry benchmark · pending Infosys data';
+export const BENCHMARK_SOURCE = {
+  name: 'Gartner',
+  pending: true,
+  /* The fine print, once the figures are real. Says what the number is and
+     what it was used for, which is the whole point of the credit. */
+  credit: 'Industry baseline from Gartner research on AI adoption in insurance. Your score for each value pool is compared against that baseline.',
+  /* Report title, author and date, exactly as Gartner require it. */
+  citation: '',
+  /* Shown instead of the credit while the figures are still placeholders, so
+     the screen never implies Gartner produced these numbers. */
+  pendingNote: 'Benchmark to be sourced from Gartner research. The comparison figures shown are illustrative placeholders, not Gartner data.'
+};
+
+export function benchmarkFinePrint() {
+  const s = BENCHMARK_SOURCE;
+  if (s.pending) return s.pendingNote;
+  return s.citation ? `${s.credit} ${s.citation}` : s.credit;
+}
+
+/* Kept for the surfaces that want the short label rather than the full note. */
+export const BENCHMARK_STATUS = 'Illustrative industry benchmark · Gartner figures pending';
 
 /* Rescaled proportionally from the old /12 values, so the illustrative spread
    survives. Only medians that coincide with a stop can ever be matched exactly

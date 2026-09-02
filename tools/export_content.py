@@ -24,6 +24,9 @@ _dump = os.path.join(tempfile.gettempdir(), "uav_dump.mjs")
 with open(_dump, "w", encoding="utf-8") as fh:
     fh.write("import * as D from %r;\n" % os.path.join(ROOT, "build/js/data.js")
              + "const o={};for(const[k,v]of Object.entries(D))o[k]=typeof v==='function'?'[fn]':v;"
+             # resolved here rather than reimplemented in Python, so the sheet
+             # quotes the string the kiosk actually shows
+               "o.BENCHMARK_FINE_PRINT=D.benchmarkFinePrint();"
                "process.stdout.write(JSON.stringify(o));")
 D = json.loads(subprocess.check_output(["node", _dump], text=True))
 
@@ -112,7 +115,7 @@ line("Where we still need content from Infosys", "h2")
 line("These are gaps in the build today, not questions about wording. Highlighted amber on their sheets.")
 line("    1.  Six of the eighteen proof tiles have no case study, marked 'Infosys to supply'. Physical AI has no case studies at all; AI Trust has one of three; Agentic Legacy Modernization has two of three. See 'Proof tiles'.")
 line("        These six are now more urgent: one case study per pool also appears on that pool's diagnostic question, so Physical AI's question has no proof on it at all.")
-line("    2.  Benchmark medians are illustrative placeholders, not Infosys research. See 'Benchmark'.")
+line("    2.  Benchmark. Agreed the industry baseline comes from Gartner. Three things are needed and all three need Gartner access: the six baseline figures on a 0-100 scale, the exact reference (report title, author, publication date), and confirmation that Gartner's reprint terms allow attribution on a public kiosk. Until then the figures on screen stay labelled as placeholders and the fine print says so. See 'Benchmark'.")
 line("    3.  The QR code on the final screen points nowhere yet. We need the destination URL.")
 line("    5.  Case study clients are masked to descriptors, so no carrier is named anywhere in the build. If any are cleared for use by name, tell us which and we will restore them.")
 line("    4.  The five-year forecast columns present today's case studies under future-dated headings. Flag if that framing is a problem.")
@@ -125,7 +128,7 @@ for t, d in [
     ("Score band feedback",  "30 report blocks. What each score band tells a visitor, and the recommended move."),
     ("Archetypes",           "Five overall positions a visitor can land in."),
     ("Role futures",         "How each role changes, matched from the badge."),
-    ("Benchmark",            "Industry median per pool. Placeholder data."),
+    ("Benchmark",            "Industry baseline per pool, to come from Gartner. Placeholder figures today."),
     ("Forecast lines",       "The three five-year outlook captions."),
     ("Screen copy",          "Headlines, buttons and instructional text that is not pool-specific."),
 ]:
@@ -222,11 +225,17 @@ sheet("Role futures",
 rows = [[NAME[pid], D["BENCHMARK_MEDIAN"][pid], D["MAX_POOL_SCORE"], "", "", "", True]
         for pid in ORDER]
 ws = sheet("Benchmark",
-      ["Value pool", "Industry median (placeholder)", "Max score"] + REVIEW + ["_p"],
+      ["Value pool", "Gartner baseline (placeholder today)", "Max score"] + REVIEW + ["_p"],
       [24, 26, 11, 13, 42, 34, 3], rows, pending_col=6,
       notes=[f"Kiosk currently labels this: \"{D['BENCHMARK_STATUS']}\"",
-             "Every figure here is a placeholder we invented for layout. Replace with Infosys research, or we keep the "
-             "'illustrative' label on the screen."])
+             f"Fine print on the results screen and the final screen currently reads: \"{D['BENCHMARK_FINE_PRINT']}\"",
+             "Every figure in this sheet is a placeholder we invented for layout. None of them is Gartner data and the "
+             "screen does not claim otherwise.",
+             "To go live we need three things from a Gartner seat: these six figures on the 0-100 scale, the exact "
+             "reference to cite (report title, author, publication date), and confirmation that Gartner's reprint terms "
+             "permit attribution on a public kiosk at a show. The third one is the long pole, so worth starting early.",
+             "Once they arrive the fine print becomes: \"Industry baseline from Gartner research on AI adoption in "
+             "insurance. Your score for each value pool is compared against that baseline.\" plus the citation."])
 ws.column_dimensions["G"].hidden = True
 
 # ---------- 9. Forecast lines ----------

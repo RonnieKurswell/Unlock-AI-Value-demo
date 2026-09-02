@@ -6,7 +6,8 @@
 import { HiveScene } from './scene.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
-  classifyArchetype, BENCHMARK_MEDIAN, BENCHMARK_STATUS, ROLES, ROLE_DEFAULT,
+  classifyArchetype, BENCHMARK_MEDIAN, BENCHMARK_STATUS, benchmarkFinePrint,
+  ROLES, ROLE_DEFAULT,
   TILES, forecast, FORECAST_LINES, hexOrder
 } from './data.js';
 
@@ -535,6 +536,9 @@ function buildWrapped() {
 
   /* benchmark */
   $('benchNote').textContent = BENCHMARK_STATUS;
+  /* Where the baseline came from and what it was used for. Both surfaces read
+     the same string, so the credit can never say two different things. */
+  $('benchSource').textContent = benchmarkFinePrint();
 
   const ahead = ORDER.filter(id => S.scores[id] > BENCHMARK_MEDIAN[id]);
   const level = ORDER.filter(id => S.scores[id] === BENCHMARK_MEDIAN[id]);
@@ -716,6 +720,8 @@ function showDone() {
   const r = S.recipient || {};
   $('doneName').textContent = r.name ? `, ${r.name.split(/\s+/)[0]}` : '';
   $('doneEmail').textContent = r.email || 'the address on your badge';
+  // The emailed report carries the same comparison, so the credit follows it.
+  $('doneSource').textContent = benchmarkFinePrint();
   show('done');
   countdown();
 }
