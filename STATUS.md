@@ -1,80 +1,88 @@
-# Insurance — Unlock AI Value · status 2 Sep (pm)
+# Insurance — Unlock AI Value · status 3 Sep
 
-Build link : https://ronniekurswell.github.io/Unlock-AI-Value-demo/
-Figma : V3 — current build (31 Aug) · **diagnostic screens there are 4 revisions behind, waiting on your sign-off**
-Due : **29 September** · look and feel review Thursday 3 Sep
-
----
-
-## ⚠️ VISUAL DIRECTION — still the thing that blocks the week
-
-* Client killed the 3D. Three.js hexagon read as "low-poly and dated". New direction is PNG.
-* Evelyn + Tarun design the hexagon, Kai splits to 6 PNGs. Was due today.
-* Unresolved: client says "blue text on crisp white", our build is dark glass. Land it before Thursday.
-* The board is back to a 50% share, so a PNG swap is a straight replacement of the 3D object in that half. Not free, but not a rebuild.
-* My recommendation: keep the motion, drop the 3D.
-
-## ⚠️ OFFLINE vs EMAIL — can hard-fail on the day
-
-* Brief says fully offline. ITC Vegas has no NFC, so results are email only, via Mailgun.
-* Mailgun needs a network. Nobody has said whether the kiosk gets wifi or queues locally and flushes later.
-* Jamil builds it, Huw briefs this week.
+Build link : https://ronniekurswell.github.io/Unlock-AI-Value-demo/ · **pushed and live**
+Figma : V3 — current build (31 Aug) · **badly out of date, see below**
+Due : **29 September** · look and feel review today
 
 ---
 
-## Diagnostic screen — done today
+## ⚠️ Blocking
 
-* ✅ Case study **in the question panel**, between the answer and Next, for that question's own pool. Tap opens the full case.
-* ✅ **Email capture replaces the badge tap**, with a confirmation after submitting
-* ✅ **Role beat removed** from the results. Three beats now: position, benchmark, five-year
-* ✅ Benchmark fine print on one line
-* ✅ Standalone mid-quiz proof screen built, then removed when you asked for it on the question instead
-* ✅ Split settled at **50:50** after trying 70:30 and 60:40
-* ✅ Slider spans the panel, same width as the progress bar, case study and action row
-* ✅ **Hierarchy rebuilt.** Seven uppercase letterspaced labels down to three; six blue elements down to two, so the slider and Next own the blue
-* ✅ Theme demoted from a second heading into the meta row, sentence case
-* ✅ Progress bar above the meta row, thinner, so its fill no longer reads as an underline of the words
-* ✅ **Back and Next in one action row**, rule above it, back left and forward right. Was two stacked left-aligned links of equal weight
-* ✅ Panel is **one fixed height** with the action row pinned to the bottom, so Next is in the same place on all six questions
-* ✅ More air above the question, and the rhythm below it is even
-* ✅ Attract says "Two minutes", which is what six questions actually take
-* ✅ **All carrier names masked** to descriptors, in the build, the README and the review spreadsheet
+**Visual direction.** Client killed the 3D, wants PNG. Evelyn + Tarun on the hexagon, Kai to split it. Was due yesterday. And still unresolved: client said "blue text on crisp white", the build is dark glass. That question needs answering before John and Evelyn spend today on it.
 
-## Earlier, still standing
+**Offline vs email.** Mailgun needs a network, the brief says fully offline. Nobody has answered which wins. Sharper now than last week, because with NFC gone email is the only way a visitor gets their report.
 
-* ✅ Insurance in the headline · jump straight to diagnostic · "Question 1 of 6" · arrows either side of the pool dots · Infosys logo restarts
-* ✅ 18 questions → 6, one drag slider per pool, five labelled stops
-* ✅ Transitions and staggered entrances on every screen
+---
+
+## Done
+
+**Diagnostic screen**
+* ✅ Case study in the question panel, between the answer and Next, for that question's own pool. Tap opens the full case
+* ✅ 50:50 split, after trying 70:30 and 60:40
+* ✅ Slider spans the panel, same width as the progress bar and the case study
+* ✅ Hierarchy rebuilt. Seven uppercase labels down to three, six blue elements down to two
+* ✅ Back and Next in one action row, rule above it, back left and forward right
+* ✅ One fixed panel height, so Next sits in the same place on all six questions
+* ✅ 18 questions to 6, one drag slider per pool, five labelled stops
+* ✅ Insurance in the headline, jump straight to diagnostic, "Question 1 of 6", pool arrows, logo restarts
+
+**Results**
+* ✅ Role beat removed. Three beats now: position, benchmark, five-year
+* ✅ Benchmark screen cut down. The word "benchmark" was on it twelve times
+* ✅ Gartner credited in fine print on the results and final screens, one line
+* ✅ Fixed rows reading "100/12", left over from the 18-question rescale
+* ✅ "BENCHMARK" tick label was 7.5px against a 13px floor. Now 13px
+
+**Delivery**
+* ✅ NFC removed. One email field, with a confirmation before the results roll
+* ✅ Copy rewritten: "Your blueprint is ready", not "Where should we send it?"
+* ✅ Form centred on the same axis as the headline
+
+**Content**
+* ✅ All 13 carrier mentions masked to descriptors, in the build, the README and the spreadsheet
+* ✅ Attract says "Two minutes", which is what six questions take
+* ✅ Every em dash removed
+
+**Build**
+* ✅ Runs offline, no build step, ships to Pages
 * ✅ Fills the window on non-16:9 displays
-* ✅ Dev server threaded, so two browsers can hit it without it looking like a crash
+* ✅ Framework reusable, swap data.js per vertical
+* ✅ Dev server threaded. The "server keeps dying" was it answering one request at a time
 
-## Not done — mine
+---
 
-* ⬜ **Diagnostic CTA on the explore screen still not centred.** Two of them, neither is the focal point ⚠️
-* ⬜ Framework intro screen: retain but redesign, flagged as maybe redundant with the pool screen
-* ⬜ Five-year results screen: three columns become one paragraph per persona. Touches part of 30 band blocks
-* ⬜ Figma: 6 diagnostic screens need re-rendering to match the build
-* ⬜ **6 commits unpushed on main**
+## Missing — mine
 
-## Not done — blocked on other people
+* ⬜ **Explore screen still has two diagnostic CTAs**, neither centred. Last unactioned item from Anshul's original list that is purely mine
+* ⬜ **Figma is four or five revisions behind.** Six diagnostic screens, the whole results section, the email screen. The role beat still exists in there and no longer exists in the build
+* ⬜ **Framework intro screen** — retain but redesign, flagged as maybe redundant with the pool screen
+* ⬜ **Five-year screen to one paragraph per persona.** Needs a content decision first: 30 band blocks and 3 forecast lines in scope
+* ⬜ Fine print on the Done screen still runs to two lines
 
-* ✅ **Carrier names masked.** All 13 mentions replaced with descriptors, per Anshul's instruction that case studies carry no client references. Nothing to chase unless he clears specific names, in which case the mapping is kept locally
-* ⬜ **6 of 18 case study tiles empty.** Physical AI has zero, so its question shows no case study at all ⚠️
-* ⬜ **Benchmark: Gartner agreed as the source (Huw).** Fine print is built and live on the results and final screens. Still needed, all three from a Gartner seat: the six baseline figures, the exact reference to cite, and confirmation their reprint terms allow attribution on a public kiosk ⚠️
-* ⬜ All 15 backgrounds are placeholder. John and Evelyn producing the real set ⚠️
-* ⬜ Hexagon still the PowerPoint-looking one ⚠️
-* ⬜ QR still reads "QR · PLACEHOLDER", no destination URL
-* ⬜ Email backend is Jamil's, brief not sent
-* ✅ **NFC removed.** Email only, one field, with a confirmation before the report rolls. An NFC build stays a separate config if AI Day New York wants it
+## Missing — other people
+
+* ⬜ **6 of 18 case tiles empty.** Physical AI 3/3 pending, AI Trust 2/3, Agentic Legacy 1/3. Physical AI's question shows no case study at all ⚠️
+* ⬜ **Gartner: figures, citation, reprint permission.** All three need a Gartner seat. Permission for a public kiosk is the long pole ⚠️
+* ⬜ **All 16 background plates are placeholder.** John and Evelyn ⚠️
+* ⬜ **Hexagon still the PowerPoint-looking one** ⚠️
+* ⬜ **QR points nowhere.** Still literally "QR · PLACEHOLDER", and with NFC gone it is the only thing a visitor leaves with if the kiosk has no network ⚠️
+* ⬜ **Email backend is Jamil's**, brief not sent
+* ⬜ "Proven now" on the five-year screen still puts today's case studies under future-dated headings. Anshul was asked to flag whether that framing is a problem and never answered
 * ⬜ Anshul's consolidated feedback after the Deepak meeting never arrived
 
 ---
 
 ## Decisions needed
 
-1. White or glass. Client said white, you said glass. Cannot have both.
+1. White or glass. Client said white, we went glass. Cannot have both
 2. Does Three.js stay in any form, or does all motion go with it
-3. Mask the carriers now with generic descriptors, or wait for Anshul's cleared list
-4. Who chases Anshul for the missing case studies, Physical AI especially
-5. Does the kiosk get wifi at ITC Vegas, or does email queue locally
-6. Where do the benchmark numbers actually come from
+3. Who chases Anshul for the missing case studies, Physical AI especially
+4. Does the kiosk get wifi at ITC Vegas, or does email queue locally
+5. Who starts the Gartner reprint permission, since that is the slowest of the three
+6. Are the carrier names to stay masked, or does Anshul have a cleared list
+
+## Note on history
+
+The carrier names are masked in the build but still sit in earlier commits, and
+that history is now pushed. Removing them needs a rewrite and a force push,
+which is a call for whoever else is working off this repo.
