@@ -50,7 +50,7 @@ Every figure, client name and platform name traces to one of:
 Three things are deliberately visible on screen rather than filled in:
 
 1. **Physical AI has no case study.** The playbook's Pillar 5 carries an unfilled `<CASE STUDY>` placeholder and the use case register has no Physical AI row, so all three of its proof tiles render greyed as "Infosys to supply".
-2. **AI Trust has one, borrowed.** Ameritas risk & compliance is substituted from the use case register and labelled as such; its other two tiles are pending.
+2. **AI Trust has one, borrowed.** A risk & compliance case is substituted from the use case register and labelled as such; its other two tiles are pending.
 3. **Peer medians are illustrative placeholders.** Infosys has not supplied benchmark data, so every surface showing them carries `BENCHMARK_STATUS`. Do not present them as research.
 
 `TILES` in `data.js` holds three proof points per pool — 18 in total, of which 6 are pending. That list is the content still to chase with Infosys.

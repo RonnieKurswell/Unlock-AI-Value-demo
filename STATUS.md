@@ -35,6 +35,7 @@ Due : **29 September** · look and feel review Thursday 3 Sep
 * ✅ Panel is **one fixed height** with the action row pinned to the bottom, so Next is in the same place on all six questions
 * ✅ More air above the question, and the rhythm below it is even
 * ✅ Attract says "Two minutes", which is what six questions actually take
+* ✅ **All carrier names masked** to descriptors, in the build, the README and the review spreadsheet
 
 ## Earlier, still standing
 
@@ -54,7 +55,7 @@ Due : **29 September** · look and feel review Thursday 3 Sep
 
 ## Not done — blocked on other people
 
-* ⬜ **13 mentions of 8 client names live on the public repo.** Anshul said mask all of them, and they are now on screen during the diagnostic ⚠️
+* ✅ **Carrier names masked.** All 13 mentions replaced with descriptors, per Anshul's instruction that case studies carry no client references. Nothing to chase unless he clears specific names, in which case the mapping is kept locally
 * ⬜ **6 of 18 case study tiles empty.** Physical AI has zero, so its question shows no case study at all ⚠️
 * ⬜ Benchmark numbers are internal R&D. Anshul wants ISG, Gartner, Forrester, HFS, WEF ⚠️
 * ⬜ All 15 backgrounds are placeholder. John and Evelyn producing the real set ⚠️

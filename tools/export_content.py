@@ -114,13 +114,14 @@ line("    1.  Six of the eighteen proof tiles have no case study, marked 'Infosy
 line("        These six are now more urgent: one case study per pool also appears on that pool's diagnostic question, so Physical AI's question has no proof on it at all.")
 line("    2.  Benchmark medians are illustrative placeholders, not Infosys research. See 'Benchmark'.")
 line("    3.  The QR code on the final screen points nowhere yet. We need the destination URL.")
+line("    5.  Case study clients are masked to descriptors, so no carrier is named anywhere in the build. If any are cleared for use by name, tell us which and we will restore them.")
 line("    4.  The five-year forecast columns present today's case studies under future-dated headings. Flag if that framing is a problem.")
 line("")
 line("Sheet guide", "h2")
 for t, d in [
     ("Diagnostic questions", "18 questions, 5 answers each (90 rows). Answer wording and the score behind each answer."),
     ("Value pools",          "The six pools: name, verb, description, three supporting facts."),
-    ("Proof tiles",          "18 case-study tiles, 3 per pool. Six are unfilled. One per pool also shows during the diagnostic."),
+    ("Proof tiles",          "18 case-study tiles, 3 per pool. Six are unfilled, and client names are masked. One per pool also shows during the diagnostic."),
     ("Score band feedback",  "30 report blocks. What each score band tells a visitor, and the recommended move."),
     ("Archetypes",           "Five overall positions a visitor can land in."),
     ("Role futures",         "How each role changes, matched from the badge."),
@@ -172,7 +173,7 @@ for pid in ORDER:
                      t.get("client", ""), t.get("title", ""), t.get("metric", ""),
                      t.get("detail", ""), "", "", "", p])
 ws = sheet("Proof tiles",
-      ["Value pool", "Status", "Client", "Tile title", "Headline metric", "Detail"] + REVIEW + ["_p"],
+      ["Value pool", "Status", "Client (masked)", "Tile title", "Headline metric", "Detail"] + REVIEW + ["_p"],
       [22, 15, 20, 28, 30, 66, 13, 42, 34, 3], rows, pending_col=9,
       notes=["Three per pool. Amber rows have no case study. We need client name, metric and one or two lines of detail, "
              "or permission to drop the tile.",
@@ -180,7 +181,9 @@ ws = sheet("Proof tiles",
              "per Anshul's note that proof should land while someone is still answering. The first cleared tile in "
              "each pool is used, and amber rows are skipped, so Physical AI currently shows no case study at all "
              "on its question.",
-             "Named carriers appear on a public show floor. Confirm each one is cleared for use."])
+             "Client names are masked, per your note that all case study names go without client references. "
+             "The Client column carries a descriptor instead. Tell us which carriers are cleared by name and we "
+             "will put them back."])
 ws.column_dimensions["J"].hidden = True
 
 # ---------- 5. Score band feedback ----------

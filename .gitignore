@@ -12,3 +12,6 @@ node_modules/
 # nothing and it got committed once already.
 ~$*
 .DS_Store
+
+# Carrier name mapping. Masked in the build per Anshul; this must not be committed.
+carrier-names.local.json

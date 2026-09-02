@@ -70,7 +70,7 @@ export const POOLS = [
     facts: [
       'Submission to bound, straight through',
       'FNOL triaged by severity, routine claims settled touchlessly',
-      'Manual underwriting effort cut 50% at Allied World'
+      'Manual underwriting effort cut 50% at a global specialty insurer'
     ]
   },
   {
@@ -84,7 +84,7 @@ export const POOLS = [
     facts: [
       'Rating logic recovered from legacy code by AI agents',
       'Module-by-module migration while the book stays live',
-      '99.2% extraction accuracy (F1) at MassMutual'
+      '99.2% extraction accuracy (F1) on legacy product rules'
     ]
   },
   {
@@ -127,31 +127,31 @@ export const TILES = {
   strategy: [
     { client: 'US carrier', title: 'AI strategy and COE', metric: '150+ opportunities prioritised',
       detail: 'Workers\u2019 compensation, E&S and reinsurance specialist. Fragmented initiatives with no unified governance; Infosys defined the target architecture and a use case scoring methodology.' },
-    { client: 'Ameritas', title: 'AI Factory model', metric: '45K+ hours realised',
-      detail: 'Multi-line mutual insurer. An AI Factory operating model with dedicated PODs and governance; 80+ opportunities identified and prioritised across business functions.' },
-    { client: 'Northwestern Mutual', title: 'AI COE foundation', metric: 'Standardised intake and guardrails',
-      detail: 'Large US mutual life insurer. Five-stream COE covering structured intake, value realisation, Responsible AI, backlog grooming and AI architecture.' }
+    { client: 'US multi-line mutual insurer', title: 'AI Factory model', metric: '45K+ hours realised',
+      detail: 'An AI Factory operating model with dedicated PODs and governance; 80+ opportunities identified and prioritised across business functions.' },
+    { client: 'Large US mutual life insurer', title: 'AI COE foundation', metric: 'Standardised intake and guardrails',
+      detail: 'Five-stream COE covering structured intake, value realisation, Responsible AI, backlog grooming and AI architecture.' }
   ],
   data: [
-    { client: 'Everest Re', title: 'Treaty digitization', metric: '100% of treaties digitized',
+    { client: 'Global reinsurer', title: 'Treaty digitization', metric: '100% of treaties digitized',
       detail: 'Decades of treaty wordings trapped in scanned files. Document AI and Neural Connect turned them into a searchable layer with natural-language querying over NATCAT exposure.' },
-    { client: 'Ameritas', title: 'Provider fee optimisation', metric: '$1.2M recurring annual saving',
-      detail: 'Dental and vision insurer. ML anomaly detection over fee schedules, with market segmentation replacing a one-size-fits-all contracting model.' },
-    { client: 'One America', title: 'Competitive intelligence', metric: 'Manual research effort removed',
+    { client: 'US dental and vision insurer', title: 'Provider fee optimisation', metric: '$1.2M recurring annual saving',
+      detail: 'ML anomaly detection over fee schedules, with market segmentation replacing a one-size-fits-all contracting model.' },
+    { client: 'US retirement and life insurer', title: 'Competitive intelligence', metric: 'Manual research effort removed',
       detail: 'Leadership had no real-time view of competitor and regulatory movement. An agent aggregates sources into a single briefing on request.' }
   ],
   process: [
-    { client: 'Allied World', title: 'Underwriting workbench', metric: 'Request-to-bind up 50%',
+    { client: 'Global specialty insurer', title: 'Underwriting workbench', metric: 'Request-to-bind up 50%',
       detail: 'Underwriters spent 1\u20132 hours per submission just qualifying it. AI Next orchestrated triage, auto-decline and IGO/NIGO classification; manual effort and operations TCO both halved.' },
-    { client: 'One America', title: 'Hardship withdrawals', metric: '10\u201314 days to under 30 minutes',
+    { client: 'US retirement benefits provider', title: 'Hardship withdrawals', metric: '10\u201314 days to under 30 minutes',
       detail: 'Retirement benefits processing cost over $100 per transaction with NIGO above 65%. Straight-through processing cut cost under $10 and NIGO below 5%.' },
-    { client: 'SageSure', title: 'Statement of Values processing', metric: '80% less manual effort',
+    { client: 'US property insurer', title: 'Statement of Values processing', metric: '80% less manual effort',
       detail: 'Submissions arrived as emails, PDFs, ACORD forms and loss runs. An AI Foundry pipeline extracts, validates and standardises into a rating-ready output, with humans on exceptions only.' }
   ],
   legacy: [
-    { client: 'MassMutual', title: 'Policy migration extraction', metric: 'F1 99.2% across 9,100 pages',
+    { client: 'US life and annuities carrier', title: 'Policy migration extraction', metric: 'F1 99.2% across 9,100 pages',
       detail: 'Product rules scattered across 1,132 documents. IPMS industrialised extraction, cutting BRS time-to-create by over 50% and delivering 15 functionalities in 12 weeks.' },
-    { client: 'Northwestern Mutual', title: 'Informatica ETL reverse engineering', metric: '~70% less documentation effort',
+    { client: 'US mutual insurer', title: 'Informatica ETL reverse engineering', metric: '~70% less documentation effort',
       detail: '1,000+ legacy ETL mappings moving to Databricks. Graph RAG over exported XML recovered transformation rules into SME validation workbooks.' },
     { pending: true, title: 'Third proof point', metric: 'Infosys to supply',
       detail: 'The playbook and use case register contain two Agentic Legacy engagements. A third is needed to balance this pool against the others.' }
@@ -165,7 +165,7 @@ export const TILES = {
       detail: 'Digital twins of insured properties and fleets appear in the playbook narrative with no supporting engagement.' }
   ],
   trust: [
-    { client: 'Ameritas', title: 'AI-first risk and compliance', metric: '30% productivity improvement', substitute: true,
+    { client: 'US insurance group', title: 'AI-first risk and compliance', metric: '30% productivity improvement', substitute: true,
       detail: 'Substituted from the use case register: continuous risk scoring, automated evidence compilation and control testing, with human experts on interpretation and high-risk exceptions.' },
     { pending: true, title: 'NAIC governance proof', metric: 'Infosys to supply',
       detail: 'The playbook\u2019s AI Trust section carries an unfilled case study placeholder. A named governance engagement is needed.' },
