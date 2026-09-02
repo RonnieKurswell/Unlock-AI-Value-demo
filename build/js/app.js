@@ -7,7 +7,6 @@ import { HiveScene } from './scene.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
   classifyArchetype, BENCHMARK_MEDIAN, benchmarkFinePrint,
-  ROLES, ROLE_DEFAULT,
   TILES, forecast, FORECAST_LINES, hexOrder
 } from './data.js';
 
@@ -44,7 +43,6 @@ const S = {
   answers: {},
   scores: {},
   beat: 0,
-  role: null,
   recipient: null
 };
 ORDER.forEach(id => { S.scores[id] = 0; });
@@ -168,7 +166,6 @@ function reset(toAttract = true) {
   S.qi = 0;
   S.answers = {};
   S.beat = 0;
-  S.role = null;
   S.recipient = null;
   ORDER.forEach(id => { S.scores[id] = 0; });
   scene.resetTiles();
@@ -531,7 +528,7 @@ function buildWrapped() {
   $('archBody').innerHTML = `${arch.body}<br><br>${composeNarrative()}`;
   $('archRisk').textContent = arch.risk;
 
-  const pips = [0, 1, 2, 3].map(i => `<i data-pip="${i}"></i>`).join('');
+  const pips = BEATS.map((_, i) => `<i data-pip="${i}"></i>`).join('');
   document.querySelectorAll('.beat-pips').forEach(n => { n.innerHTML = pips; });
 
   /* benchmark */
@@ -601,36 +598,9 @@ function buildWrapped() {
     grid.appendChild(d);
   });
 
-  buildRoleBeat();
 }
 
-/* ---- beat 4: pick your role, see it transform ---- */
-
-function buildRoleBeat() { paintRole(S.role); }
-
-/* The note asks for role read from the scan AND the questionnaire. The badge
-   gives the transformation; the answers decide which pool to point them at —
-   weakest among the pools that actually matter to that role, so an actuary is
-   sent to Data or Trust rather than to whatever scored lowest overall. */
-function focusPool(role) {
-  const candidates = (role && role.focus && role.focus.length) ? role.focus : ORDER;
-  return [...candidates].sort((a, b) => S.scores[a] - S.scores[b])[0];
-}
-
-function paintRole(i) {
-  const r = (i == null) ? ROLE_DEFAULT : ROLES[i];
-  $('roleFrom').textContent = r.from;
-  $('roleTo').textContent = r.to;
-  $('roleChange').textContent = r.change;
-
-  const f = POOL[focusPool(r)];
-  const el2 = $('roleFocus');
-  if (el2 && f) {
-    el2.innerHTML = `Your focus area is <b style="color:${f.hex}">${f.name}</b>, the pool where your answers and your role intersect.`;
-  }
-}
-
-/* ---- beat 5: proof ---- */
+/* ---- proof under the forecast columns ---- */
 
 /* Best available proof for a timeline column: a real engagement if one of the
    column's pools has one, otherwise a pending tile with its label intact. */
@@ -648,12 +618,18 @@ function columnProof(ids) {
 
 /* ---- beats ---- */
 
+/* Three beats: position, benchmark, five-year view. The role morph is gone -
+   it was matched from a job title the badge used to supply, and the badge is
+   gone too. */
+const BEATS = ['beat1', 'beat2', 'beat3'];
+const LAST_BEAT = BEATS.length - 1;
+
 function setBeat(i) {
   S.beat = i;
   // Each beat has its own plate, composed around where its copy sits.
   $('stage').dataset.beat = String(i + 1);
   syncPlate();
-  [1, 2, 3, 4].forEach(n => $('beat' + n).classList.toggle('on', n === i + 1));
+  BEATS.forEach((_, n) => $('beat' + (n + 1)).classList.toggle('on', n === i));
   document.querySelectorAll('.beat-pips').forEach(nav => {
     [...nav.querySelectorAll('i')].forEach((pip, k) => pip.classList.toggle('on', k <= i));
   });
@@ -662,7 +638,7 @@ function setBeat(i) {
 }
 
 document.querySelectorAll('[data-next]').forEach(b => {
-  b.onclick = () => { if (S.beat < 3) setBeat(S.beat + 1); else showDone(); };
+  b.onclick = () => { if (S.beat < LAST_BEAT) setBeat(S.beat + 1); else showDone(); };
 });
 
 /* =============================================================
@@ -671,60 +647,49 @@ document.querySelectorAll('[data-next]').forEach(b => {
 
 function resetDelivery() {
   $('tileSheet').classList.remove('on');
-  $('socket').classList.remove('locked');
-  $('cradleMark').textContent = '';
-  $('scanState').textContent = 'Waiting for badge…';
-  $('manualForm').classList.remove('on');
-  document.querySelector('#v-identify .deliver-wrap')?.classList.remove('form-open');
+  $('idAsk').hidden = false;
+  $('idDone').hidden = true;
   $('mfError').textContent = '';
-  ['mfName', 'mfTitle', 'mfEmail'].forEach(id => { $(id).value = ''; });
+  $('mfEmail').value = '';
+  clearTimeout(idAdvance);
 }
 
-$('manualBtn').onclick = () => {
-  $('manualForm').classList.add('on');
-  document.querySelector('#v-identify .deliver-wrap').classList.add('form-open');
-  $('mfName').focus();
-};
-$('manualCancel').onclick = () => {
-  $('manualForm').classList.remove('on');
-  document.querySelector('#v-identify .deliver-wrap').classList.remove('form-open');
-  $('mfError').textContent = '';
-};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+let idAdvance = null;
 
-$('manualForm').addEventListener('submit', e => {
+$('emailForm').addEventListener('submit', e => {
   e.preventDefault();
   const email = $('mfEmail').value.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!EMAIL_RE.test(email)) {
     $('mfError').textContent = 'Enter a valid email address.';
+    $('mfEmail').focus();
     return;
   }
-  identified({ name: $('mfName').value.trim(), title: $('mfTitle').value.trim(), email });
+  $('mfError').textContent = '';
+  S.recipient = { email };
+
+  /* Acknowledge before the report rolls, so nobody is left wondering whether
+     the address went in. It moves on by itself: on a kiosk an extra tap to
+     dismiss a confirmation is a tap nobody wants. */
+  $('idDoneEmail').textContent = email;
+  $('idAsk').hidden = true;
+  $('idDone').hidden = false;
+  replay($('idDone'));
+  scene.flare(1);
+  clearTimeout(idAdvance);
+  idAdvance = setTimeout(revealResults, 2600);
 });
 
-/* Stands in for the NFC read. On the kiosk the reader fires this. */
-$('simulateTap').onclick = () => {
-  $('socket').classList.add('locked');
-  $('cradleMark').textContent = '✓';
-  $('scanState').textContent = 'Badge read · profile matched';
-  scene.flare(1);
-  // a real badge carries name, job title and email; the sim supplies a title
-  setTimeout(() => identified({ name: '', title: 'Head of Underwriting', email: 'the address on your badge' }), 900);
-};
-
-/* Identity in hand: build the report, then show it. */
-function identified({ name, email, title }) {
-  S.recipient = { name, email, title };
-  if (title) {
-    const i = ROLES.findIndex(r => r.match.some(m => title.toLowerCase().includes(m)));
-    S.role = i >= 0 ? i : null;
-  }
+$('idContinue').addEventListener('click', () => {
+  clearTimeout(idAdvance);
   revealResults();
-}
+});
 
 function showDone() {
   const r = S.recipient || {};
-  $('doneName').textContent = r.name ? `, ${r.name.split(/\s+/)[0]}` : '';
-  $('doneEmail').textContent = r.email || 'the address on your badge';
+  // No name is collected any more, so nothing to greet them by.
+  $('doneName').textContent = '';
+  $('doneEmail').textContent = r.email || 'your address';
   // The emailed report carries the same comparison, so the credit follows it.
   $('doneSource').textContent = benchmarkFinePrint();
   show('done');
@@ -757,7 +722,7 @@ document.addEventListener('keydown', e => {
   if (S.view === 'diag' && /^[1-5]$/.test(e.key) && !typing()) return answer(Number(e.key) - 1);
   if (S.view === 'wrap' && (e.key === 'Enter' || e.key === ' ')) {
     e.preventDefault();
-    if (S.beat < 3) setBeat(S.beat + 1); else showDone();
+    if (S.beat < LAST_BEAT) setBeat(S.beat + 1); else showDone();
   }
 });
 

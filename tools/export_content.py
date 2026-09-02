@@ -127,7 +127,6 @@ for t, d in [
     ("Proof tiles",          "18 case-study tiles, 3 per pool. Six are unfilled, and client names are masked. One per pool also shows during the diagnostic."),
     ("Score band feedback",  "30 report blocks. What each score band tells a visitor, and the recommended move."),
     ("Archetypes",           "Five overall positions a visitor can land in."),
-    ("Role futures",         "How each role changes, matched from the badge."),
     ("Benchmark",            "Industry baseline per pool, to come from Gartner. Placeholder figures today."),
     ("Forecast lines",       "The three five-year outlook captions."),
     ("Screen copy",          "Headlines, buttons and instructional text that is not pool-specific."),
@@ -208,19 +207,6 @@ sheet("Archetypes",
       [24, 30, 76, 72, 13, 42, 34], rows,
       notes=["The visitor's overall position, chosen from their six pool scores. One of five."])
 
-# ---------- 7. Role futures ----------
-rows = [[", ".join(r["match"]), r["from"], r["to"],
-         ", ".join(NAME[f] for f in r["focus"]), r["change"], "", "", ""]
-        for r in D["ROLES"]]
-rd = D["ROLE_DEFAULT"]
-rows.append(["(fallback, no keyword match)", rd["from"], rd["to"],
-             ", ".join(NAME[f] for f in rd["focus"]), rd["change"], "", "", ""])
-sheet("Role futures",
-      ["Badge keyword match", "Role today", "Role in five years", "Focus pools", "How the role changes"] + REVIEW,
-      [30, 24, 30, 40, 76, 13, 42, 34], rows,
-      notes=["Matched from the job title on the visitor's badge. Keywords are matched as substrings, case-insensitive.",
-             "Telling someone their job changes is the most personal claim the kiosk makes. Worth a close read."])
-
 # ---------- 8. Benchmark ----------
 rows = [[NAME[pid], D["BENCHMARK_MEDIAN"][pid], D["MAX_POOL_SCORE"], "", "", "", True]
         for pid in ORDER]
@@ -271,24 +257,19 @@ SCREEN = [
  ("Diagnostic", "Progress", "Question 1 of 6"),
  ("Diagnostic", "Case card eyebrow", "[Value pool] \u00b7 [Client]"),
  ("Diagnostic", "Case card link", "Read the case"),
- ("Identify", "Headline", "Tap your badge"),
- ("Identify", "Lede", "Your badge carries your role, so the blueprint fits your job."),
- ("Identify", "Reader state", "Waiting for badge"),
- ("Identify", "Button", "Enter email manually"),
- ("Identify", "Button", "See my results"),
- ("Identify", "Button", "Cancel"),
+ ("Email capture", "Headline", "Where should we send it?"),
+ ("Email capture", "Lede", "One address. Your blueprint lands in your inbox."),
+ ("Email capture", "Field label", "Email"),
+ ("Email capture", "Field placeholder", "name@company.com"),
+ ("Email capture", "Button", "See my results"),
+ ("Email capture", "Error", "Enter a valid email address."),
+ ("Email capture", "Confirmation headline", "Got it"),
+ ("Email capture", "Confirmation body", "Your blueprint is on its way to [email]. Here is what it says."),
  ("Results 1", "Eyebrow", "Your position"),
- ("Results 2", "Eyebrow", "Where you lead, where you lag"),
  ("Results 2", "Headline", "Against the benchmark"),
- ("Results 3", "Eyebrow", "And your role"),
- ("Results 3", "Source note", "Matched from your badge · playbook workforce transformation table"),
- ("Results 3", "Eyebrow", "The human constraint"),
- ("Results 3", "Body", "The people most affected by AI are the domain experts who make it work. A team can have the model and "
-                       "still not trust it over decades of manual judgment, which is why the carriers that scale it own "
-                       "governance at board level and reward AI-enabled outcomes."),
- ("Results 4", "Eyebrow", "Five-year view"),
- ("Results 4", "Headline", "Where the gap goes"),
- ("Results 4", "Lede", "Unchanged, this is your five-year position."),
+ ("Results 3", "Eyebrow", "Five-year view"),
+ ("Results 3", "Headline", "Where the gap goes"),
+ ("Results 3", "Lede", "Unchanged, this is your five-year position."),
  ("Done", "Eyebrow", "Report dispatched"),
  ("Done", "Headline", "On its way"),
  ("Done", "Body", "Sent to [email]. Three ways to get it back:"),

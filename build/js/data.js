@@ -441,12 +441,12 @@ export const BENCHMARK_SOURCE = {
   pending: true,
   /* The fine print, once the figures are real. Says what the number is and
      what it was used for, which is the whole point of the credit. */
-  credit: 'Industry baseline from Gartner research on AI adoption in insurance. Your score for each value pool is compared against that baseline.',
+  credit: 'Industry baseline from Gartner research on AI adoption in insurance.',
   /* Report title, author and date, exactly as Gartner require it. */
   citation: '',
   /* Shown instead of the credit while the figures are still placeholders, so
      the screen never implies Gartner produced these numbers. */
-  pendingNote: 'Benchmark to be sourced from Gartner research. The comparison figures shown are illustrative placeholders, not Gartner data.'
+  pendingNote: 'Benchmark to be sourced from Gartner research. Figures shown are illustrative placeholders.'
 };
 
 export function benchmarkFinePrint() {
@@ -459,53 +459,6 @@ export function benchmarkFinePrint() {
    survives. Only medians that coincide with a stop can ever be matched exactly
    by "level with the benchmark"; the rest read as ahead or behind. */
 export const BENCHMARK_MEDIAN = { strategy: 50, data: 50, process: 58, legacy: 42, physical: 33, trust: 50 };
-
-/* -------------------------------------------------------------
-   WORKFORCE ROLE EVOLUTION — verbatim structure from the
-   playbook's role transformation table. Matched from job title,
-   which the NFC badge already provides.
-   ------------------------------------------------------------- */
-
-export const ROLES = [
-  {
-    match: ['underwrit', 'risk', 'appetite'], focus: ['process', 'data', 'trust'],
-    from: 'Underwriter', to: 'AI-Augmented Risk Advisor',
-    change: 'Shifts from data gathering and manual risk assessment to overseeing AI-driven risk models, concentrating human judgment on the complex and novel risks where model confidence is low.'
-  },
-  {
-    match: ['claim', 'adjust', 'loss', 'fnol'], focus: ['process', 'physical', 'data'],
-    from: 'Claims Adjuster', to: 'AI-Assisted Decision Maker',
-    change: 'Moves from end-to-end case management to exception handling and complex case oversight, with AI managing routine assessment, documentation and settlement.'
-  },
-  {
-    match: ['actuar', 'pricing', 'reserv', 'model'], focus: ['data', 'trust', 'strategy'],
-    from: 'Actuary', to: 'AI Model Steward',
-    change: 'Evolves from building models to validating, governing and continuously improving AI pricing and reserving models, with explainability and fairness as core responsibilities.'
-  },
-  {
-    match: ['distribut', 'sales', 'growth', 'agency', 'channel'], focus: ['data', 'process', 'strategy'],
-    from: 'Distribution Manager', to: 'AI-Enabled Growth Leader',
-    change: 'Gains real-time performance intelligence, AI-powered lead scoring and agent copilot tools, shifting from reactive support to proactive growth enablement.'
-  },
-  {
-    match: ['broker', 'agent', 'advis', 'placement'], focus: ['process', 'data', 'legacy'],
-    from: 'Broker / Agent', to: 'AI-Powered Advisory Partner',
-    change: 'Shifts from manual quote comparison and paperwork-intensive placement to relationship-led advisory, with AI streamlining quote aggregation, risk matching and proposal creation.'
-  }
-];
-
-export const ROLE_DEFAULT = {
-  focus: ['strategy', 'trust', 'legacy'],
-  from: 'Insurance Leader', to: 'AI Portfolio Owner',
-  change: 'Accountability moves from approving individual AI initiatives to owning an operating model, where governance, value tracking and workforce readiness are the levers that determine whether AI scales.'
-};
-
-export function roleFor(title) {
-  const t = (title || '').toLowerCase();
-  for (const r of ROLES) if (r.match.some(m => t.includes(m))) return r;
-  return ROLE_DEFAULT;
-}
-
 
 /* -------------------------------------------------------------
    FORECAST — five-year framing, derived from band position.

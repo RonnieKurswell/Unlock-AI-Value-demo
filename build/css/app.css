@@ -233,8 +233,7 @@ input, textarea { font: inherit; }
    somewhere the reading is not. */
 #stage[data-view='wrap'][data-beat='1'] #bg { background-image: url('../images/bg-beat1.jpg'); }
 #stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/bg-beat2.jpg'); }
-#stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/bg-beat3.jpg'); }
-#stage[data-view='wrap'][data-beat='4'] #bg { background-image: url('../images/bg-beat4.jpg'); }
+#stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/bg-beat4.jpg'); }
 #stage[data-view='done'] #bg {
   background-image: url('../images/bg-done.jpg');
 }
@@ -941,7 +940,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .fine-print {
   margin-top: var(--s4);
   font-size: clamp(13px, 0.82cqw, 15.6px); line-height: 1.5;
-  color: var(--fg-3); max-width: 92ch;
+  color: var(--fg-3);
 }
 #v-done .fine-print { margin-top: var(--s5); max-width: 62ch; margin-left: auto; margin-right: auto; }
 
@@ -1279,31 +1278,6 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4);
 }
 
-/* beat 4 — role */
-.role-wrap {
-  display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--s6);
-  align-items: center; width: min(1320px, 88cqw); margin: 0 auto;
-}
-.role-morph { margin: var(--s4) 0 var(--s3); }
-.role-morph .from {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.857cqw, 16.4px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
-}
-.role-morph .to {
-  font-family: var(--display); font-weight: 300;
-  font-size: clamp(26px, 2.8cqw, 52px); line-height: 1.04; letter-spacing: -0.022em;
-  color: var(--blue-lift); margin-top: var(--s1);
-}
-.role-change { font-size: clamp(13.8px, 0.996cqw, 19.1px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
-.role-focus { font-size: clamp(13.8px, 0.996cqw, 19.1px); line-height: 1.6; color: var(--fg-2); max-width: 44ch; margin-top: var(--s3); }
-.role-focus b { font-weight: 500; }
-.role-src {
-  margin-top: var(--s4); font-family: var(--label); font-weight: 400;
-  font-size: clamp(13.0px, 0.773cqw, 14.5px); letter-spacing: 0.13em;
-  text-transform: uppercase; color: var(--fg-4);
-}
-.role-aside { border-left: 1px solid var(--hair); padding-left: var(--s5); }
-.role-aside p { margin-top: var(--s3); }
 
 /* beat 5 — proof */
 .pending-note {
@@ -1327,153 +1301,67 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .deliver-wrap .lede { margin: var(--s3) auto 0; max-width: 46ch; }
 .id-title { margin-top: var(--s2); }
 
+/* ---------- email capture ----------------------------------
+   One field, centred, sized like the rest of the build rather than like a form
+   control. The badge reader that used to own this screen is gone: ITC Vegas has
+   no NFC cards, and the brief is email only.
+   ------------------------------------------------------------- */
+.email-form { margin: var(--s6) auto 0; max-width: 520px; text-align: left; }
+.ef-field { display: block; }
+.ef-label {
+  display: block; font-family: var(--label); font-weight: 500;
+  font-size: clamp(13.0px, 0.8cqw, 15.2px); letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--fg-3);
+}
+.email-form input {
+  display: block; width: 100%; margin-top: var(--s2);
+  background: transparent; border: none; border-bottom: 1px solid var(--hair);
+  color: var(--fg); font-family: var(--body); font-weight: 300;
+  font-size: clamp(17px, 1.35cqw, 26px); letter-spacing: normal;
+  /* 56px of field, so it is a real target for a finger on a touchscreen. */
+  padding: var(--s3) 0; min-height: 56px;
+  transition: border-color 0.24s var(--ease);
+}
+.email-form input::placeholder { color: var(--fg-4); }
+.email-form input:focus { outline: none; border-bottom-color: var(--blue-lift); }
+.email-form .btn.primary { margin-top: var(--s5); }
+.mf-error {
+  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
+  letter-spacing: 0.12em; color: #E0736B; margin-top: var(--s3); min-height: 15px;
+}
+
+/* ---------- the acknowledgement ------------------------------
+   Shown in place of the field. It advances by itself, so this is read rather
+   than acted on, and the tick is the only thing that moves.
+   ------------------------------------------------------------- */
+.id-done { display: flex; flex-direction: column; align-items: center; }
+.id-done[hidden] { display: none; }
+.id-done .lede { margin-top: var(--s3); }
+.id-done #idDoneEmail { color: var(--blue-lift); }
+.id-done .btn.primary { margin-top: var(--s5); }
+.id-tick {
+  width: clamp(56px, 4.6cqw, 88px); height: clamp(56px, 4.6cqw, 88px);
+  margin-bottom: var(--s4);
+  display: grid; place-items: center;
+  border: 1px solid var(--glass-line); border-radius: 50%;
+  background: rgba(243, 247, 251, 0.05);
+}
+.id-tick svg { width: 58%; height: 58%; overflow: visible; }
+.id-tick path {
+  fill: none; stroke: var(--blue-lift); stroke-width: 3.2;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 44; stroke-dashoffset: 44;
+  animation: tickIn 0.5s var(--ease-in-out-soft) 0.12s both;
+}
+@keyframes tickIn { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .id-tick path { animation: none; stroke-dashoffset: 0; }
+}
+
 /* ---------- the badge reader ----------
    Sized to be the first thing seen, and centred so it lands on the middle of
    the identify plate, whose hexagon rings radiate from exactly there — plate
    and target then read as one object rather than two. */
-.socket {
-  position: relative;
-  width: clamp(200px, 17cqw, 330px);
-  aspect-ratio: 1;
-  margin: var(--s5) auto var(--s4);
-  display: grid; place-items: center;
-}
-
-/* Three hexagon outlines pulsing outward, staggered. Drawn as strokes in SVG
-   because clip-path can only fill a shape, not outline one. */
-.s-rings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.s-ring {
-  fill: none; stroke: var(--blue-lift); stroke-width: 1.4;
-  transform-box: fill-box; transform-origin: center;
-  animation: ringOut 3.2s var(--ease) infinite;
-}
-.s-ring.r2 { animation-delay: 1.05s; }
-.s-ring.r3 { animation-delay: 2.1s; }
-@keyframes ringOut {
-  0%   { transform: scale(0.62); opacity: 0; }
-  22%  { opacity: 0.85; }
-  100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* A symmetric breath behind the face. The previous version rotated a conic
-   gradient inside a hexagon clip, which drew a lopsided dark wedge and made the
-   whole target look sheared. */
-.s-pulse {
-  position: absolute; inset: 12%;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(55, 166, 228, 0.22) 0%, rgba(55, 166, 228, 0.07) 55%, transparent 100%);
-  animation: pulseBreath 3.2s var(--ease) infinite;
-}
-@keyframes pulseBreath {
-  0%, 100% { opacity: 0.45; transform: scale(0.92); }
-  50%      { opacity: 1;    transform: scale(1.06); }
-}
-
-.socket .cradle {
-  position: relative;
-  width: 56%; aspect-ratio: 1;
-  clip-path: polygon(50% 0, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
-  background:
-    linear-gradient(180deg, rgba(55, 166, 228, 0.42), rgba(0, 124, 195, 0.16));
-  box-shadow: 0 0 60px rgba(55, 166, 228, 0.22);
-  display: grid; place-items: center;
-  transition: background 0.45s var(--ease), transform 0.45s var(--ease);
-}
-
-/* A card and signal waves: shows the gesture instead of naming the radio. */
-.badge-glyph {
-  width: 46%; height: auto;
-  fill: none; stroke: var(--fg); stroke-width: 1.6;
-  stroke-linecap: round; stroke-linejoin: round;
-  opacity: 0.92;
-  transition: opacity 0.3s var(--ease);
-}
-.badge-glyph .wave { stroke: var(--blue-lift); }
-.badge-glyph .w1 { animation: waveOn 1.9s var(--ease) infinite; }
-.badge-glyph .w2 { animation: waveOn 1.9s var(--ease) infinite 0.32s; }
-@keyframes waveOn { 0%, 100% { opacity: 0.25 } 50% { opacity: 1 } }
-
-.cradle-mark {
-  position: absolute;
-  font-family: var(--display); font-weight: 300;
-  font-size: clamp(30px, 3cqw, 54px); color: var(--fg);
-}
-
-/* Read: the rings stop, the face floods, the glyph gives way to the tick. */
-.socket.locked .s-ring,
-.socket.locked .s-pulse { animation-play-state: paused; opacity: 0; }
-.socket.locked .cradle {
-  background: linear-gradient(180deg, rgba(55, 166, 228, 0.85), rgba(0, 124, 195, 0.55));
-  transform: scale(1.04);
-}
-.socket.locked .badge-glyph { opacity: 0; }
-
-.scan-state {
-  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.882cqw, 16.4px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-2);
-  display: inline-flex; align-items: center; gap: var(--s2);
-}
-.scan-state::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--blue-lift); flex: none;
-  animation: breathe 1.6s var(--ease) infinite;
-}
-.socket.locked ~ .scan-state::before { animation: none; background: var(--fg-2); }
-
-@media (prefers-reduced-motion: reduce) {
-  .s-ring, .s-pulse, .badge-glyph .wave, .scan-state::before { animation: none; }
-  .s-ring { opacity: 0.4; }
-}
-
-.deliver-actions { margin-top: var(--s5); display: flex; justify-content: center; }
-
-/* once they choose typing, the badge socket is decoration — shrink it so the
-   form fits without the screen overflowing */
-/* Shrink the box, not just the paint. transform: scale() leaves the layout box
-   at full size, which at the reader's new 326px pushed the form 11px past the
-   bottom of the stage. */
-.deliver-wrap.form-open .socket {
-  width: clamp(110px, 8cqw, 150px);
-  margin: var(--s2) auto 0;
-}
-.deliver-wrap.form-open .s-pulse { display: none; }
-.deliver-wrap.form-open .scan-state { opacity: 0; }
-.deliver-wrap.form-open .deliver-actions { display: none; }
-.deliver-wrap.form-open .demo-trigger { margin-top: var(--s4); }
-.socket, .scan-state { transition: width 0.4s var(--ease), opacity 0.3s var(--ease), margin 0.4s var(--ease); }
-
-.manual-form { display: none; margin: var(--s4) auto 0; max-width: 440px; text-align: left; }
-.manual-form.on { display: block; animation: rise 0.44s var(--ease) both; }
-.manual-form label {
-  display: block; font-family: var(--label); font-weight: 500;
-  font-size: clamp(13.0px, 0.8cqw, 15.2px); letter-spacing: 0.13em;
-  text-transform: uppercase; color: var(--fg-3); margin-bottom: var(--s4);
-}
-.manual-form .mf-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
-.manual-form input {
-  display: block; width: 100%; margin-top: var(--s1);
-  background: transparent; border: none; border-bottom: 1px solid var(--hair);
-  color: var(--fg); font-family: var(--body); font-weight: 300;
-  font-size: clamp(14.8px, 1.06cqw, 19.1px); letter-spacing: normal; text-transform: none;
-  padding: var(--s2) 0;
-}
-.manual-form input::placeholder { color: var(--fg-4); }
-.manual-form input:focus { outline: none; border-bottom-color: var(--blue); }
-.mf-actions { display: flex; gap: var(--s5); align-items: center; margin-top: var(--s3); }
-.mf-error {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
-  letter-spacing: 0.12em; color: #E0736B; margin-top: var(--s2); min-height: 14px;
-}
-
-.demo-trigger {
-  min-height: 44px; padding: 0 var(--s3);
-  margin-top: var(--s6); font-family: var(--label); font-weight: 400;
-  font-size: clamp(13.0px, 0.773cqw, 14.5px); letter-spacing: 0.13em;
-  text-transform: uppercase; color: var(--fg-4);
-  transition: color 0.2s var(--ease);
-}
-.demo-trigger:active { color: var(--fg-3); }
 
 /* ---------- done -------------------------------------------- */
 
@@ -1499,11 +1387,9 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 @container stage (max-width: 1100px) {
   .fc-grid { grid-template-columns: 1fr; gap: var(--s4); }
   .fc-col { padding-left: 0; border-left: none; }
-  .role-wrap, #beat1 .arch-cols { grid-template-columns: 1fr; gap: var(--s4); }
-  .role-aside { border-left: none; padding-left: 0; }
+  #beat1 .arch-cols { grid-template-columns: 1fr; gap: var(--s4); }
   #v-diag .qcol, #v-explore .col { width: 56%; }
   .pr-tiles { grid-template-columns: 1fr; }
-  .manual-form .mf-row { grid-template-columns: 1fr; }
   .bench-row { grid-template-columns: 11em 1fr 5em; gap: var(--s3); }
 }
 

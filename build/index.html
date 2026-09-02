@@ -246,56 +246,39 @@
 
 
     <!-- IDENTIFY — before results, so nobody leaves without tapping -->
+    <!-- IDENTIFY - one email address and nothing else. ITC Vegas has no NFC
+         cards, and the note was email only: no name, no job title. The badge
+         reader, the manual-form toggle and the name and title fields are all
+         gone with it. -->
     <section class="view" id="v-identify">
       <div class="deliver-wrap">
-        <h2 class="d-xl id-title">Tap your badge</h2>
-        <p class="lede">Your badge carries your role, so the blueprint fits your job.</p>
+        <div class="id-ask" id="idAsk">
+          <h2 class="d-xl id-title">Where should we send it?</h2>
+          <p class="lede">One address. Your blueprint lands in your inbox.</p>
 
-        <!-- The reader is the screen. Rings pulse outward from it so the eye is
-             pulled to the one place a badge is meant to go, and the glyph shows
-             the gesture rather than naming the technology. -->
-        <div class="socket" id="socket">
-          <!-- Three concentric regular hexagons. Generated from circumradius so
-               all three are the same shape: width is height * cos30. Hand-typed
-               paths had them at 0.94, 0.94 and 1.00 width-to-height against the
-               correct 0.866, which read as a skewed, lopsided target. -->
-          <svg class="s-rings" viewBox="0 0 100 100" aria-hidden="true">
-            <path class="s-ring r1" d="M50.00 2.00 L8.43 26.00 L8.43 74.00 L50.00 98.00 L91.57 74.00 L91.57 26.00 Z"/>
-            <path class="s-ring r2" d="M50.00 11.00 L16.23 30.50 L16.23 69.50 L50.00 89.00 L83.77 69.50 L83.77 30.50 Z"/>
-            <path class="s-ring r3" d="M50.00 20.00 L24.02 35.00 L24.02 65.00 L50.00 80.00 L75.98 65.00 L75.98 35.00 Z"/>
-          </svg>
-          <span class="s-pulse" aria-hidden="true"></span>
-          <div class="cradle" id="cradle">
-            <svg class="badge-glyph" viewBox="0 0 44 34" aria-hidden="true">
-              <rect x="1.5" y="1.5" width="27" height="31" rx="3"/>
-              <circle cx="15" cy="12" r="4"/>
-              <path d="M8.5 25c1.6-3.6 11.4-3.6 13 0"/>
-              <path class="wave w1" d="M33 11a9 9 0 0 1 0 12"/>
-              <path class="wave w2" d="M37.5 7a15 15 0 0 1 0 20"/>
-            </svg>
-            <span class="cradle-mark" id="cradleMark"></span>
-          </div>
-        </div>
-        <div class="scan-state" id="scanState">Waiting for badge</div>
-
-        <div class="deliver-actions">
-          <button class="btn" id="manualBtn">Enter email manually</button>
+          <form class="email-form" id="emailForm" novalidate>
+            <label class="ef-field">
+              <span class="ef-label">Email</span>
+              <input type="email" id="mfEmail" autocomplete="email"
+                     inputmode="email" placeholder="name@company.com"
+                     aria-describedby="mfError">
+            </label>
+            <button class="btn primary" type="submit">See my results <span class="arrow">&#8594;</span></button>
+            <p class="mf-error" id="mfError" role="alert"></p>
+          </form>
         </div>
 
-        <form class="manual-form" id="manualForm" novalidate>
-          <div class="mf-row">
-            <label>Name<input type="text" id="mfName" autocomplete="off" placeholder="Full name"></label>
-            <label>Job title<input type="text" id="mfTitle" autocomplete="off" placeholder="Head of Underwriting"></label>
+        <!-- Shown in place of the form once the address is in. It advances on
+             its own, because an extra tap to acknowledge a confirmation is a
+             tap nobody wants on a kiosk. -->
+        <div class="id-done" id="idDone" hidden>
+          <div class="id-tick" aria-hidden="true">
+            <svg viewBox="0 0 44 44"><path d="M12 23.5 L19 30.5 L32 14.5"/></svg>
           </div>
-          <label>Email<input type="email" id="mfEmail" autocomplete="off" placeholder="name@company.com"></label>
-          <div class="mf-actions">
-            <button class="btn primary" type="submit">See my results</button>
-            <button class="btn quiet" type="button" id="manualCancel">Cancel</button>
-          </div>
-          <p class="mf-error" id="mfError"></p>
-        </form>
-
-        <button class="demo-trigger" id="simulateTap">Demo · simulate badge tap</button>
+          <h2 class="d-l">Got it</h2>
+          <p class="lede">Your blueprint is on its way to <span id="idDoneEmail"></span>. Here is what it says.</p>
+          <button class="btn primary" id="idContinue">See my results <span class="arrow">&#8594;</span></button>
+        </div>
       </div>
     </section>
 
@@ -334,31 +317,7 @@
           <button class="btn primary" data-next>Continue <span class="arrow">→</span></button>
         </div>
       </div>
-
       <div class="beat stagger" id="beat3">
-        <div class="role-wrap">
-          <div>
-            <span class="label">And your role</span>
-            <div class="role-morph">
-              <div class="from" id="roleFrom">&nbsp;</div>
-              <div class="to" id="roleTo">&nbsp;</div>
-            </div>
-            <p class="role-change" id="roleChange">&nbsp;</p>
-            <p class="role-focus" id="roleFocus"></p>
-            <div class="role-src">Matched from your badge · playbook workforce transformation table</div>
-          </div>
-          <div class="role-aside">
-            <span class="label cool">The human constraint</span>
-            <p class="body">The people most affected by AI are the domain experts who make it work. A team can have the model and still not trust it over decades of manual judgment, which is why the carriers that scale it own governance at board level and reward AI-enabled outcomes.</p>
-          </div>
-        </div>
-        <div class="beat-nav">
-          <div class="beat-pips"></div>
-          <button class="btn primary" data-next>Continue <span class="arrow">→</span></button>
-        </div>
-      </div>
-
-      <div class="beat stagger" id="beat4">
         <div class="fc-wrap">
           <div class="fc-head">
             <span class="label cool">Five-year view</span>
