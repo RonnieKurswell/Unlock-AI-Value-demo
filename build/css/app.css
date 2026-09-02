@@ -1306,7 +1306,9 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    control. The badge reader that used to own this screen is gone: ITC Vegas has
    no NFC cards, and the brief is email only.
    ------------------------------------------------------------- */
-.email-form { margin: var(--s6) auto 0; max-width: 520px; text-align: left; }
+/* Centred like everything else on the screen. Left-aligning a lone field under
+   a centred headline read as a form that had wandered off the axis. */
+.email-form { margin: var(--s6) auto 0; max-width: 520px; text-align: center; }
 .ef-field { display: block; }
 .ef-label {
   display: block; font-family: var(--label); font-weight: 500;
@@ -1314,7 +1316,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   text-transform: uppercase; color: var(--fg-3);
 }
 .email-form input {
-  display: block; width: 100%; margin-top: var(--s2);
+  display: block; width: 100%; margin-top: var(--s2); text-align: center;
   background: transparent; border: none; border-bottom: 1px solid var(--hair);
   color: var(--fg); font-family: var(--body); font-weight: 300;
   font-size: clamp(17px, 1.35cqw, 26px); letter-spacing: normal;
