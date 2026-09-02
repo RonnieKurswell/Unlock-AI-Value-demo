@@ -187,6 +187,20 @@
 
     <!-- DIAGNOSTIC -->
     <section class="view" id="v-diag">
+      <!-- The proof for the pool being asked about, alongside the question
+           rather than after it. Anshul wanted case studies during the
+           diagnostic; putting one on the question screen itself means it is
+           read while the question is being considered, not as an interruption
+           between two of them. Hidden on pools with no cleared case study, so
+           it is genuinely optional. -->
+      <button class="qcase panel" id="qCase" hidden>
+        <span class="qc-rule" id="qcRule"></span>
+        <span class="label cool" id="qcEyebrow">&nbsp;</span>
+        <span class="qc-metric" id="qcMetric">&nbsp;</span>
+        <span class="qc-title" id="qcTitle">&nbsp;</span>
+        <span class="qc-more">Read the case <span class="arrow">→</span></span>
+      </button>
+
       <div class="qcol">
         <div class="panel qpanel stagger">
           <div class="qmeta">
@@ -227,28 +241,6 @@
       </div>
     </section>
 
-
-    <!-- PROOF - a case study lands mid-diagnostic, not only in the report.
-         Anshul's note was that proof should arrive while someone is still
-         answering, so this fires after every second question. One engagement,
-         one number, drawn from whichever answered pool scored lowest: the
-         case study then reads as what closing that gap looks like. -->
-    <section class="view" id="v-proof">
-      <div class="copy-scrim" aria-hidden="true"></div>
-      <div class="proof-col">
-        <div class="panel proof-card stagger">
-          <div class="pf-rule" id="pfRule"></div>
-          <span class="label cool" id="pfEyebrow">&nbsp;</span>
-          <h2 class="pf-title" id="pfTitle">&nbsp;</h2>
-          <div class="pf-metric" id="pfMetric">&nbsp;</div>
-          <p class="body pf-detail" id="pfDetail">&nbsp;</p>
-          <div class="pf-foot">
-            <span class="pf-count" id="pfCount">&nbsp;</span>
-            <button class="btn primary" id="pfNext">Continue <span class="arrow">→</span></button>
-          </div>
-        </div>
-      </div>
-    </section>
 
 
     <!-- IDENTIFY — before results, so nobody leaves without tapping -->

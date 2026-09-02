@@ -111,7 +111,7 @@ line("")
 line("Where we still need content from Infosys", "h2")
 line("These are gaps in the build today, not questions about wording. Highlighted amber on their sheets.")
 line("    1.  Six of the eighteen proof tiles have no case study, marked 'Infosys to supply'. Physical AI has no case studies at all; AI Trust has one of three; Agentic Legacy Modernization has two of three. See 'Proof tiles'.")
-line("        These six are now more urgent: case studies also appear during the diagnostic, so the pool of usable tiles is doing more work.")
+line("        These six are now more urgent: one case study per pool also appears on that pool's diagnostic question, so Physical AI's question has no proof on it at all.")
 line("    2.  Benchmark medians are illustrative placeholders, not Infosys research. See 'Benchmark'.")
 line("    3.  The QR code on the final screen points nowhere yet. We need the destination URL.")
 line("    4.  The five-year forecast columns present today's case studies under future-dated headings. Flag if that framing is a problem.")
@@ -120,7 +120,7 @@ line("Sheet guide", "h2")
 for t, d in [
     ("Diagnostic questions", "18 questions, 5 answers each (90 rows). Answer wording and the score behind each answer."),
     ("Value pools",          "The six pools: name, verb, description, three supporting facts."),
-    ("Proof tiles",          "18 case-study tiles, 3 per pool. Six are unfilled. Two are shown mid-diagnostic."),
+    ("Proof tiles",          "18 case-study tiles, 3 per pool. Six are unfilled. One per pool also shows during the diagnostic."),
     ("Score band feedback",  "30 report blocks. What each score band tells a visitor, and the recommended move."),
     ("Archetypes",           "Five overall positions a visitor can land in."),
     ("Role futures",         "How each role changes, matched from the badge."),
@@ -176,10 +176,10 @@ ws = sheet("Proof tiles",
       [22, 15, 20, 28, 30, 66, 13, 42, 34, 3], rows, pending_col=9,
       notes=["Three per pool. Amber rows have no case study. We need client name, metric and one or two lines of detail, "
              "or permission to drop the tile.",
-             "Two of these tiles now also appear during the diagnostic, on their own screen after the second and "
-             "fourth questions, per Anshul's note that proof should land while someone is still answering. "
-             "The kiosk picks the lowest scoring pool answered so far and skips any amber row, so an unfilled "
-             "tile is never shown on the floor.",
+             "One of these appears on each diagnostic question screen, next to the question for its own value pool, "
+             "per Anshul's note that proof should land while someone is still answering. The first cleared tile in "
+             "each pool is used, and amber rows are skipped, so Physical AI currently shows no case study at all "
+             "on its question.",
              "Named carriers appear on a public show floor. Confirm each one is cleared for use."])
 ws.column_dimensions["J"].hidden = True
 
@@ -258,9 +258,8 @@ SCREEN = [
  ("Explore", "Instruction", "Tap a value pool to explore"),
  ("Explore", "Button", "Start the diagnostic"),
  ("Diagnostic", "Progress", "Question 1 of 6"),
- ("Proof (mid-diagnostic)", "Eyebrow", "[Value pool] \u00b7 [Client]"),
- ("Proof (mid-diagnostic)", "Progress", "2 of 6 answered"),
- ("Proof (mid-diagnostic)", "Button", "Continue"),
+ ("Diagnostic", "Case card eyebrow", "[Value pool] \u00b7 [Client]"),
+ ("Diagnostic", "Case card link", "Read the case"),
  ("Identify", "Headline", "Tap your badge"),
  ("Identify", "Lede", "Your badge carries your role, so the blueprint fits your job."),
  ("Identify", "Reader state", "Waiting for badge"),
