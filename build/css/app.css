@@ -338,12 +338,11 @@ input, textarea { font: inherit; }
 
 /* --blue-lift measured 2.91:1 over the film. White clears it without
    pushing the scrim so dark the film stops reading as motion. */
-#v-attract .label { color: var(--brand); }
 /* Attract only: blue sentence, ink accent. The reverse of every other heading,
-   and the reverse of what the dark build did. */
+   and the reverse of what the dark build did. The eyebrow and subhead rules
+   that sat here went with the elements. */
 #v-attract .d-xl { color: var(--brand); }
 #v-attract .d-xl em { color: var(--ink); }
-#v-attract .sub { color: var(--brand); }
 
 /* The plate is the video's poster, so it must not paint over it as well. */
 /* The V4 home screen loop, 8s at 3840x2160. Back on now that it is the light
@@ -657,7 +656,10 @@ input, textarea { font: inherit; }
   letter-spacing: 0.13em; text-transform: uppercase;
   color: var(--blue-lift);
 }
-.label.cool { color: var(--brand); }
+/* --brand measures 4.00:1 at worst over the renders. That clears the 3:1 a
+   headline needs and fails the 4.5 a small label needs, so labels take the
+   darker step and only display type keeps the brand blue. */
+.label.cool { color: var(--blue-lift); }
 
 .d-xl, .d-l, .d-m {
   font-family: var(--display); font-weight: 300;
@@ -722,10 +724,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 #v-attract.on { display: grid; }
 #v-attract .statement { max-width: none; }
 #v-attract .d-xl { max-width: 21ch; margin: var(--s3) auto 0; }
-#v-attract .sub {
-  margin-top: var(--s4); color: var(--fg-2);
-  font-size: clamp(13.8px, 1.007cqw, 20.1px); white-space: nowrap;
-}
+
 .touch-cue {
   margin-top: var(--s5); white-space: nowrap;
   /* inline-flex so the parent's text-align keeps it centred */
@@ -1005,13 +1004,15 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* ---------- diagnostic -------------------------------------- */
 
 #v-diag { pointer-events: none; }
-/* An even split, after trying 70 and 60. Both left the panel wider than its
-   content wanted to be, which is what read as awkward. */
+/* The design's own footprint, in the frame's own pixels: the content box sits
+   at x 1096, y 156 and is 727 wide. Ours was half the frame at up to 900px, so
+   the same copy spread across a third more width, the composition stopped
+   matching the render behind it, and that read as the artwork being zoomed. */
 #v-diag .qcol {
   pointer-events: auto; z-index: 1;
-  position: absolute; top: var(--pad-t); right: var(--pad-x); bottom: var(--pad-b);
-  width: 50%; max-width: 900px;
-  display: flex; flex-direction: column; justify-content: center;
+  position: absolute; top: 156px; left: 1096px; right: auto; bottom: 75px;
+  width: 727px; max-width: none;
+  display: flex; flex-direction: column;
 }
 
 /* ---------- fine print --------------------------------------
@@ -1075,8 +1076,11 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    used to change height and move Next with it; on a kiosk the hand should find
    the same place six times. The slack lands in the reading area under the
    slider, which is the one part of the panel that is meant to be quiet. */
+/* The column is the footprint now, so the panel fills it rather than carrying
+   its own height. The action row still lands in the same place on all six
+   questions, which is what the min-height was for. */
 #v-diag .qpanel {
-  display: flex; flex-direction: column; min-height: 77cqh;
+  display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0;
   background: none; backdrop-filter: none; -webkit-backdrop-filter: none;
   border: none; box-shadow: none; padding: 0;
 }
@@ -1103,12 +1107,13 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-family: var(--display); font-weight: 300;
   /* Grown with the column. At 26ch the question was leaving a third of the
      panel empty to its right. */
-  font-size: clamp(23px, 2.35cqw, 44px); line-height: 1.1; letter-spacing: -0.02em;
+  /* The design's 54px at its own tracking. It wraps inside the 727 column. */
+  font-size: clamp(26px, 2.81cqw, 54px); line-height: 1.06; letter-spacing: -0.014em;
   /* A clear step down from the meta row above it. At --s4 the gap was smaller
      than the question's own line height, so the row read as part of it rather
      than as the label it is. The panel is a fixed height with its slack under
      the slider, so this comes out of the quiet space and Next does not move. */
-  margin: var(--s6) 0 0; max-width: 32ch; text-wrap: balance;
+  margin: var(--s6) 0 0; max-width: none; text-wrap: balance;
   /* Two lines reserved. Five of the six questions wrap to two and one does not,
      which moved everything below it by a line and left Next a few pixels out
      of place between questions. */
