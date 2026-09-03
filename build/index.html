@@ -322,9 +322,16 @@
           <div class="fc-head">
             <span class="label cool">Five-year view</span>
             <h2 class="d-m">Where the gap goes</h2>
-            <p class="lede">Unchanged, this is your five-year position.</p>
           </div>
-          <div class="fc-grid" id="fcGrid"></div>
+          <p class="fy-body" id="fyBody">&nbsp;</p>
+          <!-- One case study under the paragraph. The label names its pool: the
+               paragraph points at the weakest pool, and that pool does not
+               always have a cleared case study, so without the pool name the
+               tile can look like it belongs to a sentence it does not. -->
+          <div class="fy-proof" id="fyProof" hidden>
+            <div class="fc-proof-label" id="fyProofLabel">Proven now</div>
+            <div id="fyProofTile"></div>
+          </div>
         </div>
         <div class="beat-nav">
           <div class="beat-pips"></div>

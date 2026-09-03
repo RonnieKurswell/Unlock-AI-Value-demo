@@ -1239,18 +1239,18 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .bench-wrap .fine-print { margin-top: 0; }
 .fc-head { text-align: left; }
 .fc-head .lede { margin-top: var(--s2); }
-.fc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s5); }
-.fc-col { padding-left: var(--s4); border-left: 1px solid var(--hair); min-width: 0; }
-.fc-col:first-child { padding-left: 0; border-left: none; }
-.fc-col h4 {
-  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.8cqw, 15.2px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
+/* ---------- five-year view -----------------------------------
+   One paragraph in place of the three columns. Set at reading size rather than
+   heading size: it is the argument, and the heading above it is the claim.
+   ------------------------------------------------------------- */
+.fy-body {
+  font-size: clamp(15.4px, 1.13cqw, 21.4px); line-height: 1.62;
+  color: var(--fg); max-width: 62ch;
 }
-.fc-col.hot h4 { color: var(--blue-lift); }
-.fc-col p { font-size: clamp(13.7px, 0.935cqw, 17.1px); line-height: 1.6; color: var(--fg-3); margin: var(--s3) 0 var(--s4); }
-.fc-col ul { list-style: none; display: flex; flex-direction: column; gap: var(--s2); }
-.fc-col li { display: flex; align-items: center; gap: var(--s2); font-size: clamp(14.8px, 1.026cqw, 18.2px); }
-.fc-col li i { width: 7px; height: 7px; flex: none; }
+.fy-body b { font-weight: 500; }
+.fy-proof { max-width: 420px; }
+.fy-proof[hidden] { display: none; }
+
 .fc-proof { margin-top: var(--s4); }
 .fc-proof-label {
   font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.773cqw, 14.5px);
@@ -1273,10 +1273,6 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 }
 .retrieve b { color: var(--fg); font-weight: 500; }
 
-.fc-empty {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4);
-}
 
 
 /* beat 5 — proof */
@@ -1387,8 +1383,6 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* ---------- narrow preview windows -------------------------- */
 
 @container stage (max-width: 1100px) {
-  .fc-grid { grid-template-columns: 1fr; gap: var(--s4); }
-  .fc-col { padding-left: 0; border-left: none; }
   #beat1 .arch-cols { grid-template-columns: 1fr; gap: var(--s4); }
   #v-diag .qcol, #v-explore .col { width: 56%; }
   .pr-tiles { grid-template-columns: 1fr; }

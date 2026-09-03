@@ -464,19 +464,53 @@ export const BENCHMARK_MEDIAN = { strategy: 50, data: 50, process: 58, legacy: 4
    FORECAST — five-year framing, derived from band position.
    ------------------------------------------------------------- */
 
-export function forecast(scores) {
-  const compounding = [], exposed = [], holding = [];
-  for (const id of ORDER) {
-    const b = bandOf(scores[id]);
-    if (b >= 3) compounding.push(id);
-    else if (b <= 1) exposed.push(id);
-    else holding.push(id);
-  }
-  return { compounding, exposed, holding };
-}
+/* -------------------------------------------------------------
+   FIVE-YEAR VIEW
 
-export const FORECAST_LINES = {
-  compounding: 'Where your advantage widens. Each use case in a mature pool costs less than the last.',
-  exposed: 'Where the gap grows fastest, not because it degrades, but because the benchmark moves while it stays flat.',
-  holding: 'Enough capability to move, not to compound. A decision this year changes the five-year position.'
+   One paragraph per archetype, replacing the three-column
+   compounding / holding / exposed grid. Anshul asked for a single
+   paragraph in a persona style; with the role beat gone the
+   archetype is the persona.
+
+   Each paragraph is about TRAJECTORY, deliberately not about
+   position. Beat 1 already tells someone where they are and what
+   the risk is, so repeating that here would be the third time the
+   report says the same thing.
+
+   {lead} and {lag} are filled with the visitor's own strongest and
+   weakest pools, so the paragraph is about them rather than about
+   their category. Both are always present and always different:
+   leadAndLag() picks the highest and lowest scoring pool, and falls
+   back to the ends of ORDER when everything is level.
+   ------------------------------------------------------------- */
+
+export const FIVE_YEAR = {
+  foundation:
+    'Nothing here is behind yet, because nothing has been committed. Five years changes that twice over: the carriers ' +
+    'that sequence the foundation first are running production models on shared data, and the ones that led with a ' +
+    'visible pilot are rebuilding underneath it. {lag} is what decides which of those you become.',
+  purgatory:
+    'On this trajectory the proofs keep proving the same point for another five years. The cost of each one does not ' +
+    'fall, because every pilot rebuilds the pipeline the last one used, and each stall makes the next business case ' +
+    'harder to fund. {lag} is the constraint that decides it, not the models. Clear that and {lead} becomes the ' +
+    'platform everything else runs on.',
+  myopia:
+    '{lead} keeps delivering, and that is the trap. Five years of local wins on separate pipelines leaves a set of ' +
+    'integrations nobody owns and a cost per use case that never comes down. Carriers that consolidate onto shared ' +
+    'data reach their eleventh use case for a fraction of what the first one cost. {lag} is where that has to start.',
+  platform:
+    'The capability stays ahead of the benchmark. What changes over five years is the argument: an underused platform ' +
+    'is the hardest investment to defend at budget, and it gets harder every cycle it is not pointed at underwriting ' +
+    'or claims. {lag} is where the economics accrue, and {lead} is what you already have to spend on it.',
+  compounding:
+    'On this trajectory the gap widens in your favour, because each use case in a mature pool costs less than the ' +
+    'last. The five-year constraint is not technology. It is whether underwriters act on the models: {lead} is ' +
+    'already running, and {lag} is where reach or trust still limits what it is allowed to decide.'
 };
+
+/* Strongest and weakest pool. Ties break on framework order, so the same set
+   of scores always produces the same paragraph. */
+export function leadAndLag(scores) {
+  const ranked = [...ORDER].sort((a, b) => (scores[b] - scores[a]) || (ORDER.indexOf(a) - ORDER.indexOf(b)));
+  return { lead: ranked[0], lag: ranked[ranked.length - 1] };
+}

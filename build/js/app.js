@@ -7,7 +7,7 @@ import { HiveScene } from './scene.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
   classifyArchetype, BENCHMARK_MEDIAN, benchmarkFinePrint,
-  TILES, forecast, FORECAST_LINES, hexOrder
+  TILES, FIVE_YEAR, leadAndLag, hexOrder
 } from './data.js';
 
 const $ = id => document.getElementById(id);
@@ -570,41 +570,34 @@ function buildWrapped() {
     requestAnimationFrame(() => { row.querySelector('.fill').style.width = `${(sc / MAX_POOL_SCORE) * 100}%`; });
   });
 
-  /* forecast */
-  const fc = forecast(S.scores);
-  const cols = [
-    { key: 'compounding', title: 'Compounding', ids: fc.compounding, hot: false },
-    { key: 'holding', title: 'Decision point', ids: fc.holding, hot: true },
-    { key: 'exposed', title: 'Widening gap', ids: fc.exposed, hot: false }
-  ];
-  const grid = $('fcGrid');
-  grid.innerHTML = '';
-  cols.forEach(c => {
-    const d = el('div', 'fc-col' + (c.hot ? ' hot' : ''));
-    const items = c.ids.length
-      ? `<ul>${c.ids.map(id => `<li><i style="background:${POOL[id].hex}"></i>${POOL[id].name}</li>`).join('')}</ul>`
-      : `<div class="fc-empty">None in this band</div>`;
-    d.innerHTML = `<h4>${c.title}</h4><p>${FORECAST_LINES[c.key]}</p>${items}`;
+  /* five-year view: one paragraph, in the archetype's voice, naming this
+     visitor's own strongest and weakest pool. */
+  const { lead, lag } = leadAndLag(S.scores);
+  const poolName = id => `<b style="color:${POOL[id].hex}">${POOL[id].name}</b>`;
+  $('fyBody').innerHTML = (FIVE_YEAR[arch.key] || '')
+    .replace(/\{lead\}/g, poolName(lead))
+    .replace(/\{lag\}/g, poolName(lag));
 
-    /* Proof under each column. These describe today, not the forecast, so the
-       label says so — otherwise it reads as evidence of a five-year claim. */
-    const pick = columnProof(c.ids);
-    if (pick) {
-      const wrap = el('div', 'fc-proof');
-      wrap.appendChild(el('div', 'fc-proof-label', 'Proven now'));
-      wrap.appendChild(tileEl(POOL[pick.poolId], pick.tile, 0));
-      d.appendChild(wrap);
-    }
-    grid.appendChild(d);
-  });
-
+  /* Proof for the pool the paragraph points at. bestProof takes the pools in
+     preference order and returns the first with a cleared case study, so the
+     lag pool wins when it has one and a pending tile is never shown while any
+     real one exists. */
+  const pick = bestProof([lag, lead, ...ORDER]);
+  const proof = $('fyProof'), holder = $('fyProofTile');
+  holder.innerHTML = '';
+  if (pick) {
+    holder.appendChild(tileEl(POOL[pick.poolId], pick.tile, 0));
+    $('fyProofLabel').textContent = `Proven now · ${POOL[pick.poolId].name}`;
+    proof.hidden = false;
+  } else {
+    proof.hidden = true;
+  }
 }
 
-/* ---- proof under the forecast columns ---- */
-
-/* Best available proof for a timeline column: a real engagement if one of the
-   column's pools has one, otherwise a pending tile with its label intact. */
-function columnProof(ids) {
+/* Best available proof across a list of pools, taken in preference order: a
+   cleared engagement if any of them has one, otherwise a pending tile with its
+   label intact. Was per timeline column; the columns are gone. */
+function bestProof(ids) {
   for (const id of ids) {
     const real = (TILES[id] || []).find(t => !t.pending);
     if (real) return { poolId: id, tile: real };

@@ -128,7 +128,7 @@ for t, d in [
     ("Score band feedback",  "30 report blocks. What each score band tells a visitor, and the recommended move."),
     ("Archetypes",           "Five overall positions a visitor can land in."),
     ("Benchmark",            "Industry baseline per pool, to come from Gartner. Placeholder figures today."),
-    ("Forecast lines",       "The three five-year outlook captions."),
+    ("Five-year view",       "One paragraph per archetype for the last results screen."),
     ("Screen copy",          "Headlines, buttons and instructional text that is not pool-specific."),
 ]:
     c = ws.cell(row=line.__defaults__[1][0], column=2)
@@ -223,14 +223,20 @@ ws = sheet("Benchmark",
              "insurance. Your score for each value pool is compared against that baseline.\" plus the citation."])
 ws.column_dimensions["G"].hidden = True
 
-# ---------- 9. Forecast lines ----------
-LBL = {"compounding": "Pools where they score well", "exposed": "Pools where they score badly",
-       "holding": "Pools in the middle"}
-rows = [[LBL.get(k, k), k, v, "", "", ""] for k, v in D["FORECAST_LINES"].items()]
-sheet("Forecast lines",
-      ["Applies to", "Key", "Caption"] + REVIEW,
-      [34, 16, 86, 13, 42, 34], rows,
-      notes=["Captions on the five-year view."])
+# ---------- 9. Five-year paragraphs ----------
+ARCH_NAME = {k: v["name"] for k, v in D["ARCHETYPES"].items()}
+rows = [[ARCH_NAME.get(k, k), k, v, "", "", ""] for k, v in D["FIVE_YEAR"].items()]
+sheet("Five-year view",
+      ["Archetype", "Key", "Paragraph"] + REVIEW,
+      [26, 14, 96, 13, 42, 34], rows,
+      notes=["The last results screen. One paragraph per archetype, replacing the three-column "
+             "compounding / holding / exposed grid, per the note asking for a single paragraph in a persona style.",
+             "{lead} and {lag} are filled in live with that visitor's strongest and weakest value pool, so the "
+             "paragraph names their own pools rather than describing their category. Both always appear and are "
+             "always different pools. Keep both tokens if you rewrite a paragraph.",
+             "These are about trajectory on purpose, not about position. 'Your position' on the first results screen "
+             "already says where someone is and what the risk is, so repeating it here would be the third time the "
+             "report makes the same point."])
 
 # ---------- 10. Screen copy ----------
 SCREEN = [
@@ -269,7 +275,8 @@ SCREEN = [
  ("Results 2", "Headline", "Against the benchmark"),
  ("Results 3", "Eyebrow", "Five-year view"),
  ("Results 3", "Headline", "Where the gap goes"),
- ("Results 3", "Lede", "Unchanged, this is your five-year position."),
+ ("Results 3", "Paragraph", "One per archetype, see the 'Five-year view' sheet"),
+ ("Results 3", "Proof label", "Proven now \u00b7 [Value pool]"),
  ("Done", "Eyebrow", "Report dispatched"),
  ("Done", "Headline", "On its way"),
  ("Done", "Body", "Sent to [email]. Three ways to get it back:"),
