@@ -120,21 +120,8 @@
    shadows, no heavy rounding, no illustration. Our hairlines and our type
    hierarchy, on a light ground.
    ------------------------------------------------------------- */
-/* The design's card, verbatim: pale blue gradient, white hairline, and a wide
-   soft blue shadow instead of the dark one a panel on a navy ground needed. The
-   blur stays because the renders have real local variance behind a card, and
-   without it a 30% gradient is not enough to settle type over a glass edge. */
-.panel {
-  background: var(--card);
-  backdrop-filter: blur(16px) saturate(1.05);
-  -webkit-backdrop-filter: blur(16px) saturate(1.05);
-  border: 1px solid var(--card-line);
-  border-radius: var(--radius);
-  box-shadow: var(--card-shadow);
-  padding: clamp(22px, 2.3cqw, 46px) clamp(24px, 2.6cqw, 52px);
-  color: var(--ink);
-}
-.panel.panel-2 { background: rgba(255, 255, 255, 0.62); }
+/* No card. The copy sits straight on the render, held by the white wash and
+   the page margin rather than by a glass container. */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -876,7 +863,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* which of the six is open */
 /* The row now positions; the dots are just the dots. */
 .pool-nav {
-  position: absolute; left: var(--pad-x); bottom: var(--pad-b);
+  position: absolute; left: var(--pad-x); bottom: var(--pad-b); z-index: 2;
   display: flex; align-items: center; gap: var(--s3);
   opacity: 0; transition: opacity 0.5s var(--ease); pointer-events: none;
 }
@@ -1081,8 +1068,6 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    questions, which is what the min-height was for. */
 #v-diag .qpanel {
   display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0;
-  background: none; backdrop-filter: none; -webkit-backdrop-filter: none;
-  border: none; box-shadow: none; padding: 0;
 }
 #v-diag .mslider { margin-bottom: auto; }
 /* One row: which pool, what it is about, where you are. The theme used to be a
