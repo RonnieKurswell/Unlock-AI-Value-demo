@@ -252,7 +252,7 @@ function renderPool(poolId) {
 
   $('prRule').style.background = p.hex;
   $('prVerb').textContent = p.verb;
-  $('prVerb').style.color = p.hex;
+  $('prVerb').style.removeProperty('color');
   $('prName').textContent = p.name;
   $('prBlurb').textContent = p.blurb;
 
@@ -430,7 +430,8 @@ function renderQuestion() {
   const p = POOL[q.pool];
 
   $('qPool').textContent = p.name;
-  $('qPool').style.color = p.hex;
+  // The pool hex is a fill colour. Text on white takes the darker step.
+  $('qPool').style.removeProperty('color');
   /* Spelled out rather than "01 / 18": at kiosk distance a slashed pair
      reads as a code, not as position in a sequence. */
   $('qCount').textContent = `Question ${S.qi + 1} of ${FLAT.length}`;
@@ -444,6 +445,11 @@ function renderQuestion() {
   // Static, in the action row. It used to be built fresh on every question,
   // which meant a listener per render and no fixed place on the screen.
   $('qBack').hidden = S.qi === 0;
+
+  /* The design gives every question its own render, so the plate follows the
+     pool being asked about the same way the explore screen's does. */
+  $('stage').dataset.pool = q.pool;
+  syncPlate();
 
   scene.focus(q.pool);
 }
@@ -573,7 +579,7 @@ function buildWrapped() {
   /* five-year view: one paragraph, in the archetype's voice, naming this
      visitor's own strongest and weakest pool. */
   const { lead, lag } = leadAndLag(S.scores);
-  const poolName = id => `<b style="color:${POOL[id].hex}">${POOL[id].name}</b>`;
+  const poolName = id => `<b>${POOL[id].name}</b>`;
   $('fyBody').innerHTML = (FIVE_YEAR[arch.key] || '')
     .replace(/\{lead\}/g, poolName(lead))
     .replace(/\{lag\}/g, poolName(lag));

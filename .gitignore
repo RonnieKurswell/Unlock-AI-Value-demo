@@ -15,3 +15,9 @@ node_modules/
 
 # Carrier name mapping. Masked in the build per Anshul; this must not be committed.
 carrier-names.local.json
+
+# Figma timeline export, kept out of the build until the real loop lands
+build/media/attract-v4-figma.mp4
+
+# 28MB of source PNGs for the V4 renders. The build ships the JPEGs.
+artwork-src/

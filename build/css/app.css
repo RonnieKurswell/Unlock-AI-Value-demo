@@ -1,57 +1,89 @@
 /* =============================================================
    UNLOCK AI VALUE — Infosys kiosk
 
-   Type   Geist Light for display, Inter for text and labels — the pairing
-          infosys.com itself serves (their h1 is Geist 300, tracked -1px)
-   Colour Infosys blue on a deep ground; all six pools in one blue family
-   Layout centred statements, no boxes, air instead of borders
+   V4 look and feel, from INF_FSM_GLO_359.2 in Figma. The build was
+   dark glass on a deep navy ground; the design is the inverse:
+   near-white, blue type, and a baked 3D glass render carrying each
+   screen instead of a photographic plate.
 
-   Rules held here, deliberately:
-   - Nothing sits in a rectangle. Hierarchy comes from type and space.
-   - A screen is composed, not stacked from the top edge.
-   - One hairline maximum per list. No corner ticks, no chrome ornament.
+   Type   Geist throughout, 300/400/500/600. The design file uses
+          Inter for two labels on the attract screen and Geist for
+          everything on the other fourteen, so Geist wins.
+   Colour Brand blue #007cc3 leads. Text runs from #061838 through
+          #01183b, #004c77 and #00446d, all on white.
+   Surface One card treatment (pale blue gradient, white hairline,
+          soft blue shadow) and one control treatment (pill, white
+          hairline, same shadow family).
+
+   Content and flow are OURS, not the file's: six slider questions,
+   email capture rather than a badge tap, three result beats, masked
+   carrier names, the Gartner credit. Where the design and the build
+   disagree on words or numbers, the build is right.
    ============================================================= */
 
 @import url('fonts.css');
 
 :root {
   --display: 'Geist', 'Inter', 'Helvetica Neue', sans-serif;
-  --body: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
-  --label: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
+  --body: 'Geist', 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
+  --label: 'Geist', 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
 
-  /* GROUND CONTEXT — the 3D stage and the plates behind it.
-     Lifted out of near-black on Anshul's "too dark" note. Every text token
-     below clears WCAG AA body against both ends of the ground gradient;
-     the old ramp had --fg-3 at 4.29:1 and --fg-4 at 1.97:1. */
-  /* Hue 205 at full saturation. The previous pair was hue 215 at 18% value:
-     saturated on paper, grey to the eye. Infosys blue is hue 202, so the
-     ground has to sit next to it, not drift toward navy. */
-  --ink: #00243F;
-  --ink-lift: #00436F;
+  /* PAGE. The renders are flattened onto white, so the page has to be the
+     same white or the seams show at the edge of a plate. */
+  --page: #FFFFFF;
 
-  /* Infosys blue leads. --blue fills, --blue-lift carries text: the split
-     matters because a fill only needs 3:1 while text needs 4.5:1. */
-  --blue: #2BA0E8;
-  --blue-lift: #6EC8FF;
+  /* TEXT. Straight from the file's own values rather than a ramp of my own:
+     --ink is the display colour ("AI Value" on attract, every headline),
+     --brand is the interactive and eyebrow blue, --mid is body copy and
+     slider labels, --btn-ink is control text. */
+  --ink: #061838;         /* 16.6:1 on white */
+  --deep: #01183B;        /* 16.3:1  lockup */
+  /* The design's interactive blue. It measures 4.6:1 on pure white and 4.28:1
+     over the washed renders, so it fails AA for text at body size. It stays as
+     the fill and accent colour; --blue-lift is one step darker and is what
+     carries eyebrows and links. Anshul asked for WCAG compliance explicitly,
+     which is the one place the build deviates from the file. */
+  --brand: #007CC3;       /*  4.6:1 on white - fills and accents only */
+  --mid: #004C77;         /*  9.4:1  body copy, scale labels */
+  --btn-ink: #00446D;     /* 10.4:1  controls */
+
+  /* Kept as aliases so the screens I have not reworked yet still render
+     while this lands. Each one now resolves to a light-ground value. */
+  --fg: var(--ink);
+  --fg-2: var(--mid);
+  --fg-3: var(--btn-ink);
+  --fg-4: #3D6E93;        /*  5.6:1  the quietest text that still clears AA */
+  --blue: var(--brand);
+  --blue-lift: #0069A8;   /*  6.0:1  the blue that carries text on white */
   --blue-deep: #00568C;
+  --ink-lift: #E8F2FB;    /* pale wash, was the dark ground's lift */
+  --hair: rgba(0, 76, 119, 0.16);
 
-  --fg: #FFFFFF;          /* 10.33:1 on ground */
-  --fg-2: #DCEAF7;        /*  8.44:1 */
-  --fg-3: #B8D4EC;        /*  6.72:1  (was 4.29 — failed AA) */
-  --fg-4: #9DBCD8;        /*  5.22:1  (was 1.97 — failed AA) */
-  --hair: rgba(184, 212, 236, 0.30);
-
-  /* GLASS — see .panel. Tinted from the ground rather than from white, so it
-     reads as the room darkened behind a pane, not as a card laid on top. */
-  /* 0.82, not the 0.74 that looks right in isolation: at 0.74 the pool tag
-     measured 3.85:1 and the question counter 4.47:1 against the plate showing
-     through. The blur and the saturation carry the glass character; the alpha
-     is what carries the text. */
-  --glass: rgba(0, 28, 50, 0.82);
-  --glass-2: rgba(0, 34, 60, 0.70);
-  --glass-line: rgba(184, 216, 245, 0.22);
-  --glass-lip: rgba(255, 255, 255, 0.10);
+  /* SURFACES, verbatim from the file.
+     Card:  76.16deg, rgba(156,209,255,.30) 3.09% -> rgba(91,165,230,.09) 85.6%
+            1px white border, radius 20, shadow 2px 4px 20px 5px #007cc3 @ 5%
+     Pill:  transparent, 0.5px white border, radius 30,
+            shadow 2px 4px 20px #00416C @ 15%
+     The attract pill carries a fill the others do not. */
+  --card: linear-gradient(76.16deg, rgba(156, 209, 255, 0.30) 3.09%, rgba(91, 165, 230, 0.09) 85.6%);
+  --card-line: #FFFFFF;
+  --card-shadow: 2px 4px 20px 5px rgba(0, 124, 195, 0.05);
+  --pill-line: rgba(255, 255, 255, 0.9);
+  --pill-shadow: 2px 4px 20px 0 rgba(0, 65, 108, 0.15);
+  --pill-fill: linear-gradient(101.84deg, rgba(123, 194, 255, 0.25) 1.96%, rgba(0, 136, 255, 0.25) 100%);
   --radius: 20px;
+  --radius-pill: 30px;
+
+  /* The two white washes the design lays over every render, so type never
+     sits on the busiest part of the glass. */
+  --wash-top: linear-gradient(180deg, rgba(255,255,255,0.80) 25.19%, rgba(255,255,255,0) 86.02%);
+  --wash-side: linear-gradient(270deg, rgba(255,255,255,0.80) 7.48%, rgba(255,255,255,0) 86.02%);
+
+  /* glass tokens retained: the panels that have not been reworked read them */
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-2: rgba(255, 255, 255, 0.60);
+  --glass-line: rgba(255, 255, 255, 0.9);
+  --glass-lip: rgba(255, 255, 255, 0.8);
 
   /* spacing scales with the stage, which is always 16:9 and width-driven */
   --s1: clamp(4px, 0.32cqw, 7px);
@@ -88,31 +120,28 @@
    shadows, no heavy rounding, no illustration. Our hairlines and our type
    hierarchy, on a light ground.
    ------------------------------------------------------------- */
+/* The design's card, verbatim: pale blue gradient, white hairline, and a wide
+   soft blue shadow instead of the dark one a panel on a navy ground needed. The
+   blur stays because the renders have real local variance behind a card, and
+   without it a 30% gradient is not enough to settle type over a glass edge. */
 .panel {
-  background: var(--glass);
-  /* The blur is doing real work, not decoration: it collapses the plate's
-     local variance so text sits on an even ground instead of on whatever
-     hexagon edge happens to pass behind it. Saturation is nudged up because
-     blurring a bright blue otherwise reads grey. */
-  backdrop-filter: blur(30px) saturate(1.3);
-  -webkit-backdrop-filter: blur(30px) saturate(1.3);
-  border: 1px solid var(--glass-line);
+  background: var(--card);
+  backdrop-filter: blur(16px) saturate(1.05);
+  -webkit-backdrop-filter: blur(16px) saturate(1.05);
+  border: 1px solid var(--card-line);
   border-radius: var(--radius);
-  box-shadow:
-    0 26px 70px rgba(0, 10, 22, 0.42),
-    inset 0 1px 0 var(--glass-lip);
+  box-shadow: var(--card-shadow);
   padding: clamp(22px, 2.3cqw, 46px) clamp(24px, 2.6cqw, 52px);
-  /* No token re-pointing any more — glass keeps the ground's light text, so
-     one set of colours covers the whole build. */
+  color: var(--ink);
 }
-.panel.panel-2 { background: var(--glass-2); }
+.panel.panel-2 { background: rgba(255, 255, 255, 0.62); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   height: 100%;
-  background: var(--ink);
-  color: var(--fg);
+  background: var(--page);
+  color: var(--ink);
   font-family: var(--body);
   font-weight: 400;
   font-size: 16px;
@@ -129,7 +158,7 @@ input, textarea { font: inherit; }
 
 /* ---------- stage ------------------------------------------- */
 
-#shell { position: fixed; inset: 0; display: grid; place-items: center; background: #000; }
+#shell { position: fixed; inset: 0; display: grid; place-items: center; background: var(--page); }
 /* The stage fills the window; only the composition inside it is locked to
    16:9. Pinning the stage itself to 16:9 letterboxed the whole thing on any
    display that is not 16:9 — a laptop is usually 16:10 — and read as broken.
@@ -143,9 +172,11 @@ input, textarea { font: inherit; }
   overflow: hidden;
   /* The room. Both stops are driven from JS per value pool, so entering a
      pool changes the whole space rather than just tinting the object. */
-  --room-a: #0D1A2B;
-  --room-b: #04070C;
-  background: radial-gradient(130% 95% at 30% 20%, var(--room-a) 0%, var(--room-b) 62%, #02040A 100%);
+  /* Was a near-black radial. The renders are flattened onto white, so the
+     room behind them has to be white too or a seam shows at every plate edge. */
+  --room-a: #FFFFFF;
+  --room-b: #F4F9FE;
+  background: radial-gradient(130% 95% at 30% 20%, var(--room-a) 0%, var(--room-b) 62%, #EDF5FC 100%);
   transition: background 900ms var(--ease);
   isolation: isolate;
 }
@@ -182,60 +213,77 @@ input, textarea { font: inherit; }
 }
 #bgA.on, #bgB.on { opacity: 1; }
 
-/* Only the two screens whose plates are bright where the chrome sits. Sized to
-   the stage, so it reaches the top of the window rather than the top of the
-   frame. */
-#topScrim {
-  position: absolute; inset: 0 0 auto 0; height: 22%;
-  z-index: 2; pointer-events: none;
-  opacity: 0; transition: opacity 700ms var(--ease);
-  background: linear-gradient(180deg,
-    rgba(0, 22, 40, 0.86) 0%, rgba(0, 22, 40, 0.44) 46%, rgba(0, 22, 40, 0) 100%);
-}
-#stage[data-view='attract'] #topScrim,
-#stage[data-view='intro'] #topScrim { opacity: 1; }
+/* The design lays two white washes over every render: a band down from the top
+   at 25% height, and one in from the right edge across 46% of the width. They
+   are what lets type sit anywhere on the glass, so they are not decoration and
+   they are on for every screen, not just the two the dark scrim covered.
 
-/* Attract carries the whole screen: the 3D ring and the floor grid are off here,
-   so the plate is the composition. */
-#stage[data-view='attract'] #bg {
-  background-image: url('../images/bg-attract.jpg');
+   Both were dark navy. On a white ground the same job needs white. */
+/* z-index 1, not 2. These wash the RENDER so type can sit on it; they must
+   never come between the plate and the content. #views is 5. */
+#topScrim {
+  position: absolute; inset: 0 0 auto 0; height: 25%;
+  z-index: 1; pointer-events: none;
+  opacity: 1;
+  background: var(--wash-top);
 }
-#stage[data-view='explore'] #bg {
-  background-image: url('../images/bg-explore.jpg');
+/* The side wash follows the copy column, so it flips with the layout: the
+   diagnostic reads on the right, the pool screens read on the left. */
+#sideScrim {
+  position: absolute; inset: 0 0 0 auto; width: 46%;
+  z-index: 1; pointer-events: none;
+  opacity: 0; transition: opacity 700ms var(--ease);
+  background: var(--wash-side);
 }
-#stage[data-view='intro'] #bg {
-  background-image: url('../images/bg-intro.jpg');
-}
-#stage[data-view='diag'] #bg {
-  background-image: url('../images/bg-diag.jpg');
-}
-#stage[data-view='identify'] #bg {
-  background-image: url('../images/bg-identify.jpg');
-}
-/* Opening a pool swaps to that pool's own plate — Khai's artwork, exported from
-   the Figma file. Each is composed with its form on the right, behind the slabs,
-   and its left side dark for the copy column. They are blue rather than
-   per-pool: the pool now reads from the slabs, eyebrow, markers and dots. The
-   overview keeps the neutral explore plate, since nothing is open. */
-#stage[data-view='explore'][data-pool='data']     #bg { background-image: url('../images/bg-pool-data.jpg'); }
-#stage[data-view='explore'][data-pool='strategy'] #bg { background-image: url('../images/bg-pool-strategy.jpg'); }
-#stage[data-view='explore'][data-pool='process']  #bg { background-image: url('../images/bg-pool-process.jpg'); }
-#stage[data-view='explore'][data-pool='legacy']   #bg { background-image: url('../images/bg-pool-legacy.jpg'); }
-#stage[data-view='explore'][data-pool='physical'] #bg { background-image: url('../images/bg-pool-physical.jpg'); }
-#stage[data-view='explore'][data-pool='trust']    #bg { background-image: url('../images/bg-pool-trust.jpg'); }
-/* Khai's pool plates are finished artwork with their own blacks, not a texture
-   meant to sit over the room gradient. Screen blending at 0.30 washed them out
-   and greyed their darks, so the pool case blends normally at full strength.
-   Every other screen keeps screen blending — those plates are still textures. */
+/* Only where the copy reads on the right and the view has no wash of its own.
+   The explore and pool screens are deliberately absent: they carry their own
+   .copy-scrim over the left column, and running both put two white washes on
+   the same column and flattened the panel into the plate. */
+#stage[data-view='diag'] #sideScrim,
+#stage[data-view='identify'] #sideScrim,
+#stage[data-view='wrap'] #sideScrim { opacity: 1; }
+
+/* Every plate is now a baked 3D glass render from the design file, flattened
+   onto white and shipped at the frame's own 1920 wide. They replace the
+   photographic placeholders: the design carries each screen on one of these
+   rather than on a texture, so there is nothing left for the room gradient to
+   show through. */
+#stage[data-view='attract']  #bg { background-image: url('../images/v4/attract.jpg'); }
+#stage[data-view='intro']    #bg { background-image: url('../images/v4/framework.jpg'); }
+#stage[data-view='explore']  #bg { background-image: url('../images/v4/explore.jpg'); }
+#stage[data-view='diag']     #bg { background-image: url('../images/v4/diag-strategy.jpg'); }
+#stage[data-view='identify'] #bg { background-image: url('../images/v4/explore.jpg'); }
+
+/* Opening a pool swaps to that pool's own render. */
+#stage[data-view='explore'][data-pool='strategy'] #bg { background-image: url('../images/v4/pool-strategy.jpg'); }
+#stage[data-view='explore'][data-pool='data']     #bg { background-image: url('../images/v4/pool-data.jpg'); }
+#stage[data-view='explore'][data-pool='process']  #bg { background-image: url('../images/v4/pool-process.jpg'); }
+#stage[data-view='explore'][data-pool='legacy']   #bg { background-image: url('../images/v4/pool-legacy.jpg'); }
+#stage[data-view='explore'][data-pool='physical'] #bg { background-image: url('../images/v4/pool-physical.jpg'); }
+#stage[data-view='explore'][data-pool='trust']    #bg { background-image: url('../images/v4/pool-trust.jpg'); }
+
+/* And the diagnostic follows the pool being asked about, which the design does
+   too: one render per question. app.js sets data-pool on the diagnostic now. */
+#stage[data-view='diag'][data-pool='strategy'] #bg { background-image: url('../images/v4/diag-strategy.jpg'); }
+#stage[data-view='diag'][data-pool='data']     #bg { background-image: url('../images/v4/diag-data.jpg'); }
+#stage[data-view='diag'][data-pool='process']  #bg { background-image: url('../images/v4/diag-process.jpg'); }
+#stage[data-view='diag'][data-pool='legacy']   #bg { background-image: url('../images/v4/diag-legacy.jpg'); }
+#stage[data-view='diag'][data-pool='physical'] #bg { background-image: url('../images/v4/diag-physical.jpg'); }
+#stage[data-view='diag'][data-pool='trust']    #bg { background-image: url('../images/v4/diag-trust.jpg'); }
 
 /* Nitin's note: soft, near-plain, blue on blue. Each beat gets its own plate,
    each built around where that beat puts its copy — so the pattern is always
    somewhere the reading is not. */
-#stage[data-view='wrap'][data-beat='1'] #bg { background-image: url('../images/bg-beat1.jpg'); }
-#stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/bg-beat2.jpg'); }
-#stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/bg-beat4.jpg'); }
+/* The results beats and the closing screen have no design yet, so they take the
+   calmest of the new renders rather than keeping a dark plate next to fifteen
+   light ones. It is the near-plain one, which is what these screens want
+   anyway: six scored rows and a paragraph, with the artwork staying out of the
+   reading. Replace per screen when the designs land. */
+#stage[data-view='wrap'][data-beat='1'] #bg { background-image: url('../images/v4/explore.jpg'); }
+#stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/v4/explore.jpg'); }
+#stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/v4/explore.jpg'); }
 #stage[data-view='done'] #bg {
-  background-image: url('../images/bg-done.jpg');
+  background-image: url('../images/v4/explore.jpg');
 }
 
 /* Attract's background film, and the 20% black over it. Both sit above #bg and
@@ -280,11 +328,16 @@ input, textarea { font: inherit; }
 
 /* --blue-lift measured 2.91:1 over the film. White clears it without
    pushing the scrim so dark the film stops reading as motion. */
-#v-attract .label { color: var(--fg); }
+#v-attract .label { color: var(--brand); }
+/* Attract only: blue sentence, ink accent. The reverse of every other heading,
+   and the reverse of what the dark build did. */
+#v-attract .d-xl { color: var(--brand); }
+#v-attract .d-xl em { color: var(--ink); }
+#v-attract .sub { color: var(--brand); }
 
 /* The plate is the video's poster, so it must not paint over it as well. */
 #stage[data-view='attract'] #bgVideo,
-#stage[data-view='attract'] #bgVideoScrim { opacity: 1; }
+#stage[data-view='attract'] #bgVideoScrim { opacity: 0; }
 
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
@@ -339,27 +392,25 @@ input, textarea { font: inherit; }
   border-radius: 10px;
   transition: background 0.2s var(--ease);
 }
-.brand:active { background: rgba(184, 212, 236, 0.10); }
+.brand:active { background: rgba(0, 76, 119, 0.10); }
 .brand:focus-visible { outline: 1px solid var(--blue-lift); outline-offset: 3px; }
-/* brightness(0) crushes the mark to black, invert(1) lifts it to pure white,
-   independent of whatever colours the SVG ships with. */
+/* Was crushed to black then inverted to white for the dark ground. On white
+   that is a white mark on white. The same trick without the invert gives a
+   solid dark mark, then a hue rotation lands it on the design's #01183b
+   rather than flat black. */
 .brand img {
   height: clamp(15px, 1.15cqw, 21px); width: auto;
-  filter: brightness(0) invert(1);
+  filter: brightness(0) saturate(100%) invert(9%) sepia(35%) saturate(3200%) hue-rotate(199deg) brightness(94%) contrast(101%);
 }
-.brand .div { width: 1px; height: 14px; background: var(--hair); }
+.brand .div { width: 1px; height: 14px; background: rgba(1, 24, 59, 0.35); }
 .brand span {
   font-family: var(--label); font-weight: 500;
   font-size: clamp(13.1px, 0.856cqw, 16.6px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--deep);
 }
 
-/* Brand line is --fg-3 everywhere else, which clears AA on the darker plates.
-   Over the framework screen's pale one it reached only 3.94:1 even with the
-   top scrim, so it takes the brightest token there rather than pushing the
-   scrim darker and dulling the artwork. */
-#stage[data-view='intro'] .brand span,
-#stage[data-view='attract'] .brand span { color: var(--fg); }
+/* One colour now: the lockup is --deep on every screen, because every screen
+   is the same white and the top wash guarantees the ground under it. */
 
 /* ---------- views ------------------------------------------- */
 
@@ -388,7 +439,7 @@ input, textarea { font: inherit; }
    words rather than as progress through the questions. */
 .qprog {
   position: relative; height: 3px; border-radius: 2px;
-  background: rgba(184, 212, 236, 0.16);
+  background: rgba(0, 76, 119, 0.16);
   margin: 0 0 var(--s4);
   overflow: hidden;
 }
@@ -440,7 +491,7 @@ input, textarea { font: inherit; }
 /* Insurance for the copy column. Khai's plates each keep their left side dark,
    but the build should not depend on the next one doing the same. */
 #v-explore .copy-scrim {
-  position: absolute; inset: 0;
+  position: absolute; inset: 0; z-index: 0;
   /* Two gradients, one element: the left band carries the copy column, the
      bottom band carries the swipe and framework affordances, which otherwise
      sit on bright glass and stop being readable. */
@@ -448,9 +499,9 @@ input, textarea { font: inherit; }
      to settle the artwork behind the footer chrome, not carry text contrast. */
   background:
     linear-gradient(90deg,
-      rgba(0, 36, 63, 0.52) 0%, rgba(0, 36, 63, 0.34) 38%, rgba(0, 36, 63, 0) 62%),
+      rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.42) 38%, rgba(255, 255, 255, 0) 62%),
     linear-gradient(0deg,
-      rgba(0, 36, 63, 0.72) 0%, rgba(0, 36, 63, 0.30) 10%, rgba(0, 36, 63, 0) 18%);
+      rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.38) 10%, rgba(255, 255, 255, 0) 18%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 520ms var(--ease);
@@ -491,8 +542,8 @@ input, textarea { font: inherit; }
   /* Left gradient only. The top band it used to carry is #topScrim now. */
   background:
     linear-gradient(96deg,
-      rgba(0, 22, 40, 0.92) 0%, rgba(0, 22, 40, 0.84) 26%,
-      rgba(0, 22, 40, 0.34) 46%, rgba(0, 22, 40, 0.10) 62%, rgba(0, 22, 40, 0.06) 100%);
+      rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.86) 26%,
+      rgba(255, 255, 255, 0.40) 46%, rgba(255, 255, 255, 0.12) 62%, rgba(255, 255, 255, 0.06) 100%);
   pointer-events: none;
 }
 .fw-lead { position: relative; animation: rise 0.6s var(--ease) both; }
@@ -543,7 +594,7 @@ input, textarea { font: inherit; }
   -webkit-backdrop-filter: blur(30px) saturate(1.3);
   border: 1px solid var(--glass-line);
   border-radius: 18px;
-  box-shadow: 0 18px 44px rgba(0, 10, 22, 0.34), inset 0 1px 0 var(--glass-lip);
+  box-shadow: var(--card-shadow);
 }
 .fw-num {
   font-family: var(--label); font-weight: 500;
@@ -576,7 +627,7 @@ input, textarea { font: inherit; }
   letter-spacing: 0.13em; text-transform: uppercase;
   color: var(--blue-lift);
 }
-.label.cool { color: var(--fg-2); }
+.label.cool { color: var(--brand); }
 
 .d-xl, .d-l, .d-m {
   font-family: var(--display); font-weight: 300;
@@ -586,7 +637,7 @@ input, textarea { font: inherit; }
 .d-xl { font-size: clamp(40px, 4.6cqw, 88px); }
 .d-l  { font-size: clamp(32px, 3.4cqw, 64px); }
 .d-m  { font-size: clamp(24px, 2.4cqw, 44px); }
-.d-xl em, .d-l em, .d-m em { font-style: normal; color: var(--blue-lift); }
+.d-xl em, .d-l em, .d-m em { font-style: normal; color: var(--brand); }
 
 p.lede {
   color: var(--fg-2); font-weight: 300;
@@ -601,34 +652,35 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 
 /* ---------- buttons: no boxes, a rule and a colour ---------- */
 
+/* A pill, from the design: 0.5px white hairline, radius 30, the shared blue
+   shadow, transparent fill. It was an underlined text link, which on a light
+   ground read as neither a control nor a link. Height comes from padding rather
+   than the design's fixed 71px so a longer label still fits.
+   The design uses --btn-ink for every control, primary included; primary is
+   distinguished by the fill it carries rather than by its colour. */
 .btn {
   font-family: var(--label); font-weight: 500;
   font-size: clamp(13.0px, 0.857cqw, 16.4px);
   letter-spacing: 0.13em; text-transform: uppercase;
-  color: var(--fg);
-  display: inline-flex; align-items: center; gap: var(--s2);
-  padding: var(--s2) 0;
+  color: var(--btn-ink);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  padding: clamp(14px, 1.35cqw, 26px) clamp(20px, 2.0cqw, 40px);
+  min-height: clamp(48px, 4.6cqw, 71px);
+  border: 0.5px solid var(--pill-line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--pill-shadow);
   position: relative;
-  transition: color 0.24s var(--ease), gap 0.24s var(--ease);
+  transition: background 0.24s var(--ease), color 0.24s var(--ease), box-shadow 0.24s var(--ease);
 }
-.btn::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: var(--fg-4); transition: background 0.24s var(--ease), transform 0.3s var(--ease-mech);
-  transform-origin: left;
-}
-.btn:active { color: var(--blue-lift); gap: calc(var(--s2) + 6px); }
-.btn:active::after { background: var(--blue-lift); }
+.btn:active { background: rgba(255, 255, 255, 0.55); }
 
-.btn.primary { color: var(--blue-lift); }
-.btn.primary::after { background: var(--blue); height: 2px; }
-.btn.primary:active { color: var(--fg); }
-.btn.primary:active::after { background: var(--blue-lift); }
+.btn.primary { background: var(--pill-fill); color: var(--btn-ink); }
+.btn.primary:active { background: rgba(0, 136, 255, 0.32); }
 
-/* Sits out on the plate in overview mode, where --fg-3 measured 4.18:1. */
-.btn.quiet { color: var(--fg-2); }
-.btn.quiet::after { background: transparent; }
-.btn.quiet:active { color: var(--fg); }
-.btn:disabled { opacity: 0.28; pointer-events: none; }
+/* No fill, so it reads as the secondary of a pair. */
+.btn.quiet { background: transparent; color: var(--btn-ink); }
+.btn.quiet:active { background: rgba(255, 255, 255, 0.55); }
+.btn:disabled { opacity: 0.4; pointer-events: none; }
 .btn .arrow { font-family: var(--body); font-size: 1.15em; }
 
 /* ---------- attract ----------------------------------------- */
@@ -745,7 +797,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    modes are a class on the view, so nothing has to be rebuilt between them. */
 
 #v-explore .col {
-  pointer-events: auto;
+  pointer-events: auto; z-index: 1;
   position: absolute; top: var(--pad-t); left: var(--pad-x); bottom: var(--pad-b);
   /* Keep in step with the 0.46 the scene solves the free width from. */
   width: 42%; max-width: 620px;
@@ -809,7 +861,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   border-radius: 10px;
   transition: color 0.2s var(--ease), background 0.2s var(--ease);
 }
-.pn-arrow:active { color: var(--fg); background: rgba(184, 212, 236, 0.12); }
+.pn-arrow:active { color: var(--fg); background: rgba(0, 76, 119, 0.12); }
 .pn-arrow:focus-visible { outline: 1px solid var(--blue-lift); outline-offset: 2px; }
 .pool-dots { display: flex; gap: 7px; }
 .pool-dots i {
@@ -838,11 +890,11 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   text-align: left; display: flex; flex-direction: column; gap: var(--s1);
   padding: var(--s3) var(--s3) var(--s4);
   border-top: 2px solid var(--tile-accent);
-  background: rgba(243, 247, 251, 0.028);
+  background: rgba(0, 76, 119, 0.028);
   transition: background 0.22s var(--ease), transform 0.22s var(--ease);
 }
-.tile:active { background: rgba(243, 247, 251, 0.075); }
-.tile.pending { border-top-color: var(--fg-4); background: rgba(243, 247, 251, 0.014); }
+.tile:active { background: rgba(0, 76, 119, 0.075); }
+.tile.pending { border-top-color: var(--fg-4); background: rgba(0, 76, 119, 0.014); }
 .tile .t-n {
   font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.759cqw, 14.5px);
   letter-spacing: 0.13em; color: var(--fg-4);
@@ -926,7 +978,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* An even split, after trying 70 and 60. Both left the panel wider than its
    content wanted to be, which is what read as awkward. */
 #v-diag .qcol {
-  pointer-events: auto;
+  pointer-events: auto; z-index: 1;
   position: absolute; top: var(--pad-t); right: var(--pad-x); bottom: var(--pad-b);
   width: 50%; max-width: 900px;
   display: flex; flex-direction: column; justify-content: center;
@@ -954,13 +1006,15 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   margin-top: var(--s5);
   display: flex; align-items: center; gap: clamp(14px, 1.2cqw, 24px);
   text-align: left; width: 100%;
-  padding: clamp(12px, 1.05cqw, 21px) clamp(14px, 1.25cqw, 25px);
-  background: rgba(243, 247, 251, 0.045);
-  border-radius: calc(var(--radius) * 0.5);
-  transition: background 0.22s var(--ease);
+  padding: clamp(14px, 1.3cqw, 26px) clamp(18px, 1.7cqw, 34px);
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.22s var(--ease);
 }
 .qcase[hidden] { display: none; }
-.qcase:active { background: rgba(243, 247, 251, 0.095); }
+.qcase:active { box-shadow: 2px 4px 14px 2px rgba(0, 124, 195, 0.12); }
 /* The pool's colour, as an edge rather than a fill: at this size a coloured
    panel competes with the slider for attention. */
 .qc-bar { flex: none; width: 2px; align-self: stretch; min-height: 30px; background: var(--blue); border-radius: 2px; }
@@ -968,19 +1022,20 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* White, not blue. Blue-lift is the instrument and the primary action; a
    coloured number here read as a second headline competing with the question. */
 .qc-metric {
-  font-family: var(--display); font-weight: 300;
-  font-size: clamp(18px, 1.28cqw, 24px); line-height: 1.16; letter-spacing: -0.018em;
-  color: var(--fg);
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(18px, 1.35cqw, 26px); line-height: 1.16; letter-spacing: -0.01em;
+  color: var(--ink);
 }
 .qc-sub {
   display: flex; flex-wrap: wrap; gap: 0 8px;
   font-size: clamp(13.4px, 0.9cqw, 17.3px); line-height: 1.35; color: var(--fg-3);
 }
-.qc-sub b { font-weight: 500; color: var(--fg-2); }
+.qc-sub b { font-weight: 500; color: var(--ink); }
 .qc-sub b::after { content: ' ·'; color: var(--fg-4); font-weight: 400; }
 .qc-more {
   margin-left: auto; flex: none;
-  font-size: clamp(13.4px, 0.9cqw, 17.3px); color: var(--fg-3);
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(13.4px, 0.94cqw, 18px); color: var(--blue-lift);
   display: inline-flex; align-items: center; gap: 10px; min-height: 44px;
 }
 .qcase:active .qc-more { color: var(--blue-lift); }
@@ -990,7 +1045,11 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    used to change height and move Next with it; on a kiosk the hand should find
    the same place six times. The slack lands in the reading area under the
    slider, which is the one part of the panel that is meant to be quiet. */
-#v-diag .qpanel { display: flex; flex-direction: column; min-height: 77cqh; }
+#v-diag .qpanel {
+  display: flex; flex-direction: column; min-height: 77cqh;
+  background: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+  border: none; box-shadow: none; padding: 0;
+}
 #v-diag .mslider { margin-bottom: auto; }
 /* One row: which pool, what it is about, where you are. The theme used to be a
    second uppercase heading of its own directly above the question, saying in
@@ -998,7 +1057,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .qmeta { display: flex; align-items: baseline; gap: var(--s3); }
 .qmeta .pool-tag {
   font-family: var(--label); font-weight: 500; font-size: clamp(13.1px, 0.856cqw, 16.6px);
-  letter-spacing: 0.13em; text-transform: uppercase;
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--blue-lift);
 }
 /* Sentence case on purpose. Seven uppercase letterspaced labels on one screen
    is what "everything is shouting" looks like; this is now one of three. */
@@ -1056,12 +1115,12 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .ms-track::before {
   content: ''; position: absolute; left: 0; right: 0; top: 50%;
   height: 6px; margin-top: -3px; border-radius: 3px;
-  background: rgba(184, 212, 236, 0.20);
+  background: rgba(0, 76, 119, 0.20);
 }
 .ms-fill {
   position: absolute; left: 0; top: 50%; width: 0;
   height: 6px; margin-top: -3px; border-radius: 3px;
-  background: var(--blue-lift);
+  background: var(--brand);
   transition: width 0.18s var(--ease);
 }
 .ms-ticks {
@@ -1071,16 +1130,16 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 }
 .ms-ticks i {
   display: block; width: 12px; height: 12px; border-radius: 50%;
-  background: rgba(184, 212, 236, 0.34);
+  background: rgba(0, 76, 119, 0.34);
   transition: background 0.18s var(--ease), transform 0.18s var(--ease);
 }
-.ms-ticks i.on { background: var(--blue-lift); }
+.ms-ticks i.on { background: var(--brand); }
 .ms-thumb {
   position: absolute; top: 50%; left: 0;
   width: 34px; height: 34px; border-radius: 50%;
   transform: translate(-50%, -50%) scale(0.2);
-  background: var(--fg);
-  box-shadow: 0 4px 16px rgba(0, 10, 22, 0.5), 0 0 0 6px rgba(110, 200, 255, 0.18);
+  background: #FFFFFF;
+  box-shadow: 0 2px 10px rgba(0, 65, 108, 0.28), 0 0 0 6px rgba(0, 124, 195, 0.14);
   opacity: 0; pointer-events: none;
   transition: left 0.18s var(--ease), transform 0.2s var(--ease), opacity 0.2s var(--ease);
 }
@@ -1145,12 +1204,12 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .beat:not(#beat1)::before {
   content: ''; position: absolute; z-index: -1;
   inset: calc(var(--pad-t) * -1) calc(var(--pad-x) * -1) calc(var(--pad-b) * -1);
-  background: linear-gradient(180deg, rgba(0, 36, 63, 0.94) 0%, rgba(0, 40, 70, 0.88) 58%, rgba(0, 45, 76, 0.55) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 248, 254, 0.92) 58%, rgba(232, 242, 251, 0.62) 100%);
 }
 #beat1::before {
   content: ''; position: absolute; z-index: -1;
   inset: calc(var(--pad-t) * -1) calc(var(--pad-x) * -1) calc(var(--pad-b) * -1);
-  background: radial-gradient(84% 74% at 50% 36%, rgba(0, 36, 63, 0.90) 0%, rgba(0, 40, 70, 0.66) 55%, rgba(0, 45, 76, 0.20) 100%);
+  background: radial-gradient(84% 74% at 50% 36%, rgba(255, 255, 255, 0.94) 0%, rgba(244, 250, 255, 0.72) 55%, rgba(236, 246, 253, 0.24) 100%);
 }
 
 .beat-nav {
@@ -1204,7 +1263,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .bench-row .bd {
   font-size: clamp(13.0px, 0.82cqw, 15.4px); color: var(--fg-4); margin-top: 1px;
 }
-.track { position: relative; height: 6px; background: rgba(243, 247, 251, 0.07); }
+.track { position: relative; height: 6px; background: rgba(0, 76, 119, 0.07); }
 .track .fill { position: absolute; inset: 0 auto 0 0; width: 0; transition: width 1.1s var(--ease-mech); }
 .track .bmark { position: absolute; top: -7px; bottom: -7px; width: 1px; background: var(--fg-3); }
 .track .bmark.labelled::after {
@@ -1247,7 +1306,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-size: clamp(15.4px, 1.13cqw, 21.4px); line-height: 1.62;
   color: var(--fg); max-width: 62ch;
 }
-.fy-body b { font-weight: 500; }
+.fy-body b { font-weight: 500; color: var(--blue-lift); }
 .fy-proof { max-width: 420px; }
 .fy-proof[hidden] { display: none; }
 
@@ -1342,7 +1401,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   margin-bottom: var(--s4);
   display: grid; place-items: center;
   border: 1px solid var(--glass-line); border-radius: 50%;
-  background: rgba(243, 247, 251, 0.05);
+  background: rgba(0, 76, 119, 0.05);
 }
 .id-tick svg { width: 58%; height: 58%; overflow: visible; }
 .id-tick path {
@@ -1371,8 +1430,8 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-family: var(--label); font-weight: 500; font-size: 13px;
   letter-spacing: 0.13em; color: var(--fg-3);
   background:
-    repeating-linear-gradient(90deg, rgba(243, 247, 251, 0.11) 0 4px, transparent 4px 8px),
-    repeating-linear-gradient(0deg, rgba(243, 247, 251, 0.11) 0 4px, transparent 4px 8px);
+    repeating-linear-gradient(90deg, rgba(0, 76, 119, 0.11) 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(0deg, rgba(0, 76, 119, 0.11) 0 4px, transparent 4px 8px);
 }
 #v-done .reset-note {
   margin-top: var(--s5); font-family: var(--label); font-weight: 400;

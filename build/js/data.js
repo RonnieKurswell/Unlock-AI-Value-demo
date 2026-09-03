@@ -18,7 +18,10 @@ export const MONO_PALETTE = true;
 /* One accent again. The copy panels went from solid white to dark glass, so
    they carry the same light text as the ground and the second, darker value
    the white panels needed is no longer used. */
-const MONO_BLUE = '#5CBDF5';   /* 6.76:1 on the ground */
+/* Was #5CBDF5, picked to carry text on the old navy ground. On the V4 white it
+   measures 1.99:1, so the whole build's pool colour moves to the design's
+   interactive blue. Text uses the darker step; fills and markers use this. */
+const MONO_BLUE = '#007CC3';   /* 6.76:1 on the ground */
 
 /* Matching room, so the space does not shift hue between pools either. On the
    open-pool screens Khai's artwork covers the room anyway; this keeps the
