@@ -752,6 +752,12 @@ function fitFrame() {
   frame.style.setProperty('--k', k);
   frame.style.setProperty('--fx', `${Math.round((w - 1920 * k) / 2)}px`);
   frame.style.setProperty('--fy', `${Math.round((h - 1080 * k) / 2)}px`);
+  /* The plate layers live on the stage, not in the frame, so they need the
+     same scale to stay in register with the content. Without this they were
+     sized with `cover` against the WINDOW while the content was sized against
+     the 1920x1080 frame, so on any window that is not exactly 16:9 the artwork
+     was enlarged relative to the type. */
+  stage.style.setProperty('--k', k);
 }
 /* Three triggers, deliberately redundant, because each one alone has a hole.
    A window resize event can fire before the stage's new box is computed, so it

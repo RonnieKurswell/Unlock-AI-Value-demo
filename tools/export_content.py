@@ -240,9 +240,7 @@ sheet("Five-year view",
 
 # ---------- 10. Screen copy ----------
 SCREEN = [
- ("Attract", "Eyebrow", "AI-First Value Framework"),
  ("Attract", "Headline", "Are you ready to unlock your AI Value in insurance?"),
- ("Attract", "Subhead", "Two minutes. Six value pools. One blueprint."),
  ("Attract", "Touch cue", "Touch to begin"),
  ("All screens", "Brand line", "Unlock AI Value in Insurance"),
  ("Framework screen", "Eyebrow", "An Infosys framework"),
