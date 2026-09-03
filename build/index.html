@@ -33,7 +33,7 @@
        pauses it whenever the attract screen is not showing — a background video
        decoding behind the questionnaire would burn the kiosk's GPU for nothing. -->
   <video id="bgVideo" aria-hidden="true" muted loop playsinline preload="auto"
-         poster="images/bg-attract.jpg">
+         poster="images/v4/attract.jpg">
     <source src="media/attract.mp4" type="video/mp4">
   </video>
   <div id="bgVideoScrim" aria-hidden="true"></div>
@@ -93,10 +93,6 @@
         <p class="fw-lede">Infosys' own model for insurance, not an industry standard.
           Each pool is somewhere AI creates measurable value for carriers, and
           somewhere programmes commonly stall.</p>
-        <div class="fw-actions">
-          <button class="btn primary fw-go" id="introGo">Explore the six pools <span class="arrow">→</span></button>
-          <button class="btn quiet fw-skip" id="introDiag">Start the diagnostic <span class="arrow">→</span></button>
-        </div>
       </div>
       <ul class="fw-grid stagger">
         <li class="fw-card">
@@ -136,6 +132,10 @@
           <span class="fw-gist">Explainability, bias testing and audit trails built in from the start</span>
         </li>
       </ul>
+      <div class="fw-actions">
+        <button class="btn quiet fw-skip" id="introGo">Explore the six pools <span class="arrow">→</span></button>
+        <button class="btn primary fw-go" id="introDiag">Start the diagnostic <span class="arrow">→</span></button>
+      </div>
     </section>
 
     <!-- EXPLORE — framework hexagon left, reading right -->
