@@ -6,6 +6,7 @@
 import { HiveScene } from './scene.js';
 import { Drift } from './particles.js';
 import { Hexagon } from './hexagon.js';
+import { HexStep } from './hexstep.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
   classifyArchetype, BENCHMARK_MEDIAN, benchmarkFinePrint,
@@ -57,6 +58,7 @@ const scene = new HiveScene($('gl'));
 const USE_3D_HEX = new URLSearchParams(location.search).get('hex') === '3d';
 const hexagon = USE_3D_HEX ? null : new Hexagon($('hexWrap'));
 window.__hex = hexagon;   // debug handle, matching window.__scene and window.__drift
+const step = new HexStep($('qStep'));
 /* Measured twice over: it needs Geist loaded, and it needs the explore view
    actually on screen, because a hidden view measures zero. */
 let hexFitted = false;
@@ -537,7 +539,7 @@ function renderQuestion() {
   /* Spelled out rather than "01 / 18": at kiosk distance a slashed pair
      reads as a code, not as position in a sequence. */
   $('qCount').textContent = `Question ${S.qi + 1} of ${FLAT.length}`;
-  $('qProgFill').style.width = `${((S.qi + 1) / FLAT.length) * 100}%`;
+  step.set(S.qi, FLAT.length);
   $('qKind').textContent = q.kind;
   $('qText').textContent = q.q;
 

@@ -196,11 +196,15 @@
     <section class="view" id="v-diag">
       <div class="qcol">
         <div class="qpanel stagger">
-          <div class="qprog" aria-hidden="true"><i id="qProgFill"></i></div>
+          <!-- The stepper replaces the progress bar: six discrete questions
+               want six discrete steps, and it carries the number the meta row
+               used to spell out. js/hexstep.js draws it. -->
+          <div id="qStep"></div>
           <div class="qmeta">
             <span class="pool-tag" id="qPool">&nbsp;</span>
             <span class="qkind" id="qKind">&nbsp;</span>
-            <span class="count" id="qCount">Question 1 of 6</span>
+            <!-- The stepper says this visually; kept for screen readers. -->
+            <span class="count sr-only" id="qCount">Question 1 of 6</span>
           </div>
           <h2 class="qtext" id="qText">&nbsp;</h2>
           <!-- One slider per pool, snapping to five labelled stops. It starts
