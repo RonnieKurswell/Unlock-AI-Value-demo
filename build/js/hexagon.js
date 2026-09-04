@@ -40,8 +40,20 @@ const WEDGE = 'M 0 109.2194384614298 L 0 204.65210016424004 ' +
 
 /* Per pool: the wedge's transform, the texture's box, and where the two labels
    sit. `m` is an SVG matrix(a,b,c,d,e,f) built from Figma's absoluteTransform
-   [[a,c,e],[b,d,f]]. `box` is the exported PNG's frame rect. Label positions
-   are centres, with the rotation the file gives them. */
+   [[a,c,e],[b,d,f]]. `box` is the exported PNG's frame rect.
+
+   Label entries are [centre x, centre y, rotation], and the rotation is the
+   file's own value — which is COUNTER-clockwise positive. CSS rotate() is
+   clockwise positive, so it is negated once in _label and every consumer
+   after that works in CSS degrees. Using the file's numbers directly mirrored
+   all twelve labels about their own axis: each one still sat in its wedge, so
+   nothing overflowed and no test caught it, but every one of them leaned the
+   wrong way against the edge it is meant to run parallel to.
+
+   The check, if this ever needs re-deriving: a wedge's outer edge is local
+   x=189.383 running along local +y, so in frame space its direction is the
+   matrix's (c, d). For trust that is (0.866, -0.5), i.e. -30 degrees with y
+   pointing down — and the file gives that label rotation +29.4. */
 const SEG = {
   data: {
     m: [1, 0, 0, 1, 1053.3198, 362.2586],
@@ -169,7 +181,9 @@ export class Hexagon {
     this.host.appendChild(labels);
   }
 
-  _label(cls, lines, [cx, cy, rot], [bw, bh], max, poolId) {
+  _label(cls, lines, [cx, cy, figmaRot], [bw, bh], max, poolId) {
+    // Figma rotates counter-clockwise, CSS clockwise. Convert once, here.
+    const rot = -figmaRot;
     const n = document.createElement('span');
     n.className = cls;
     /* One element per line. The fit tests each line's own ink rather than the
@@ -260,15 +274,15 @@ export class Hexagon {
        seg-data.png, the unrotated wedge). The names are white and the verbs
        #0C364F, so each only has contrast on its own band.
 
-       The verbs are held to the light band, which costs them nothing. The
-       names are NOT held to the dark one, and that is a deliberate, flagged
-       compromise: "AI STRATEGY & ENGINEERING" and "AGENTIC LEGACY
-       MODERNIZATION" are two lines of Geist in a slot drawn for condensed
-       Tungsten, and confining their ink to an 85px band drags every name down
-       to 9px. Left free they sit at 16.5px and read as designed, but part of
-       those two spills onto the light band at about 2:1. Tungsten fixes it
-       outright; a shorter label on the hexagon would too. Until then this is
-       an open accessibility item, not a solved one. */
+       The verbs are held inside the light band, which costs them nothing at
+       19.3px. The names are left free, and the reason is the threshold rather
+       than the geometry: at 27px they are large text under WCAG, so they need
+       3:1, not 4.5. Measured against the real textures under the actual
+       per-line ink they run 4.06 to 5.40, so the one that reaches furthest
+       inboard — "AGENTIC LEGACY MODERNIZATION" at 4.06 — still clears it with
+       room. Holding them off the light band as well is possible, and costs
+       9.5px of type across all six names to fix a label that already passes,
+       so it is not done. */
     const BAND = { name: [-1e4, 1e4], verb: [0, 99] };
     const inside = n => {
       const seg = this.svg.querySelector(`.hex-seg[data-pool="${n.dataset.pool}"] .hex-hit`);

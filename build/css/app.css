@@ -893,7 +893,9 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* pre, not normal: the line breaks come from data.js so they match the file
    instead of falling wherever the box happens to end. */
 .hex-name { color: #FFFFFF; }
-.hex-labels b { display: block; font-weight: 500; line-height: 1.08; letter-spacing: 0.01em; }
+/* nowrap: the line breaks come from data.js so they match the file. Left to
+   wrap, a single-line name like PHYSICAL AI broke in two as the fit grew. */
+.hex-labels b { display: block; white-space: nowrap; font-weight: 500; line-height: 1.08; letter-spacing: 0.01em; }
 .hex-verb { color: #0C364F; }
 .hex-verb b { letter-spacing: 0.10em; }
 /* The centre lockup, in the file's own --brand. Sized to the design's 165px
