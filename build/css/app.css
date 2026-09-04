@@ -203,8 +203,20 @@ input, textarea { font: inherit; }
   background-repeat: no-repeat;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 900ms var(--ease-in-out-soft);
 }
+/* Two fixed roles rather than a ping-pong. #bgA is the plate on screen and is
+   never animated; #bgB is the one arriving, and it fades in over the top. That
+   ordering matters: the layers are stacked, not weighted, so fading the old one
+   out at the same time let the page white show through both. At the midpoint of
+   a symmetric cross-fade a quarter of the composite was flat white, which is
+   the pale flash the switch had. With the old plate held opaque underneath the
+   composite is exactly new*t + old*(1-t) and nothing shows between them.
+
+   The curve was --ease-in-out-soft, which is misnamed: cubic-bezier(0.16,1,0.3,1)
+   is expo-out. It put the fade 61% through in its first 100ms and then spent
+   600ms crawling the last 5% — a snap with a long dead tail. A dissolve wants a
+   symmetric curve, so this is sine-in-out. */
+#bgB { transition: opacity 800ms cubic-bezier(0.37, 0, 0.63, 1); }
 #bgA.on, #bgB.on { opacity: 1; }
 
 /* The design lays two white washes over every render: a band down from the top
@@ -340,6 +352,19 @@ input, textarea { font: inherit; }
 #stage[data-view='attract'] #bgVideoScrim { opacity: 0; }
 
 #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* The particle layer. z-index stays auto so it keeps its DOM position: above
+   the plates and the film, below the two white washes (z-index 1) and below
+   #frame (z-index 2). It is on for every screen — that is the point of it —
+   and the wash is what keeps it off the brand line and the right-hand copy. */
+#px {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  pointer-events: none;
+  opacity: 0; transition: opacity 900ms var(--ease);
+}
+#stage[data-view] #px { opacity: 1; }
+/* Attract runs a film, which already has motion of its own. */
+#stage[data-view='attract'] #px { opacity: 0.55; }
 /* Off by default, on for exactly one screen. Every V4 render already carries a
    3D object, so a canvas board on top of one is two objects on the same screen
    fighting each other. The framework overview is the exception, because there
@@ -986,7 +1011,11 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-family: var(--label); font-weight: 500; font-size: clamp(13.0px, 0.828cqw, 15.9px);
   letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
 }
-#seenCount { color: var(--blue-lift); }
+/* The numeral was --blue-lift, which at 23.8px / 500 measured 4.78:1 over the
+   busiest plate: a pass, but the thinnest margin on the screen, on the one
+   number that tells a visitor how far through they are. Emphasis moves from
+   hue to weight and the darkest ink, which takes it to about 13:1. */
+#seenCount { color: var(--ink); font-weight: 600; }
 
 /* ---------- diagnostic -------------------------------------- */
 

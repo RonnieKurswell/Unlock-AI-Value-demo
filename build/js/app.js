@@ -4,6 +4,7 @@
    ============================================================= */
 
 import { HiveScene } from './scene.js';
+import { Drift } from './particles.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
   classifyArchetype, BENCHMARK_MEDIAN, benchmarkFinePrint,
@@ -48,6 +49,8 @@ const S = {
 ORDER.forEach(id => { S.scores[id] = 0; });
 
 const scene = new HiveScene($('gl'));
+const drift = new Drift($('px'));
+window.__drift = drift;   // debug handle, matching window.__scene
 scene.start();
 
 // debug handle — framing checks and on-site kiosk troubleshooting
@@ -69,27 +72,49 @@ const BEAT_SCENE = i => (i === 0 ? 'results' : 'resultsQuiet');
    background-image is not an animatable property — changing it on one element
    is what made switching pool blip to the next image.
    ------------------------------------------------------------- */
-let plateFront = null;
+const PLATE_FADE = 800;                    // keep in step with #bgB in the CSS
+let plateSrc = null;
+let plateSettle = 0;
+
+/* #bgA holds what is on screen and never animates; #bgB is the plate arriving
+   and fades in over it. Once it has landed, settle() copies it down onto #bgA
+   and frees #bgB for the next one — invisible, because #bgB is opaque and
+   showing that exact image at the time. */
+function settlePlate() {
+  const base = $('bgA'), lead = $('bgB');
+  if (!lead.classList.contains('on')) return;
+  base.style.backgroundImage = lead.style.backgroundImage;
+  base.dataset.src = lead.dataset.src;
+  base.classList.add('on');
+  lead.style.transition = 'none';
+  lead.classList.remove('on');
+  void lead.offsetHeight;
+  lead.style.transition = '';
+}
 
 function syncPlate() {
   const want = getComputedStyle($('bg')).backgroundImage;
-  const a = $('bgA'), b = $('bgB');
-  const front = plateFront || a;
-  if (front.dataset.src === want) return;
+  const base = $('bgA'), lead = $('bgB');
+  if (plateSrc === want) return;
+
+  clearTimeout(plateSettle);
+  /* A swap landing mid-fade would leave a half-faded layer under the next one.
+     Land the one in flight onto the base first: it is already most of the way
+     in, so the step the eye sees is the small remainder rather than a cut. */
+  settlePlate();
 
   if (!want || want === 'none') {          // a state with no plate of its own
-    a.classList.remove('on');
-    b.classList.remove('on');
-    a.dataset.src = b.dataset.src = 'none';
+    base.classList.remove('on');
+    base.dataset.src = lead.dataset.src = 'none';
+    plateSrc = 'none';
     return;
   }
-  const back = front === a ? b : a;
-  back.style.backgroundImage = want;
-  back.dataset.src = want;
-  void back.offsetHeight;                  // so the opacity transition runs
-  back.classList.add('on');
-  front.classList.remove('on');
-  plateFront = back;
+  lead.style.backgroundImage = want;
+  lead.dataset.src = want;
+  void lead.offsetHeight;                  // so the opacity transition runs
+  lead.classList.add('on');
+  plateSrc = want;
+  plateSettle = setTimeout(settlePlate, PLATE_FADE + 60);
 }
 
 /* Decoded up front, so the first cross-fade into a plate is not a pop. */

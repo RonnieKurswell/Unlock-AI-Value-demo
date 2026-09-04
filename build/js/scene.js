@@ -78,7 +78,6 @@ export class HiveScene {
     this._ground();
     this._tiles();
     this._core();
-    this._dust();
     this._drift();
 
     this.raycaster = new THREE.Raycaster();
@@ -275,41 +274,10 @@ export class HiveScene {
     this.driftGroup = group;
   }
 
-  _dust() {
-    const N = 1400;
-    const pos = new Float32Array(N * 3), seed = new Float32Array(N);
-    for (let i = 0; i < N; i++) {
-      const r = 4 + Math.random() * 26, a = Math.random() * TAU;
-      pos[i * 3] = Math.cos(a) * r;
-      pos[i * 3 + 1] = Math.random() * 14 - 1;
-      pos[i * 3 + 2] = Math.sin(a) * r;
-      seed[i] = Math.random();
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
-    this.dustMat = new THREE.ShaderMaterial({
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      uniforms: { uTime: { value: 0 }, uSize: { value: 2.4 * Math.min(window.devicePixelRatio, 2) }, uTint: { value: new THREE.Color(0xaecbf5) } },
-      vertexShader: `attribute float aSeed; uniform float uTime; uniform float uSize; varying float vA;
-        void main(){
-          vec3 p = position;
-          p.y += sin(uTime*0.18 + aSeed*24.0)*0.9;
-          p.x += cos(uTime*0.11 + aSeed*17.0)*0.6;
-          vec4 mv = modelViewMatrix * vec4(p,1.0);
-          gl_Position = projectionMatrix * mv;
-          gl_PointSize = uSize * (1.0 + aSeed) * (12.0 / -mv.z);
-          vA = (0.16 + 0.5*aSeed) * smoothstep(46.0, 6.0, -mv.z);
-        }`,
-      fragmentShader: `varying float vA; uniform vec3 uTint;
-        void main(){
-          float d = length(gl_PointCoord - 0.5);
-          if (d > 0.5) discard;
-          gl_FragColor = vec4(uTint * 1.6, vA * (1.0 - d*2.0));
-        }`
-    });
-    this.scene.add(new THREE.Points(geo, this.dustMat));
-  }
+  /* _dust() lived here: 1400 additive points tinted 0xaecbf5. Additive
+     blending over a white ground draws nothing, so on the V4 theme it was a
+     shader running every frame for a field nobody could see. The visible
+     particle layer is js/particles.js, on its own canvas above the plates. */
 
   /* ---------- input ------------------------------------------ */
 
@@ -993,7 +961,6 @@ export class HiveScene {
 
     this.groundMat.uniforms.uTime.value = t;
     this.groundMat.uniforms.uFade.value = damp(this.groundMat.uniforms.uFade.value, this.groundFadeTarget, 3, dt);
-    this.dustMat.uniforms.uTime.value = t;
 
     /* Rotate and bob. Slow enough that it reads as ambient rather than as
        something asking to be looked at. */
@@ -1007,9 +974,6 @@ export class HiveScene {
 
     if (this.roomTarget) {
       this.scene.fog.color.lerp(this.roomDeep, 1 - Math.exp(-2.2 * dt));
-      this.dustTint = this.dustTint || new THREE.Color(0xaecbf5);
-      this.dustTint.lerp(this.roomTarget, 1 - Math.exp(-2.2 * dt));
-      this.dustMat.uniforms.uTint.value.copy(this.dustTint);
     }
 
     if (this.pickEnabled) {
