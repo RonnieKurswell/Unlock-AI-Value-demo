@@ -250,13 +250,13 @@ function stepPool(delta) {
 $('poolPrev').addEventListener('click', () => stepPool(-1));
 $('poolNext').addEventListener('click', () => stepPool(1));
 
-/* The scene reports the room it is moving to; the stage gradient follows so
-   the WebGL fog and the CSS backdrop agree. */
-scene.onRoom = ([a, b]) => {
-  const st = $('stage');
-  st.style.setProperty('--room-a', a);
-  st.style.setProperty('--room-b', b);
-};
+/* The scene still tracks a room per pool for its own fog, but that colour no
+   longer drives the CSS stage. The room palette is the dark theme's — entering
+   a pool was setting the stage gradient to #0A1A2B, and clearing one set it
+   back to the same navy. On the 16:9 kiosk the plate covers the stage so it
+   never showed; on any other aspect ratio the margin around the frame went
+   dark navy instead of the page white the plates are flattened onto. The
+   stage keeps the white room the CSS declares. */
 
 /* Build it up front so a fast tap never lands on an empty explore screen,
    then re-rasterise once the webfonts are in. */
@@ -311,13 +311,47 @@ function tileEl(p, t, i) {
   return b;
 }
 
+/* The case study reader. The metric is the headline and the case name sits
+   under it, which is the design's hierarchy: on a show floor the number is
+   what stops someone, and the engagement name means nothing until it has.
+
+   The article is optional. Where a case has one it gets the lead, the
+   labelled sections and the figures beside them; where it does not, `detail`
+   becomes the lead and both the sections and the figure column drop out. Six
+   of the eighteen cases have no content at all yet and eleven have no
+   article, so the short form is what most of them render today. */
 function openTile(p, t) {
-  $('tsRule').style.background = p.hex;
+  const art = t.article;
   $('tsClient').textContent = `${p.name} · ${t.client || 'Content pending'}`;
-  $('tsTitle').textContent = t.title;
   $('tsMetric').textContent = t.metric;
-  $('tsMetric').style.color = t.pending ? 'var(--fg-3)' : p.hex;
-  $('tsDetail').textContent = t.detail;
+  $('tsMetric').style.color = t.pending ? 'var(--fg-4)' : '';
+  $('tsTitle').textContent = t.title;
+  $('tsLead').textContent = (art && art.lead) || t.detail || '';
+
+  const sects = $('tsSections');
+  sects.textContent = '';
+  for (const [label, body] of (art && art.sections) || []) {
+    const w = el('div', 'ts-sect');
+    const h = el('h4'); h.textContent = label;
+    const b = el('p');  b.textContent = body;
+    w.append(h, b);
+    sects.appendChild(w);
+  }
+
+  const stats = $('tsStats');
+  stats.textContent = '';
+  for (const [figure, label] of (art && art.stats) || []) {
+    const w = el('div', 'ts-stat');
+    const f = el('b');    f.textContent = figure;
+    const l = el('span'); l.textContent = label;
+    w.append(f, l);
+    stats.appendChild(w);
+  }
+
+  // Hug the content when there is no article; hold the design's height when
+  // there is, so the approved layout stays exact for the full case.
+  $('tileSheet').querySelector('.ts-card').classList.toggle('short', !art);
+
   const flag = $('tsFlag');
   if (t.pending) {
     flag.hidden = false;
@@ -333,7 +367,11 @@ function openTile(p, t) {
 
 const closeTile = () => $('tileSheet').classList.remove('on');
 $('tileClose').onclick = closeTile;
-$('tileSheet').addEventListener('pointerdown', e => { if (e.target === $('tileSheet')) closeTile(); });
+/* Tapping the render outside the sheet closes it too. The scrim is its own
+   element now, so the test is against that rather than the container. */
+$('tileSheet').addEventListener('pointerdown', e => {
+  if (e.target === $('tileSheet') || e.target.classList.contains('ts-scrim')) closeTile();
+});
 
 /* Keyboard parity with the booth build: 1–6 select, arrows cycle, Esc clears. */
 function exploreKeys(e) {

@@ -365,15 +365,28 @@
 
   </div>
 
-  <!-- proof tile detail -->
+  <!-- The case study reader. Full screen, floating over whatever plate is
+       showing, so the screen you came from stays visible behind it rather
+       than being replaced. Figma: node 333:276 in the V4 file. -->
   <div id="tileSheet">
-    <div class="ts-card" role="dialog" aria-modal="true">
-      <button id="tileClose">Close ✕</button>
-      <div class="ts-rule" id="tsRule"></div>
-      <span class="label cool" id="tsClient">&nbsp;</span>
-      <h3 class="ts-title" id="tsTitle">&nbsp;</h3>
-      <div class="ts-metric" id="tsMetric">&nbsp;</div>
-      <p class="body" id="tsDetail">&nbsp;</p>
+    <div class="ts-scrim" aria-hidden="true"></div>
+    <div class="ts-card" role="dialog" aria-modal="true" aria-labelledby="tsMetric tsTitle">
+      <div class="ts-top">
+        <span class="ts-eyebrow" id="tsClient">&nbsp;</span>
+        <button id="tileClose"><span class="arrow back" aria-hidden="true">←</span> Back to the question</button>
+      </div>
+      <div class="ts-hero">
+        <h3 class="ts-metric" id="tsMetric">&nbsp;</h3>
+        <p class="ts-title" id="tsTitle">&nbsp;</p>
+      </div>
+      <div class="ts-rule" aria-hidden="true"></div>
+      <div class="ts-body">
+        <div class="ts-article">
+          <p class="ts-lead" id="tsLead">&nbsp;</p>
+          <div class="ts-sections" id="tsSections"></div>
+        </div>
+        <div class="ts-stats" id="tsStats"></div>
+      </div>
       <div class="pending-note" id="tsFlag" hidden></div>
     </div>
   </div><!-- /views -->

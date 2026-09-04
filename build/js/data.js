@@ -124,6 +124,16 @@ export const POOLS = [
    THREE PROOF TILES PER POOL. Real engagements where the source
    documents have one; `pending` where they do not, so the gap is
    visible on the kiosk instead of being filled with invention.
+
+   A tile may also carry `article`, which is what the full-screen reader
+   renders: a lead, up to three labelled sections, and up to three figures
+   for the column beside them. It is optional on purpose. Only one case has
+   it so far, because the source documents give two sentences per engagement
+   and an article needs 120-180 words that somebody has to write and sign
+   off. Without it the reader shows `detail` as the lead and drops the
+   sections and the figures — see openTile in app.js. That degradation is
+   the feature: a case with no article looks short, not broken, and nothing
+   here is invented to fill the space.
    ------------------------------------------------------------- */
 
 export const TILES = {
@@ -145,7 +155,24 @@ export const TILES = {
   ],
   process: [
     { client: 'Global specialty insurer', title: 'Underwriting workbench', metric: 'Request-to-bind up 50%',
-      detail: 'Underwriters spent 1\u20132 hours per submission just qualifying it. AI Next orchestrated triage, auto-decline and IGO/NIGO classification; manual effort and operations TCO both halved.' },
+      detail: 'Underwriters spent 1\u20132 hours per submission just qualifying it. AI Next orchestrated triage, auto-decline and IGO/NIGO classification; manual effort and operations TCO both halved.',
+      /* The article Huw and John signed off with the reader design. It is the
+         detail above re-cut into sections; the one line that goes past the
+         source is "submissions arrived faster than the team could triage
+         them", which is an inference and still wants Anshul's tick. */
+      article: {
+        lead: 'Underwriters spent one to two hours per submission just qualifying it \u2014 reading the slip, checking appetite, deciding whether it was even worth a quote.',
+        sections: [
+          ['The challenge', 'Submissions arrived faster than the team could triage them, and the work was the same every time: is this in appetite, is it complete, is it worth quoting.'],
+          ['What Infosys built', 'AI Next orchestrated the front of the journey \u2014 triage, auto-decline and IGO/NIGO classification \u2014 so a submission reaches an underwriter already sorted and scored against appetite.'],
+          ['The outcome', 'Manual effort and operations TCO both halved. Underwriters spend their hours on the submissions worth winning.']
+        ],
+        stats: [
+          ['Halved', 'manual qualifying effort'],
+          ['Halved', 'operations TCO'],
+          ['1\u20132 hrs', 'per submission, before']
+        ]
+      } },
     { client: 'US retirement benefits provider', title: 'Hardship withdrawals', metric: '10\u201314 days to under 30 minutes',
       detail: 'Retirement benefits processing cost over $100 per transaction with NIGO above 65%. Straight-through processing cut cost under $10 and NIGO below 5%.' },
     { client: 'US property insurer', title: 'Statement of Values processing', metric: '80% less manual effort',
