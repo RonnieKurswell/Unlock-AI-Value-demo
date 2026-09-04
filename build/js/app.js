@@ -880,20 +880,52 @@ renderPool(POOLS[0].id);
 paintDots(-1);
 $('backToFramework').addEventListener('click', () => board.clear());
 
-/* Swipe to change pool. The board bound this to its own canvas, which only
-   worked because an opacity-0 canvas still takes pointer events; with the SVG
-   hexagon there is no canvas over the focus screen, so it lives on the view.
-   Same rule as before: only while a pool is open, horizontal, and past a
-   threshold no tap can reach. */
+/* Swipe to change pool.
+   ---
+   The board bound this to its own canvas, which worked only because an
+   opacity-0 canvas still takes pointer events. The obvious replacement was
+   #v-explore, and that silently did nothing: the view carries
+   `pointer-events: none` on purpose, so taps fell through to the canvas
+   underneath. It listens on the document and gates on state instead, which
+   also means the gesture works wherever it starts rather than only over the
+   handful of children that opt back in.
+
+   Same rule as the board's: only while a pool is open, horizontal, and past a
+   threshold no tap can reach. The threshold is a share of the frame so it
+   behaves the same whatever --k is. */
 if (!USE_3D_HEX) {
+  const swipeLive = () =>
+    S.view === 'explore' && board.selected >= 0 && !$('tileSheet').classList.contains('on');
+  const threshold = () => $('frame').getBoundingClientRect().width * (70 / 1920);
+
   let down = null;
-  const view = $('v-explore');
-  view.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; }, { passive: true });
-  view.addEventListener('pointerup', e => {
-    if (!down || board.selected < 0) { down = null; return; }
+  document.addEventListener('pointerdown', e => {
+    down = swipeLive() ? { x: e.clientX, y: e.clientY } : null;
+  }, { passive: true });
+  document.addEventListener('pointerup', e => {
+    if (!down || !swipeLive()) { down = null; return; }
     const dx = e.clientX - down.x, dy = e.clientY - down.y;
     down = null;
-    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) board.cycle(dx < 0 ? 1 : -1);
+    if (Math.abs(dx) > threshold() && Math.abs(dx) > Math.abs(dy) * 1.5) board.cycle(dx < 0 ? 1 : -1);
+  }, { passive: true });
+  document.addEventListener('pointercancel', () => { down = null; }, { passive: true });
+
+  /* A two-finger trackpad swipe is a wheel event, not a drag. The kiosk is a
+     touchscreen and never sends these, but every review of this happens on a
+     laptop, where "swipe" means the trackpad and nothing was happening.
+     Accumulated with a short lock so one gesture moves one pool rather than
+     flying through all six. */
+  let wheelAcc = 0, wheelUntil = 0;
+  document.addEventListener('wheel', e => {
+    if (!swipeLive() || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    const now = performance.now();
+    if (now < wheelUntil) return;
+    wheelAcc += e.deltaX;
+    if (Math.abs(wheelAcc) > 120) {
+      board.cycle(wheelAcc > 0 ? 1 : -1);
+      wheelAcc = 0;
+      wheelUntil = now + 600;
+    }
   }, { passive: true });
 }
 $('beginDiagOv').addEventListener('click', startDiagnostic);
