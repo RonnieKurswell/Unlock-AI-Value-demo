@@ -262,23 +262,44 @@
          reader, the manual-form toggle and the name and title fields are all
          gone with it. -->
     <section class="view" id="v-identify">
+      <!-- Figma node 326:280. Two fields now: the design puts a name above
+           the email. The name is optional — the email is the only thing the
+           report actually needs, and a kiosk should not stop someone who
+           will not give their name. -->
+      <div class="id-ask" id="idAsk">
+        <img class="id-art" src="images/id/report.png" alt="" aria-hidden="true">
+        <span class="id-eyebrow">Smart analysis</span>
+        <h2 class="id-title">Access the diagnostic result</h2>
+
+        <form class="id-form" id="emailForm" novalidate>
+          <label class="id-field">
+            <span class="sr-only">Your name (optional)</span>
+            <input type="text" id="mfName" autocomplete="name" placeholder="Enter your name">
+            <!-- The design carries an icon beside each placeholder. Both are
+               shown only while the field is empty, which is where a
+               placeholder's job ends. -->
+            <span class="id-ph" aria-hidden="true">
+            <svg class="id-ph-ico" viewBox="0 0 17.18 17.18" fill="none">
+              <path d="M0.75 16.4242H4.10865L16.4242 4.10865L13.0652 0.75L0.75 13.0656V16.4242Z"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.70652 4.10865L13.0652 7.46729"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Enter your name
+            </span>
+          </label>
+          <label class="id-field">
+            <span class="sr-only">Work email</span>
+            <input type="email" id="mfEmail" autocomplete="email"
+                 inputmode="email" placeholder="Enter your email"
+                 aria-describedby="mfError">
+            <span class="id-ph" aria-hidden="true"><b class="id-ph-at">@</b> Enter your email</span>
+          </label>
+          <button class="btn primary id-go" type="submit">Access now <span class="arrow">&#8594;</span></button>
+          <p class="mf-error" id="mfError" role="alert"></p>
+        </form>
+      </div>
       <div class="deliver-wrap">
-        <div class="id-ask" id="idAsk">
-          <h2 class="d-xl id-title">Your blueprint is ready</h2>
-          <p class="lede">Add your email and we will send the full report, with the case studies behind every score.</p>
-
-          <form class="email-form" id="emailForm" novalidate>
-            <label class="ef-field">
-              <span class="ef-label">Work email</span>
-              <input type="email" id="mfEmail" autocomplete="email"
-                     inputmode="email" placeholder="name@company.com"
-                     aria-describedby="mfError">
-            </label>
-            <button class="btn primary" type="submit">See my results <span class="arrow">&#8594;</span></button>
-            <p class="mf-error" id="mfError" role="alert"></p>
-          </form>
-        </div>
-
         <!-- Shown in place of the form once the address is in. It advances on
              its own, because an extra tap to acknowledge a confirmation is a
              tap nobody wants on a kiosk. -->

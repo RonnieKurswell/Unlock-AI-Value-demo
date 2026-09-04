@@ -258,7 +258,7 @@ input, textarea { font: inherit; }
 #stage[data-view='intro']    #bg { background-image: url('../images/v4/framework.jpg'); }
 #stage[data-view='explore']  #bg { background-image: url('../images/v4/explore.jpg'); }
 #stage[data-view='diag']     #bg { background-image: url('../images/v4/diag-strategy.jpg'); }
-#stage[data-view='identify'] #bg { background-image: url('../images/v4/explore.jpg'); }
+#stage[data-view='identify'] #bg { background-image: url('../images/v4/identify.jpg'); }
 
 /* Opening a pool swaps to that pool's own render. */
 #stage[data-view='explore'][data-pool='strategy'] #bg { background-image: url('../images/v4/pool-strategy.jpg'); }
@@ -1592,6 +1592,89 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* Wider than the other statement screens: the reader needs room to be the
    subject rather than a detail under the copy. */
 .deliver-wrap { text-align: center; width: min(860px, 58cqw); }
+
+/* ---------- identify, from Figma 326:280 ---------------------
+   Geometry in frame pixels, like the diagnostic column and the case reader:
+   #frame is a fixed 1920x1080 surface scaled by --k, so the file's own
+   coordinates transfer directly. Vertical gaps are the file's — 29 under the
+   artwork, 10 to the heading, 24 to the form, 18 between fields, 47 to the
+   button — rather than a scale step, because the file spaces them by eye.
+
+   Two colours are not the file's, both measured against its own plate:
+
+   - the placeholders are #A7BFCF in the design, which is 1.51:1 there. They
+     carry the only instruction on the screen, so they take --fg-4 at 5.5:1,
+     which is what the rest of the build already uses for a placeholder.
+   - the eyebrow is #007cc3, which is 3.61:1 at 18px. It takes --blue-lift at
+     4.70:1 — the same substitution the token block already documents for
+     --brand carrying text.
+   ------------------------------------------------------------- */
+/* No view padding here: everything on this screen is placed at the file's own
+   frame coordinates, so the padding would only offset them. #idAsk is a direct
+   child of the view for the same reason — inside .deliver-wrap it was
+   resolving against that instead of the frame and landing 578px low. */
+#v-identify { padding: 0; }
+#v-identify .deliver-wrap {
+  position: absolute; inset: 0; width: auto;
+  display: grid; place-items: center;
+}
+#v-identify .id-ask {
+  position: absolute; left: 0; right: 0; top: 198px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+#v-identify .id-ask[hidden] { display: none; }
+.id-art { display: block; width: 401px; height: 272px; }
+.id-eyebrow {
+  margin-top: 29px;
+  font-family: var(--label); font-weight: 400; font-size: 18px; line-height: 1.4;
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--blue-lift);
+}
+#v-identify .id-title {
+  margin-top: 10px;
+  font-family: var(--display); font-weight: 300;
+  font-size: 54px; line-height: 1.06; letter-spacing: -0.014em; color: var(--ink);
+}
+
+.id-form { margin-top: 24px; display: flex; flex-direction: column; align-items: center; }
+.id-field {
+  position: relative; display: block;
+  width: 384px; height: 69px;
+  border: 2px solid var(--card-line); border-radius: 5px;
+  box-shadow: 2px 4px 20px 0 rgba(0, 65, 108, 0.05);
+}
+.id-field + .id-field { margin-top: 18px; }
+.id-field input {
+  display: block; width: 100%; height: 100%;
+  background: transparent; border: none; border-radius: inherit;
+  text-align: center; color: var(--ink);
+  font-family: var(--body); font-weight: 300; font-size: 24px;
+  padding: 0 var(--s3);
+}
+.id-field input:focus { outline: none; }
+.id-field:focus-within { border-color: var(--blue-lift); }
+/* The real placeholder is hidden: the visible one is the row below, so the
+   icon and the words travel together and stay centred as a pair. */
+.id-field input::placeholder { color: transparent; }
+.id-ph {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.18s var(--ease);
+  font-family: var(--label); font-weight: 500; font-size: 16px;
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4);
+}
+.id-field input:placeholder-shown ~ .id-ph { opacity: 1; }
+.id-ph-ico { width: 19px; height: 19px; display: block; }
+.id-ph-at { font-weight: 500; font-size: 18px; }
+
+/* The shared .btn padding takes it to 81px; the file draws this one at 71. */
+.id-form .id-go {
+  margin-top: 47px;
+  width: 287px; height: 71px; min-height: 71px;
+  padding-top: 0; padding-bottom: 0;
+}
+.id-form .mf-error { margin-top: var(--s3); }
 .deliver-wrap .lede { margin: var(--s3) auto 0; max-width: 46ch; }
 .id-title { margin-top: var(--s2); }
 

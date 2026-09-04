@@ -754,6 +754,7 @@ function resetDelivery() {
   $('idDone').hidden = true;
   $('mfError').textContent = '';
   $('mfEmail').value = '';
+  $('mfName').value = '';
   clearTimeout(idAdvance);
 }
 
@@ -769,7 +770,11 @@ $('emailForm').addEventListener('submit', e => {
     return;
   }
   $('mfError').textContent = '';
-  S.recipient = { email };
+  /* The name is optional: the design asks for it, and the report only needs
+     the address. Nobody on a show floor should be stopped for declining to
+     give their name. */
+  const name = $('mfName').value.trim();
+  S.recipient = name ? { email, name } : { email };
 
   /* Acknowledge before the report rolls, so nobody is left wondering whether
      the address went in. It moves on by itself: on a kiosk an extra tap to
