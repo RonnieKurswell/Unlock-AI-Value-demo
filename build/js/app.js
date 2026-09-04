@@ -5,6 +5,7 @@
 
 import { HiveScene } from './scene.js';
 import { Drift } from './particles.js';
+import { Hexagon } from './hexagon.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
   classifyArchetype, BENCHMARK_MEDIAN, benchmarkFinePrint,
@@ -49,6 +50,32 @@ const S = {
 ORDER.forEach(id => { S.scores[id] = 0; });
 
 const scene = new HiveScene($('gl'));
+
+/* The framework hexagon is SVG now (js/hexagon.js, from Figma 287:725). The
+   WebGL board is still here and ?hex=3d puts it back, so the two can be
+   compared on the same build while this is reviewed. */
+const USE_3D_HEX = new URLSearchParams(location.search).get('hex') === '3d';
+const hexagon = USE_3D_HEX ? null : new Hexagon($('hexWrap'));
+window.__hex = hexagon;   // debug handle, matching window.__scene and window.__drift
+/* Measured twice over: it needs Geist loaded, and it needs the explore view
+   actually on screen, because a hidden view measures zero. */
+let hexFitted = false;
+function fitHexLabels() {
+  if (hexFitted || !hexagon) return;
+  document.fonts.ready.then(() => {
+    requestAnimationFrame(() => { hexFitted = hexagon.fitLabels(); });
+  });
+}
+if (USE_3D_HEX) $('hexWrap').hidden = true;
+else $('gl').hidden = true;   // nothing visible left on it; see the note in app.css
+/* One object for the rest of the file to talk to, whichever is in play. */
+const board = {
+  get selected() { return USE_3D_HEX ? scene.hexSelected : hexagon.hexSelected; },
+  get seen()     { return USE_3D_HEX ? scene.hexSeen : hexagon.hexSeen; },
+  select: i => (USE_3D_HEX ? scene.selectHex(i) : hexagon.select(i)),
+  clear:  () => (USE_3D_HEX ? scene.clearHex()  : hexagon.clear()),
+  cycle:  n => (USE_3D_HEX ? scene.cycleHex(n)  : hexagon.cycle(n))
+};
 const drift = new Drift($('px'));
 window.__drift = drift;   // debug handle, matching window.__scene
 scene.start();
@@ -181,9 +208,10 @@ $('introDiag').addEventListener('click', () => startDiagnostic());
 function start() {
   reset(false);
   show('explore');
-  if (!scene.hex) scene.buildHex(hexOrder());
+  if (USE_3D_HEX && !scene.hex) scene.buildHex(hexOrder());
+  fitHexLabels();
   // Opens on the whole framework. A pool is only opened by tapping one.
-  scene.clearHex();
+  board.clear();
 }
 
 function reset(toAttract = true) {
@@ -194,7 +222,8 @@ function reset(toAttract = true) {
   S.recipient = null;
   ORDER.forEach(id => { S.scores[id] = 0; });
   scene.resetTiles();
-  scene.clearHex();
+  board.clear();
+  if (!USE_3D_HEX) hexagon.resetSeen();
   /* clearHex only clears this when a hexagon was actually open. Left set, the
      next visitor's explore overview would open on a pool plate. */
   delete $('stage').dataset.pool;
@@ -209,7 +238,7 @@ function reset(toAttract = true) {
 
 /* The framework hexagon lives in the 3D scene. Its labels are canvas
    textures, so it can only be built once the webfonts have loaded. */
-scene.onHexSelect = (id, i) => {
+const onPoolOpen = (id, i) => {
   renderPool(id);
   const view = $('v-explore');
   view.classList.add('focus');
@@ -221,8 +250,8 @@ scene.onHexSelect = (id, i) => {
   paintDots(i);
 };
 
-/* Back to the framework: the copy clears and the board reassembles. */
-scene.onHexClear = () => {
+/* Back to the framework: the copy clears and the hexagon comes back. */
+const onPoolClose = () => {
   const view = $('v-explore');
   view.classList.remove('focus');
   view.style.removeProperty('--seg');
@@ -230,6 +259,14 @@ scene.onHexClear = () => {
   syncPlate();
   paintDots(-1);
 };
+
+if (USE_3D_HEX) {
+  scene.onHexSelect = onPoolOpen;
+  scene.onHexClear = onPoolClose;
+} else {
+  hexagon.onSelect = onPoolOpen;
+  hexagon.onClear = onPoolClose;
+}
 
 function paintDots(active) {
   const wrap = $('poolDots');
@@ -243,9 +280,9 @@ function paintDots(active) {
    the ends, because on a kiosk a dead control reads as broken. */
 function stepPool(delta) {
   const n = hexOrder().length;
-  const cur = scene.hexSelected;
-  if (cur < 0) return scene.selectHex(0);
-  scene.selectHex(((cur + delta) % n + n) % n);
+  const cur = board.selected;
+  if (cur < 0) return board.select(0);
+  board.select(((cur + delta) % n + n) % n);
 }
 $('poolPrev').addEventListener('click', () => stepPool(-1));
 $('poolNext').addEventListener('click', () => stepPool(1));
@@ -266,8 +303,10 @@ window.__scene = scene;
 
 scene.buildHex(hexOrder());
 document.fonts.ready.then(() => {
-  scene.rebuildHex(hexOrder());
-  if (S.view === 'explore') scene.selectHex(Math.max(0, scene.hexSelected));
+  if (USE_3D_HEX) {
+    scene.rebuildHex(hexOrder());
+    if (S.view === 'explore') scene.selectHex(Math.max(0, scene.hexSelected));
+  }
 });
 
 function renderPool(poolId) {
@@ -375,9 +414,9 @@ $('tileSheet').addEventListener('pointerdown', e => {
 
 /* Keyboard parity with the booth build: 1–6 select, arrows cycle, Esc clears. */
 function exploreKeys(e) {
-  if (/^[1-6]$/.test(e.key)) return scene.selectHex(Number(e.key) - 1);
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') return scene.cycleHex(1);
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') return scene.cycleHex(-1);
+  if (/^[1-6]$/.test(e.key)) return board.select(Number(e.key) - 1);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') return board.cycle(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') return board.cycle(-1);
 }
 
 /* One entry point for the questionnaire. Both the framework page and the
@@ -839,7 +878,24 @@ fitFrame();
 
 renderPool(POOLS[0].id);
 paintDots(-1);
-$('backToFramework').addEventListener('click', () => scene.clearHex());
+$('backToFramework').addEventListener('click', () => board.clear());
+
+/* Swipe to change pool. The board bound this to its own canvas, which only
+   worked because an opacity-0 canvas still takes pointer events; with the SVG
+   hexagon there is no canvas over the focus screen, so it lives on the view.
+   Same rule as before: only while a pool is open, horizontal, and past a
+   threshold no tap can reach. */
+if (!USE_3D_HEX) {
+  let down = null;
+  const view = $('v-explore');
+  view.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; }, { passive: true });
+  view.addEventListener('pointerup', e => {
+    if (!down || board.selected < 0) { down = null; return; }
+    const dx = e.clientX - down.x, dy = e.clientY - down.y;
+    down = null;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) board.cycle(dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
 $('beginDiagOv').addEventListener('click', startDiagnostic);
 S.read = new Set();
 $('seenCount').textContent = '0';

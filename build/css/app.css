@@ -371,6 +371,10 @@ input, textarea { font: inherit; }
    the board is the thing you touch, and the brief was to keep it. */
 #gl { opacity: 0; transition: opacity 500ms var(--ease); }
 #stage[data-view='explore']:not([data-pool]) #gl { opacity: 1; }
+/* With the SVG hexagon the canvas draws nothing anyone can see, and an
+   opacity-0 canvas still takes pointer events — it was swallowing taps meant
+   for the screen underneath. js/app.js sets this unless ?hex=3d. */
+#gl[hidden] { display: none; }
 
 /* The design surface. Fixed at 1920x1080 and scaled to whatever the stage is,
    so the composition never reflows and the clamp floors never bite. --k is set
@@ -847,6 +851,61 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   transition: opacity 0.5s var(--ease);
 }
 #v-explore.focus .col { opacity: 1; pointer-events: auto; }
+
+/* ---------- the framework hexagon (SVG) ---------------------
+   Replaces the WebGL board. Sits in frame pixels, so the SVG viewBox is
+   1920x1080 and every coordinate in js/hexagon.js is the Figma frame's own.
+
+   On for the overview only, exactly as the canvas was: opening a pool swaps
+   the plate to that pool's render and the hexagon gets out of the way. */
+#hexWrap {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  opacity: 0; transition: opacity 520ms var(--ease);
+}
+#stage[data-view='explore']:not([data-pool]) #hexWrap { opacity: 1; }
+#stage[data-view='explore']:not([data-pool]) #hexWrap .hex-hit { pointer-events: auto; }
+#hexSvg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.hex-seg { transition: opacity 320ms var(--ease); }
+.hex-hit { fill: transparent; cursor: pointer; }
+/* The tapped wedge holds while the others drop back, so the tap is
+   acknowledged in the 520ms before the whole thing fades out. */
+#hexWrap.picked .hex-seg { opacity: 0.35; }
+#hexWrap.picked .hex-seg.on { opacity: 1; }
+
+/* Labels are HTML so they use the build's type tokens and stay real text.
+   ---
+   The file sets them in Tungsten Medium at 32.47px (pool names) and 24.28px
+   (verbs). Tungsten is not licensed into this build and there is no webfont
+   for it, and the kiosk has to run offline, so these are Geist. Geist is not
+   condensed: at the file's sizes the long names overflow their wedge, so the
+   sizes here are the largest that fit the same boxes. Matching the design
+   exactly needs the Tungsten web files. */
+.hex-labels { position: absolute; inset: 0; pointer-events: none; }
+.hex-labels span {
+  position: absolute;
+  display: block;
+  font-family: var(--label); text-align: center;
+  text-transform: uppercase;
+  /* The box comes from the design; fitLabels() picks the size that fits it. */
+}
+/* pre, not normal: the line breaks come from data.js so they match the file
+   instead of falling wherever the box happens to end. */
+.hex-name { color: #FFFFFF; }
+.hex-labels b { display: block; font-weight: 500; line-height: 1.08; letter-spacing: 0.01em; }
+.hex-verb { color: #0C364F; }
+.hex-verb b { letter-spacing: 0.10em; }
+/* The centre lockup, in the file's own --brand. Sized to the design's 165px
+   box for the same reason the labels are. */
+.hex-core {
+  position: absolute; left: 960px; top: 521px; width: 200px;
+  transform: translate(-50%, -50%);
+  font-family: var(--display); font-weight: 300;
+  font-size: 33px; line-height: 1.06; letter-spacing: -0.028em;
+  text-align: center; color: var(--brand);
+  text-transform: uppercase;
+}
 
 /* overview only */
 #v-explore .ov-foot {

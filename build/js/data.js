@@ -31,7 +31,7 @@ const MONO_ROOM = ['#00436F', '#00243F'];
 /* The hexagon expects pools ordered by the edge they own: index i sits on the
    edge at i x 60 degrees. Same order as the booth build. */
 export const hexOrder = () => [...POOLS].sort((a, b) => a.edge - b.edge)
-  .map(p => ({ id: p.id, title: p.name, verb: p.verb, accent: p.color, room: p.room }));
+  .map(p => ({ id: p.id, title: p.name, lines: p.lines, verb: p.verb, accent: p.color, room: p.room }));
 
 export const POOLS = [
   {
