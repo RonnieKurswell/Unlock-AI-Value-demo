@@ -1232,17 +1232,43 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* One row: which pool, what it is about, where you are. The theme used to be a
    second uppercase heading of its own directly above the question, saying in
    two words what the question says in a sentence. */
-.qmeta { display: flex; align-items: baseline; gap: var(--s3); }
+/* One line, always, and always the same height.
+   ---
+   Five of the six questions fit this row comfortably: they need 422 to 657px
+   of the column's 716. Question 4 needs 751 — "Agentic Legacy Modernization"
+   with "The core platforms underneath" — and when it overflowed all three
+   items wrapped independently. Aligned on their first baselines the second
+   lines dangled, and "Question 4 of 6" broke after "of", orphaning the 6.
+
+   Letting it wrap tidily instead was tempting and wrong: a two-line row on
+   one question of six moves everything under it down by a line on that
+   question only, which is the same fault the reserved height on .qtext
+   already exists to prevent. So the row holds one line and its own height.
+
+   The 35px comes from a tighter gap and slightly less tracking on the pool
+   tag, which reads better at 28 characters anyway. The kind is the only item
+   allowed to give: it can ellipsis rather than wrap, so a longer pool name
+   later degrades instead of breaking the layout. Nothing ellipsises today. */
+.qmeta {
+  display: flex; align-items: baseline; gap: var(--s2);
+  min-height: 1.7em;
+}
+.qmeta > * { white-space: nowrap; }
+.qkind { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .qmeta .pool-tag {
   font-family: var(--label); font-weight: 500; font-size: clamp(13.1px, 0.856cqw, 16.6px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--blue-lift);
+  letter-spacing: 0.10em; text-transform: uppercase; color: var(--blue-lift);
 }
 /* Sentence case on purpose. Seven uppercase letterspaced labels on one screen
    is what "everything is shouting" looks like; this is now one of three. */
+/* Matched to the pool tag's size rather than sitting a point above it. Three
+   items in one quiet row want one size, and at 17.3px this was the largest
+   text in the row for no reason — which was also the last 10px question 4
+   needed to stop ellipsising. */
 .qkind {
-  font-size: clamp(13.4px, 0.9cqw, 17.3px); color: var(--mid);
+  font-size: clamp(13.1px, 0.856cqw, 16.6px); color: var(--mid);
 }
-.qkind::before { content: '·'; margin-right: 0.55em; color: var(--fg-4); }
+.qkind::before { content: '·'; margin-right: 0.4em; color: var(--fg-4); }
 .qmeta .count {
   font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
   letter-spacing: 0.13em; color: var(--mid); margin-left: auto;
