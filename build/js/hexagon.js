@@ -197,7 +197,14 @@ export class Hexagon {
     }
     n.style.left = `${cx}px`;
     n.style.top = `${cy}px`;
-    n.style.width = `${bw}px`;
+    /* No width. Setting the file's box width here looked harmless and was the
+       reason most labels sat off-centre: once the fit grew the type past that
+       width, `text-align: center` stopped centring. Chrome anchors overflowing
+       nowrap content to the start edge rather than centring it, so the ink
+       shifted by half the overflow — up to 15px. The element hugs its content
+       now and translate(-50%, -50%) does the centring, which is what the box
+       width was pretending to do. `bw`/`bh` are kept only as the fit's
+       starting reference. */
     n.style.transform = `translate(-50%, -50%) rotate(${rot}deg) scaleX(${SQUEEZE})`;
     n.dataset.bw = bw; n.dataset.bh = bh; n.dataset.max = max; n.dataset.rot = rot;
     n.dataset.pool = poolId;
@@ -250,7 +257,7 @@ export class Hexagon {
     const inkLines = n => {
       const own = n.getBoundingClientRect();
       if (!own.width) return [];
-      const k = (+n.dataset.bw) / own.width;      // screen px -> frame px
+      const k = 1920 / this.svg.getBoundingClientRect().width;   // screen px -> frame px
       const ocx = own.x + own.width / 2, ocy = own.y + own.height / 2;
       const out = [];
       for (const b of n.children) {
@@ -283,8 +290,10 @@ export class Hexagon {
        room. Holding them off the light band as well is possible, and costs
        9.5px of type across all six names to fix a label that already passes,
        so it is not done. */
-    const BAND = { name: [-1e4, 1e4], verb: [0, 99] };
-    const inside = n => {
+    const BAND = { name: [101, 1e4], verb: [0, 99] };
+    // The wedge alone, used for the shared size; the band is applied after.
+    const NO_BAND = [-1e4, 1e4];
+    const inside = (n, bandOverride) => {
       const seg = this.svg.querySelector(`.hex-seg[data-pool="${n.dataset.pool}"] .hex-hit`);
       const inv = seg.getCTM().inverse();
       const cx = parseFloat(n.style.left), cy = parseFloat(n.style.top);
@@ -292,7 +301,7 @@ export class Hexagon {
       const cos = Math.cos(rot), sin = Math.sin(rot);
       const lines = inkLines(n);
       if (!lines.length) return false;
-      const band = BAND[n.classList.contains('hex-name') ? 'name' : 'verb'];
+      const band = bandOverride || BAND[n.classList.contains('hex-name') ? 'name' : 'verb'];
       for (const m of lines) {
         for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
           const lx = m.dx + sx * (m.w / 2 + PAD);
@@ -308,24 +317,39 @@ export class Hexagon {
       return true;
     };
 
-    const fitOne = n => {
+    const fitOne = (n, band) => {
       let size = +n.dataset.max;
       n.style.fontSize = `${size}px`;
-      while (size > 9 && !inside(n)) {
+      while (size > 9 && !inside(n, band)) {
         size -= 0.5;
         n.style.fontSize = `${size}px`;
       }
       return size;
     };
 
-    const smallest = cls => Math.min(...labels.filter(n => n.classList.contains(cls)).map(fitOne));
+    /* Two passes. The shared size comes from the wedge outline only, so one
+       long label cannot shrink the other five. Then any label that misses its
+       band at that size steps down on its own until it makes it.
+
+       In practice that is exactly one: "AGENTIC LEGACY MODERNIZATION" is 29
+       characters against 8 to 24 for the rest, and at the shared size its
+       first line reaches far enough inboard to sit on the light band, where
+       white measures about 2:1. Holding every name back to fix that one cost
+       10.5px across all six. The file gives that label a wider box than the
+       others for the same reason, so letting the outlier be the outlier is
+       closer to the design than flattening everything to its limit. */
+    const smallest = cls =>
+      Math.min(...labels.filter(n => n.classList.contains(cls)).map(n => fitOne(n, NO_BAND)));
     const nameSize = smallest('hex-name');
     const verbSize = smallest('hex-verb');
 
     for (const n of labels) {
-      const size = n.classList.contains('hex-name') ? nameSize : verbSize;
+      const shared = n.classList.contains('hex-name') ? nameSize : verbSize;
+      n.dataset.max = shared;                 // never grow past the shared size
+      const size = fitOne(n);                 // step down only if the band needs it
       n.style.fontSize = `${size}px`;
       n.dataset.fitted = size;
+      n.dataset.shared = shared;
       n.dataset.in = inside(n) ? 'y' : 'n';
     }
 

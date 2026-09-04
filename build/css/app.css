@@ -885,10 +885,11 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .hex-labels { position: absolute; inset: 0; pointer-events: none; }
 .hex-labels span {
   position: absolute;
-  display: block;
+  display: block; width: max-content;
   font-family: var(--label); text-align: center;
   text-transform: uppercase;
-  /* The box comes from the design; fitLabels() picks the size that fits it. */
+  /* Hugs its content, so a two-line name centres its lines against each other
+     and translate(-50%, -50%) centres the whole label on the file's point. */
 }
 /* pre, not normal: the line breaks come from data.js so they match the file
    instead of falling wherever the box happens to end. */
