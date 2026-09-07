@@ -479,7 +479,18 @@ input, textarea { font: inherit; }
 /* The progress bar is gone: the hexagon stepper replaces it. Six questions
    are six discrete steps, and a continuous bar was measuring a thing that
    only ever moves in sixths. */
-#qStep { margin: 0 0 var(--s4); }
+/* The stepper carries the count beside it: the hexagon shows how far along
+   you are at a glance, the words say it exactly. */
+.qstep-row {
+  display: flex; align-items: center; gap: var(--s3);
+  margin: 0 0 var(--s4);
+}
+.qcount {
+  font-family: var(--label); font-weight: 400;
+  font-size: clamp(13.0px, 0.833cqw, 16px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-4);
+  white-space: nowrap;
+}
 .hexstep { display: block; width: auto; height: 68px; overflow: visible; }
 /* --ink-lift was the obvious choice and it vanished: at #E8F2FB against a
    plate that is already near-white, the six unfilled capsules were invisible
@@ -1292,12 +1303,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-size: clamp(13.1px, 0.856cqw, 16.6px); color: var(--mid);
 }
 .qkind::before { content: '·'; margin-right: 0.4em; color: var(--fg-4); }
-.qmeta .count {
-  font-family: var(--label); font-weight: 400; font-size: clamp(13.0px, 0.8cqw, 15.2px);
-  letter-spacing: 0.13em; color: var(--mid); margin-left: auto;
-}
-/* Off-screen but readable. Taking "Question 4 of 6" out of the row also gives
-   question 4 its width back — it had been clearing the column by 6px. */
+/* Off-screen but readable. Used by the identify fields' labels. */
 .sr-only {
   position: absolute !important; width: 1px; height: 1px;
   margin: -1px; padding: 0; overflow: hidden;

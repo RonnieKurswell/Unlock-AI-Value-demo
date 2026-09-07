@@ -538,7 +538,7 @@ function renderQuestion() {
   $('qPool').style.removeProperty('color');
   /* Spelled out rather than "01 / 18": at kiosk distance a slashed pair
      reads as a code, not as position in a sequence. */
-  $('qCount').textContent = `Question ${S.qi + 1} of ${FLAT.length}`;
+  $('qCount').textContent = `Question ${S.qi + 1} out of ${FLAT.length}`;
   step.set(S.qi, FLAT.length);
   $('qKind').textContent = q.kind;
   $('qText').textContent = q.q;
