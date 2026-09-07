@@ -318,22 +318,22 @@ input, textarea { font: inherit; }
   transition: opacity 700ms var(--ease);
 }
 /* -------------------------------------------------------------
-   CENTRE SCRIM — identify and done
+   CENTRE SCRIM — identify and done: removed.
 
-   Both centre their copy directly over the plate, with no panel to sit on.
-   Making the plates vivid blue cost the contrast the old near-black ones
-   gave away for free: white fell to 3.19:1 on identify and --fg-3 to 1.97:1.
-   A radial scrim buys it back behind the copy while leaving the artwork at
-   the edges bright, which is where the hexagon forms live on both plates.
+   There were two of these, both near-black radials on ::before, and together
+   they were dimming identify to the point of being unreadable. They were
+   written when the plates were vivid blue and the copy on them was white:
+   the note said white fell to 3.19:1 and --fg-3 to 1.97:1, and a dark scrim
+   bought that back.
+
+   Neither condition holds now. Identify carries the design's own pale plate
+   and dark type, measured against that plate with no scrim at all: the
+   heading 13.9:1, the eyebrow 4.70, the button label 7.91, the placeholders
+   5.5. A scrim built for white-on-vivid is pure loss here.
+
+   They survived the V4 migration twice because they are pseudo-elements —
+   sweeping #stage's elements for dark backgrounds does not see a ::before.
    ------------------------------------------------------------- */
-#v-identify::before,
-#v-done::before {
-  content: ''; position: absolute; inset: 0; z-index: -1;
-  background: radial-gradient(72% 64% at 50% 50%,
-    rgba(0, 26, 45, 0.80) 0%,
-    rgba(0, 26, 45, 0.62) 46%,
-    rgba(0, 26, 45, 0) 80%);
-}
 
 /* --blue-lift measured 2.91:1 over the film. White clears it without
    pushing the scrim so dark the film stops reading as motion. */
@@ -1313,17 +1313,24 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-family: var(--display); font-weight: 300;
   /* Grown with the column. At 26ch the question was leaving a third of the
      panel empty to its right. */
-  /* The design's 54px at its own tracking. It wraps inside the 727 column. */
-  font-size: clamp(26px, 2.81cqw, 54px); line-height: 1.06; letter-spacing: -0.014em;
+  /* The design's 54px does not fit. Measured against the real Geist metrics in
+     the 716px column, two of the six questions wrap to three lines at 54 —
+     "How much of a full claims or underwriting journey does AI run?" needs
+     1520px on one line — and a third line overruns the two-line reserve below
+     and closes the gap to the slider's end labels to almost nothing.
+     48px is the largest size at which all six fit two lines: 50 and 52 still
+     leave the claims question on three. */
+  font-size: clamp(26px, 2.5cqw, 48px); line-height: 1.06; letter-spacing: -0.014em;
   /* A clear step down from the meta row above it. At --s4 the gap was smaller
      than the question's own line height, so the row read as part of it rather
      than as the label it is. The panel is a fixed height with its slack under
      the slider, so this comes out of the quiet space and Next does not move. */
   margin: var(--s6) 0 0; max-width: none; text-wrap: balance;
-  /* Two lines reserved. Five of the six questions wrap to two and one does not,
-     which moved everything below it by a line and left Next a few pixels out
-     of place between questions. */
-  min-height: 2.2em;
+  /* Exactly two lines, which is now what every question takes. Reserving it
+     keeps Next in the same place between questions. If a future question
+     needs a third line, this and the size above have to move together —
+     a third line silently eats the gap under the question. */
+  min-height: 2.12em;
 }
 
 /* options: rows separated by one hairline, no boxes */
@@ -1591,10 +1598,11 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 
 #v-identify { display: none; }
 #v-identify.on { display: grid; place-items: center; }
-#v-identify::before, #v-done::before {
-  content: ''; position: absolute; inset: 0; z-index: -1;
-  background: radial-gradient(64% 58% at 50% 46%, rgba(5, 8, 14, 0.95) 0%, rgba(5, 8, 14, 0.8) 56%, rgba(5, 8, 14, 0.3) 100%);
-}
+/* A near-black radial used to sit on both of these screens, from the dark
+   theme. It survived the V4 migration because it is a pseudo-element: a sweep
+   for dark backgrounds over #stage's elements does not see it, which is how it
+   got missed twice. Both screens sit on real plates now, so it goes — it was
+   dimming the whole identify screen to the point of being unreadable. */
 /* Wider than the other statement screens: the reader needs room to be the
    subject rather than a detail under the copy. */
 .deliver-wrap { text-align: center; width: min(860px, 58cqw); }
@@ -1620,10 +1628,15 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    child of the view for the same reason — inside .deliver-wrap it was
    resolving against that instead of the frame and landing 578px low. */
 #v-identify { padding: 0; }
+/* Full-bleed so the affirmation centres on the frame — but it sits after
+   #idAsk in the DOM, so it covered the form and swallowed every tap on the
+   fields. It only needs to catch input when it is the thing on screen. */
 #v-identify .deliver-wrap {
   position: absolute; inset: 0; width: auto;
   display: grid; place-items: center;
+  pointer-events: none;
 }
+#v-identify .id-done { pointer-events: auto; }
 #v-identify .id-ask {
   position: absolute; left: 0; right: 0; top: 198px;
   display: flex; flex-direction: column; align-items: center;
