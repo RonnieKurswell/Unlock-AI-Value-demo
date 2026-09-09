@@ -33,10 +33,15 @@ const MONO_ROOM = ['#00436F', '#00243F'];
 export const hexOrder = () => [...POOLS].sort((a, b) => a.edge - b.edge)
   .map(p => ({ id: p.id, title: p.name, lines: p.lines, verb: p.verb, accent: p.color, room: p.room }));
 
+/* `short` is the name as the priorities cards set it: two pool names share one
+   30px line there, and "AI Strategy & Engineering · Agentic Legacy
+   Modernization" does not fit one. Taken from the design (Figma 326:181)
+   rather than truncated at runtime, so the wording is somebody's decision. */
 export const POOLS = [
   {
     id: 'strategy', index: 0,
     name: 'AI Strategy & Engineering',
+    short: 'AI Strategy',
     lines: ['AI STRATEGY', '& ENGINEERING'],
     verb: 'Orchestrate', edge: 1,
     color: 0x4F9DFF, hex: '#4F9DFF',
@@ -51,6 +56,7 @@ export const POOLS = [
   {
     id: 'data', index: 1,
     name: 'Data for AI',
+    short: 'Data for AI',
     lines: ['DATA FOR AI'],
     verb: 'Insight', edge: 0,
     color: 0x35D0F5, hex: '#35D0F5',
@@ -65,6 +71,7 @@ export const POOLS = [
   {
     id: 'process', index: 2,
     name: 'Process AI',
+    short: 'Process AI',
     lines: ['PROCESS AI'],
     verb: 'Transform', edge: 5,
     color: 0xFF7AB0, hex: '#FF7AB0',
@@ -79,6 +86,7 @@ export const POOLS = [
   {
     id: 'legacy', index: 3,
     name: 'Agentic Legacy Modernization',
+    short: 'Agentic Legacy',
     lines: ['AGENTIC LEGACY', 'MODERNIZATION'],
     verb: 'Modernize', edge: 4,
     color: 0xB08BFF, hex: '#B08BFF',
@@ -93,6 +101,7 @@ export const POOLS = [
   {
     id: 'physical', index: 4,
     name: 'Physical AI',
+    short: 'Physical AI',
     lines: ['PHYSICAL AI'],
     verb: 'Innovate', edge: 3,
     color: 0xFFB454, hex: '#FFB454',
@@ -107,6 +116,7 @@ export const POOLS = [
   {
     id: 'trust', index: 5,
     name: 'AI Trust',
+    short: 'AI Trust',
     lines: ['AI TRUST'],
     verb: 'Assure', edge: 2,
     color: 0x7EE0C0, hex: '#7EE0C0',
@@ -495,48 +505,56 @@ export const BENCHMARK_MEDIAN = { strategy: 50, data: 50, process: 58, legacy: 4
    ------------------------------------------------------------- */
 
 /* -------------------------------------------------------------
-   FIVE-YEAR VIEW
+   STRATEGIC PRIORITIES — "AI Focus Areas"
 
-   One paragraph per archetype, replacing the three-column
-   compounding / holding / exposed grid. Anshul asked for a single
-   paragraph in a persona style; with the role beat gone the
-   archetype is the persona.
+   Three cards, two pools in each: where to press, where to hold,
+   where to act. Figma node 326:181 in the V4 file.
 
-   Each paragraph is about TRAJECTORY, deliberately not about
-   position. Beat 1 already tells someone where they are and what
-   the risk is, so repeating that here would be the third time the
-   report says the same thing.
+   This replaces the single five-year paragraph, which itself
+   replaced a three-column compounding / holding / exposed grid.
+   The tier names are that grid's, renamed per Rob's review on
+   9 Sep: compounding -> Double down, and gap -> Resolve. The old
+   FIVE_YEAR paragraphs are in git if the argument is wanted back.
 
-   {lead} and {lag} are filled with the visitor's own strongest and
-   weakest pools, so the paragraph is about them rather than about
-   their category. Both are always present and always different:
-   leadAndLag() picks the highest and lowest scoring pool, and falls
-   back to the ends of ORDER when everything is level.
+   The copy is per TIER, not per archetype, and is fixed. Beat 1
+   already says where this visitor sits and beat 2 how that
+   compares, so the third beat only has to say what to do about it
+   — and what to do about a leading pool is the same sentence
+   whoever is reading. The visitor's own pools are what changes.
+
+   Deliberately 2 / 2 / 2 rather than banded: a card is a slot in
+   an argument, and an empty "Double down" reads as a failure
+   state rather than as a true statement about the scores. Every
+   run fills all three, and the ranking is what carries the
+   meaning.
    ------------------------------------------------------------- */
 
-export const FIVE_YEAR = {
-  foundation:
-    'Nothing here is behind yet, because nothing has been committed. Five years changes that twice over: the carriers ' +
-    'that sequence the foundation first are running production models on shared data, and the ones that led with a ' +
-    'visible pilot are rebuilding underneath it. {lag} is what decides which of those you become.',
-  purgatory:
-    'On this trajectory the proofs keep proving the same point for another five years. The cost of each one does not ' +
-    'fall, because every pilot rebuilds the pipeline the last one used, and each stall makes the next business case ' +
-    'harder to fund. {lag} is the constraint that decides it, not the models. Clear that and {lead} becomes the ' +
-    'platform everything else runs on.',
-  myopia:
-    '{lead} keeps delivering, and that is the trap. Five years of local wins on separate pipelines leaves a set of ' +
-    'integrations nobody owns and a cost per use case that never comes down. Carriers that consolidate onto shared ' +
-    'data reach their eleventh use case for a fraction of what the first one cost. {lag} is where that has to start.',
-  platform:
-    'The capability stays ahead of the benchmark. What changes over five years is the argument: an underused platform ' +
-    'is the hardest investment to defend at budget, and it gets harder every cycle it is not pointed at underwriting ' +
-    'or claims. {lag} is where the economics accrue, and {lead} is what you already have to spend on it.',
-  compounding:
-    'On this trajectory the gap widens in your favour, because each use case in a mature pool costs less than the ' +
-    'last. The five-year constraint is not technology. It is whether underwriters act on the models: {lead} is ' +
-    'already running, and {lag} is where reach or trust still limits what it is allowed to decide.'
-};
+export const PRIORITIES = [
+  {
+    key: 'double-down',
+    label: 'Double down',
+    body: 'Where your advantage widens. Each use case in a mature pool costs less than the last.'
+  },
+  {
+    key: 'maintain',
+    label: 'Maintain',
+    body: 'Enough capability to move, not to compound. A decision this year changes the five-year position.'
+  },
+  {
+    key: 'resolve',
+    label: 'Resolve',
+    body: 'Where the gap grows fastest, not because it degrades, but because the benchmark moves while it stays flat.'
+  }
+];
+
+/* The six pools ranked and cut into the three tiers above. Ties break on
+   framework order, exactly as leadAndLag does, so one set of scores always
+   produces one arrangement of cards. */
+export function priorityTiers(scores) {
+  const ranked = [...ORDER].sort((a, b) =>
+    (scores[b] - scores[a]) || (ORDER.indexOf(a) - ORDER.indexOf(b)));
+  return PRIORITIES.map((tier, i) => ({ ...tier, pools: ranked.slice(i * 2, i * 2 + 2) }));
+}
 
 /* Strongest and weakest pool. Ties break on framework order, so the same set
    of scores always produces the same paragraph. */

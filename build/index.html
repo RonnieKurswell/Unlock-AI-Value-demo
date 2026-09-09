@@ -96,44 +96,15 @@
           Each pool is somewhere AI creates measurable value for carriers, and
           somewhere programmes commonly stall.</p>
       </div>
-      <ul class="fw-grid stagger">
-        <li class="fw-card">
-          <span class="fw-num">01</span>
-          <span class="fw-verb">Orchestrate</span>
-          <span class="fw-name">AI Strategy &amp; Engineering</span>
-          <span class="fw-gist">One operating model, instead of pilots scattered across the business</span>
-        </li>
-        <li class="fw-card">
-          <span class="fw-num">02</span>
-          <span class="fw-verb">Insight</span>
-          <span class="fw-name">Data for AI</span>
-          <span class="fw-gist">Policy, claims and treaty data made AI-ready and audit-ready</span>
-        </li>
-        <li class="fw-card">
-          <span class="fw-num">03</span>
-          <span class="fw-verb">Transform</span>
-          <span class="fw-name">Process AI</span>
-          <span class="fw-gist">Whole journeys redesigned, not task-level automation inside old ones</span>
-        </li>
-        <li class="fw-card">
-          <span class="fw-num">04</span>
-          <span class="fw-verb">Modernize</span>
-          <span class="fw-name">Agentic Legacy Modernization</span>
-          <span class="fw-gist">Core platforms modernised module by module, while the book stays live</span>
-        </li>
-        <li class="fw-card">
-          <span class="fw-num">05</span>
-          <span class="fw-verb">Innovate</span>
-          <span class="fw-name">Physical AI</span>
-          <span class="fw-gist">Telematics, IoT and drone data as a pricing and claims input</span>
-        </li>
-        <li class="fw-card">
-          <span class="fw-num">06</span>
-          <span class="fw-verb">Assure</span>
-          <span class="fw-name">AI Trust</span>
-          <span class="fw-gist">Explainability, bias testing and audit trails built in from the start</span>
-        </li>
-      </ul>
+      <!-- The six cards that used to sit here are gone (Rob, 9 Sep): naming
+           all six pools twice, once here and again on the hexagon a tap away,
+           made this screen a contents page for the next one. The lede above
+           now carries the whole argument.
+
+           PENDING: Huw is writing a purpose-built paragraph for this screen.
+           What stands in for it is the lede that was already on the screen and
+           already reviewed, so nothing here is invented — replace the
+           .fw-lede text when his copy lands. -->
       <div class="fw-actions">
         <button class="btn quiet fw-skip" id="introGo">Explore the six pools <span class="arrow">→</span></button>
         <button class="btn primary fw-go" id="introDiag">Start the diagnostic <span class="arrow">→</span></button>
@@ -308,7 +279,7 @@
           <div class="id-tick" aria-hidden="true">
             <svg viewBox="0 0 44 44"><path d="M12 23.5 L19 30.5 L32 14.5"/></svg>
           </div>
-          <h2 class="d-l">Your blueprint is on its way</h2>
+          <h2 class="d-l">Check your inbox for the full report</h2>
           <p class="lede">Sent to <span id="idDoneEmail"></span>. Your results are next.</p>
           <button class="btn primary" id="idContinue">See my results <span class="arrow">&#8594;</span></button>
         </div>
@@ -322,12 +293,29 @@
         <div class="arch-wrap">
           <div class="b1">
             <span class="label">Your position</span>
-            <h1 class="arch-name" id="archName">&nbsp;</h1>
-            <p class="arch-tag" id="archTag">&nbsp;</p>
+            <!-- The glyph is the framework's own hexagon with as many edges
+                 lit as this visitor's overall score fills, so the persona has
+                 a mark without anything being drawn that means nothing. Built
+                 in app.js from the same edge maths as the question stepper. -->
+            <div class="arch-lockup">
+              <div class="arch-glyph" id="archGlyph" aria-hidden="true"></div>
+              <div class="arch-names">
+                <h1 class="arch-name" id="archName">&nbsp;</h1>
+                <p class="arch-tag" id="archTag">&nbsp;</p>
+              </div>
+            </div>
           </div>
+          <!-- Paragraphs in ONE column (Rob, 9 Sep): split across two, the
+               risk line kept ending on a single orphan word in the right
+               column. The right side now carries the strongest benchmark
+               result instead, which is a number rather than prose and does
+               not care where it wraps. -->
           <div class="arch-cols">
-            <p class="body arch-body" id="archBody">&nbsp;</p>
-            <div class="arch-risk" id="archRisk">&nbsp;</div>
+            <div class="arch-text">
+              <p class="body arch-body" id="archBody">&nbsp;</p>
+              <div class="arch-risk" id="archRisk">&nbsp;</div>
+            </div>
+            <aside class="arch-stat" id="archStat" hidden></aside>
           </div>
         </div>
         <div class="beat-nav">
@@ -350,25 +338,21 @@
           <button class="btn primary" data-next>Continue <span class="arrow">→</span></button>
         </div>
       </div>
+      <!-- STRATEGIC PRIORITIES — three cards, centred head. Figma 326:181.
+           The head is centred here and left-aligned on the two beats before
+           it, which is the design's own call: those beats read as prose down
+           a column, this one reads as three things side by side. -->
       <div class="beat stagger" id="beat3">
-        <div class="fc-wrap">
-          <div class="fc-head">
-            <span class="label cool">Five-year view</span>
-            <h2 class="d-m">Where the gap goes</h2>
+        <div class="prio-wrap">
+          <div class="prio-head">
+            <span class="label cool">Strategic priorities</span>
+            <h2 class="d-m">AI Focus Areas</h2>
           </div>
-          <p class="fy-body" id="fyBody">&nbsp;</p>
-          <!-- One case study under the paragraph. The label names its pool: the
-               paragraph points at the weakest pool, and that pool does not
-               always have a cleared case study, so without the pool name the
-               tile can look like it belongs to a sentence it does not. -->
-          <div class="fy-proof" id="fyProof" hidden>
-            <div class="fc-proof-label" id="fyProofLabel">Proven now</div>
-            <div id="fyProofTile"></div>
-          </div>
+          <div class="prio-cards" id="prioCards"></div>
         </div>
         <div class="beat-nav">
           <div class="beat-pips"></div>
-          <button class="btn primary" data-next>Finish <span class="arrow">→</span></button>
+          <button class="btn primary" data-next>See the report <span class="arrow">→</span></button>
         </div>
       </div>
 

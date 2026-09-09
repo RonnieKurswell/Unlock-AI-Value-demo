@@ -10,7 +10,7 @@ import { HexStep } from './hexstep.js';
 import {
   POOLS, POOL, ORDER, QUESTIONS, MAX_POOL_SCORE, BANDS, bandOf, BAND_COPY,
   classifyArchetype, BENCHMARK_MEDIAN, benchmarkFinePrint,
-  TILES, FIVE_YEAR, leadAndLag, hexOrder
+  TILES, priorityTiers, hexOrder
 } from './data.js';
 
 const $ = id => document.getElementById(id);
@@ -406,7 +406,20 @@ function openTile(p, t) {
   $('tileSheet').classList.add('on');
 }
 
-const closeTile = () => $('tileSheet').classList.remove('on');
+/* When the reader is opened as an interstitial between two questions it owns
+   the only way forward, so closing it has to carry on rather than just put the
+   sheet away. Set by gateOnTile, cleared the moment it fires so a later close
+   from the explore screen cannot advance the diagnostic. */
+let afterTile = null;
+const TILE_BACK = $('tileClose').innerHTML;
+
+const closeTile = () => {
+  $('tileSheet').classList.remove('on');
+  const go = afterTile;
+  afterTile = null;
+  $('tileClose').innerHTML = TILE_BACK;
+  if (go) go();
+};
 $('tileClose').onclick = closeTile;
 /* Tapping the render outside the sheet closes it too. The scrim is its own
    element now, so the test is against that rather than the container. */
@@ -593,8 +606,26 @@ function answer(optIndex) {
   scene.ping(q.pool);
 
   S.qi++;
-  if (S.qi >= FLAT.length) finish();
-  else renderQuestion();
+  const advance = S.qi >= FLAT.length ? finish : renderQuestion;
+
+  /* The proof for the pool just answered, between this question and the next
+     (Rob, 9 Sep). It reads as the answer to what they have just claimed about
+     themselves rather than as an advert, which is why it comes after the
+     answer and not before it.
+
+     A pool with nothing cleared shows nothing and goes straight on. Physical
+     AI has no case study yet, and 17 of the 18 tiles have no article copy, so
+     most of these currently open the reader's short form — see openTile. The
+     card alongside the question stays: this gates the flow once, that is
+     there to be read at leisure. */
+  const tile = (TILES[q.pool] || []).find(t => !t.pending);
+  if (tile) {
+    afterTile = advance;
+    $('tileClose').innerHTML = 'Continue <span class="arrow" aria-hidden="true">&#8594;</span>';
+    openTile(POOL[q.pool], tile);
+  } else {
+    advance();
+  }
 }
 
 
@@ -631,12 +662,61 @@ function composeNarrative() {
   return out;
 }
 
+/* The persona mark: the framework hexagon with as many of its six edges lit as
+   the overall score fills. Same edge order and angles as the question stepper,
+   so the two read as one family, and it means something — a foundation-stage
+   visitor gets one lit edge, a compounding one gets six. Nothing is drawn that
+   is only decoration.
+
+   Rob asked for something in the style of the VR report avatars. Those are not
+   in this repo and I have not seen them, so this is the build's own geometry
+   rather than a guess at that style: swap it if the reference is closer. */
+const GLYPH_EDGES = [[30, 90], [330, 30], [270, 330], [210, 270], [150, 210], [90, 150]];
+
+function archGlyph(overall) {
+  const R = 21, W = 6, INSET = 4.5;
+  const lit = Math.max(1, Math.round(overall * 6));   // never a blank hexagon
+  const at = a => [R * Math.cos(a * Math.PI / 180), -R * Math.sin(a * Math.PI / 180)];
+  const half = R + W / 2 + 1;
+  const segs = GLYPH_EDGES.map(([a1, a2], i) => {
+    const [x1, y1] = at(a1), [x2, y2] = at(a2);
+    const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+    const ux = dx / len, uy = dy / len;
+    return `<line class="ag-seg${i < lit ? ' on' : ''}"
+      x1="${(x1 + ux * INSET).toFixed(2)}" y1="${(y1 + uy * INSET).toFixed(2)}"
+      x2="${(x2 - ux * INSET).toFixed(2)}" y2="${(y2 - uy * INSET).toFixed(2)}"
+      stroke-width="${W}" stroke-linecap="round"/>`;
+  }).join('');
+  return `<svg class="arch-hex" viewBox="${-half} ${-half} ${half * 2} ${half * 2}"
+    aria-hidden="true" focusable="false">${segs}</svg>`;
+}
+
 function buildWrapped() {
   const arch = classifyArchetype(S.scores);
   $('archName').textContent = arch.name;
   $('archTag').textContent = arch.tag;
+  $('archGlyph').innerHTML = archGlyph(arch.overall);
   $('archBody').innerHTML = `${arch.body}<br><br>${composeNarrative()}`;
   $('archRisk').textContent = arch.risk;
+
+  /* The strongest benchmark result, featured beside the position. Picked, not
+     written: the pool with the largest positive delta against its median. When
+     nothing is ahead the panel is hidden rather than filled with the least bad
+     number, because "your best result is still behind" is not a highlight. */
+  const best = [...ORDER]
+    .map(id => ({ id, d: S.scores[id] - BENCHMARK_MEDIAN[id] }))
+    .sort((a, b) => (b.d - a.d) || (ORDER.indexOf(a.id) - ORDER.indexOf(b.id)))[0];
+  const stat = $('archStat');
+  if (best && best.d > 0) {
+    stat.innerHTML = `
+      <div class="as-num">+${best.d}</div>
+      <div class="as-unit">against the benchmark</div>
+      <div class="as-pool">${POOL[best.id].name}</div>
+      <div class="as-band">${BANDS[bandOf(S.scores[best.id])]}</div>`;
+    stat.hidden = false;
+  } else {
+    stat.hidden = true;
+  }
 
   const pips = BEATS.map((_, i) => `<i data-pip="${i}"></i>`).join('');
   document.querySelectorAll('.beat-pips').forEach(n => { n.innerHTML = pips; });
@@ -667,7 +747,7 @@ function buildWrapped() {
     const first = i === 0;
     const row = el('div', 'bench-row');
     row.innerHTML = `
-      <div><div class="nm">${p.name}</div><div class="bd">${BANDS[bandOf(sc)]}</div></div>
+      <div><div class="nm">${p.name}</div><div class="bd bd-${bandOf(sc)}">${BANDS[bandOf(sc)]}</div></div>
       <div class="track">
         <div class="fill" style="background:${p.hex}"></div>
         <div class="bmark${first ? ' labelled' : ''}" style="left:${(med / MAX_POOL_SCORE) * 100}%"></div>
@@ -682,26 +762,20 @@ function buildWrapped() {
 
   /* five-year view: one paragraph, in the archetype's voice, naming this
      visitor's own strongest and weakest pool. */
-  const { lead, lag } = leadAndLag(S.scores);
-  const poolName = id => `<b>${POOL[id].name}</b>`;
-  $('fyBody').innerHTML = (FIVE_YEAR[arch.key] || '')
-    .replace(/\{lead\}/g, poolName(lead))
-    .replace(/\{lag\}/g, poolName(lag));
-
-  /* Proof for the pool the paragraph points at. bestProof takes the pools in
-     preference order and returns the first with a cleared case study, so the
-     lag pool wins when it has one and a pending tile is never shown while any
-     real one exists. */
-  const pick = bestProof([lag, lead, ...ORDER]);
-  const proof = $('fyProof'), holder = $('fyProofTile');
-  holder.innerHTML = '';
-  if (pick) {
-    holder.appendChild(tileEl(POOL[pick.poolId], pick.tile, 0));
-    $('fyProofLabel').textContent = `Proven now · ${POOL[pick.poolId].name}`;
-    proof.hidden = false;
-  } else {
-    proof.hidden = true;
-  }
+  /* beat 3 — strategic priorities. Three cards, the six pools cut 2/2/2 by
+     score. The tier copy is fixed and the pool names are this visitor's, so
+     the only thing that moves between runs is which name sits under which
+     label. Figma 326:181. */
+  const cards = $('prioCards');
+  cards.innerHTML = '';
+  priorityTiers(S.scores).forEach(tier => {
+    const card = el('div', `prio-card t-${tier.key}`);
+    card.innerHTML = `
+      <div class="pc-label">${tier.label}</div>
+      <div class="pc-pools">${tier.pools.map(id => POOL[id].short).join(' · ')}</div>
+      <p class="pc-body">${tier.body}</p>`;
+    cards.appendChild(card);
+  });
 }
 
 /* Best available proof across a list of pools, taken in preference order: a
@@ -750,6 +824,9 @@ document.querySelectorAll('[data-next]').forEach(b => {
 
 function resetDelivery() {
   $('tileSheet').classList.remove('on');
+  // A queued advance from the last visitor's run must not survive a reset.
+  afterTile = null;
+  $('tileClose').innerHTML = TILE_BACK;
   $('idAsk').hidden = false;
   $('idDone').hidden = true;
   $('mfError').textContent = '';

@@ -287,7 +287,10 @@ input, textarea { font: inherit; }
    reading. Replace per screen when the designs land. */
 #stage[data-view='wrap'][data-beat='1'] #bg { background-image: url('../images/v4/explore.jpg'); }
 #stage[data-view='wrap'][data-beat='2'] #bg { background-image: url('../images/v4/explore.jpg'); }
-#stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/v4/explore.jpg'); }
+/* Beat 3 has its own plate from the design (Figma 326:181) — the hexagon
+   bubbles clear the centre band where the three cards sit. Beats 1 and 2 are
+   still standing in with the explore plate; they have no V4 render yet. */
+#stage[data-view='wrap'][data-beat='3'] #bg { background-image: url('../images/v4/priorities.jpg'); }
 #stage[data-view='done'] #bg {
   background-image: url('../images/v4/explore.jpg');
 }
@@ -545,13 +548,6 @@ input, textarea { font: inherit; }
 
 /* The six pool cards deal out one at a time. 110ms apart is slow enough to
    read as a sequence and short enough that the last one is not a wait. */
-.fw-grid.stagger > * { animation: cardIn 0.78s var(--ease-in-out-soft) both; }
-.fw-grid.stagger > *:nth-child(1) { animation-delay: 0.12s; }
-.fw-grid.stagger > *:nth-child(2) { animation-delay: 0.23s; }
-.fw-grid.stagger > *:nth-child(3) { animation-delay: 0.34s; }
-.fw-grid.stagger > *:nth-child(4) { animation-delay: 0.45s; }
-.fw-grid.stagger > *:nth-child(5) { animation-delay: 0.56s; }
-.fw-grid.stagger > *:nth-child(6) { animation-delay: 0.67s; }
 
 @media (prefers-reduced-motion: reduce) {
   .stagger > * { animation: none; }
@@ -639,64 +635,9 @@ input, textarea { font: inherit; }
   justify-content: center; gap: var(--s4);
 }
 
-/* One container, six cells, hairlines between them. The design draws a single
-   card and divides it rather than floating six. */
-.fw-grid {
-  position: relative;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  width: min(1480px, 92cqw);
-  background: var(--card);
-  border: 1px solid var(--card-line);
-  border-radius: var(--radius);
-  box-shadow: var(--card-shadow);
-  overflow: hidden;
-  animation: rise 0.7s var(--ease) 0.08s both;
-}
-.fw-card {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: clamp(18px, 1.7cqw, 34px) clamp(18px, 1.6cqw, 32px);
-  /* Hairlines, not gaps: the dividers are the container's own rules. */
-  border-right: 1px solid var(--hair);
-  border-bottom: 1px solid var(--hair);
-}
-.fw-card:nth-child(3n) { border-right: none; }
-.fw-card:nth-child(n+4) { border-bottom: none; }
-/* The verb leads and the number sits opposite it, top right. */
-.fw-card {
-  grid-template-columns: 1fr auto;
-  grid-template-areas: 'verb num' 'name name' 'gist gist';
-}
-.fw-num {
-  grid-area: num; justify-self: end;
-  font-family: var(--label); font-weight: 400;
-  font-size: clamp(13px, 0.82cqw, 16px);
-  letter-spacing: 0.13em;
-  color: var(--blue-lift);
-}
-.fw-verb {
-  grid-area: verb;
-  font-family: var(--label); font-weight: 500;
-  font-size: clamp(13px, 0.82cqw, 16px);
-  letter-spacing: 0.13em; text-transform: uppercase;
-  color: var(--blue-lift);
-}
-.fw-name {
-  grid-area: name;
-  font-size: clamp(17px, 1.2cqw, 24px);
-  line-height: 1.24; color: var(--ink);
-  margin-top: var(--s2);
-}
-.fw-gist {
-  grid-area: gist;
-  font-size: clamp(14px, 0.94cqw, 18px);
-  line-height: 1.5; color: var(--mid);
-  margin-top: 6px;
-}
+/* The .fw-grid / .fw-card rules that were here are gone with the six cards
+   they styled (see index.html #v-intro). The framework screen is now the lede
+   and the two calls to action. */
 
 /* ---------- type primitives --------------------------------- */
 
@@ -792,10 +733,18 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 
 #v-explore { pointer-events: none; }
 
-/* hint sits centred under the board, with a pulsing touch cue.
-   The board occupies the left min(44cqw, 62cqh) band, offset from --pad-x. */
+/* Sits directly under the hexagon, 44px below its lowest vertex (Rob, 9 Sep).
+   It used to be pinned to the bottom of the frame, which put it 137px below
+   the shape in an otherwise empty band and level with the diagnostic button
+   on the right — so it read as a second footer control rather than as a label
+   for the thing above it.
+
+   The 889 is measured, not guessed: the board's own ink runs y 194 to 845 in
+   frame pixels (its six paths, bounding-boxed), and the hexagon is centred on
+   x 960, so auto margins still centre the hint on the shape. Re-measure if the
+   board's viewBox changes. */
 .hex-hint {
-  position: absolute; left: 0; right: 0; bottom: calc(var(--pad-b) - 4px);
+  position: absolute; left: 0; right: 0; top: 889px; bottom: auto;
   margin: 0 auto; width: max-content;
   display: flex; align-items: center; justify-content: center; gap: var(--s3);
   font-family: var(--label); font-weight: 600;
@@ -1486,15 +1435,56 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
   font-family: var(--body); font-weight: 300; font-style: normal;
   font-size: clamp(15.9px, 1.166cqw, 23.3px); color: var(--blue-lift); margin-top: var(--s3);
 }
+/* The persona mark, left of the name. Sized off the name's own line box so it
+   stays in proportion when the display type clamps. */
+#beat1 .arch-lockup { display: flex; align-items: center; gap: var(--s4); margin-top: var(--s3); }
+#beat1 .arch-names { min-width: 0; }
+#beat1 .arch-glyph { flex: none; width: clamp(52px, 4.06cqw, 78px); }
+.arch-hex { display: block; width: 100%; height: auto; overflow: visible; }
+/* Same pale-blue empty state as the question stepper: --ink-lift disappears on
+   a near-white plate, so the unlit edges take a tinted brand blue. */
+.ag-seg { stroke: rgba(0, 105, 168, 0.26); }
+.ag-seg.on { stroke: var(--brand); }
+
+/* Copy on the left, the strongest benchmark result on the right. The two
+   paragraphs share ONE column (Rob, 9 Sep): side by side, the risk line kept
+   ending on a single orphan word. */
 #beat1 .arch-cols {
-  display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--s5);
+  display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: var(--s5);
   align-items: start;
 }
+#beat1 .arch-cols:has(.arch-stat[hidden]) { grid-template-columns: minmax(0, 1fr); }
+#beat1 .arch-text { display: flex; flex-direction: column; gap: var(--s4); max-width: 74ch; }
 #beat1 .arch-body { font-size: clamp(14.2px, 0.958cqw, 18.2px); }
 #beat1 .arch-risk {
   padding-left: var(--s3); border-left: 2px solid var(--blue);
   font-size: clamp(14.2px, 0.98cqw, 18.2px); line-height: 1.6; color: var(--fg-2);
 }
+
+/* The featured benchmark number. On the card surface so it reads as a lifted
+   panel rather than as a third paragraph. */
+.arch-stat {
+  background: var(--card); border: 1px solid var(--card-line);
+  border-radius: var(--radius); box-shadow: var(--card-shadow);
+  padding: clamp(18px, 1.72cqw, 33px) clamp(16px, 1.354cqw, 26px);
+}
+.arch-stat[hidden] { display: none; }
+.as-num {
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(38px, 3.6cqw, 69px); line-height: 1.0; letter-spacing: -0.03em;
+  color: var(--blue-lift);
+}
+.as-unit {
+  margin-top: var(--s1);
+  font-family: var(--label); font-weight: 600;
+  font-size: clamp(13px, 0.729cqw, 14px);
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
+}
+.as-pool {
+  margin-top: var(--s3);
+  font-size: clamp(16px, 1.15cqw, 22px); line-height: 1.3; color: var(--ink);
+}
+.as-band { margin-top: 2px; font-size: clamp(13px, 0.82cqw, 15.4px); color: var(--fg-4); }
 
 /* beat 2 — benchmark */
 .bench-head { text-align: left; }
@@ -1512,9 +1502,31 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 .bench-row .nm { font-size: clamp(13.6px, 0.92cqw, 17.2px); line-height: 1.25; color: var(--fg); }
 /* Sentence case. Six uppercase band labels stacked down the left was a column
    of shouting next to the names they belong to. */
+/* Red through green across the five bands (Rob, 9 Sep), so the column can be
+   read at a glance instead of word by word.
+
+   Measured against the PLATE, not against white. The row sits on the render at
+   about #D5E7FD, whose luminance is 0.78 — so a colour picked on white reads
+   roughly 13% worse here, and the first set of these values failed at 4.24 to
+   4.43:1 while measuring 5.2 to 5.9 on paper. These are the lightest tint of
+   each hue that still clears 4.60:1 on that plate (5.80 to 5.92 on white).
+   Re-measure if the beat-2 render is ever replaced.
+
+   The five are within 0.005 of each other in luminance, deliberately: at equal
+   weight no band shouts louder than its neighbours. That does mean the ramp is
+   carried by hue alone, which a red-green colour blind reader will not get —
+   what carries it for them is the label, which spells the band out in words
+   beside its own colour, so the hue is never the only thing saying it
+   (WCAG 1.4.1). */
 .bench-row .bd {
-  font-size: clamp(13.0px, 0.82cqw, 15.4px); color: var(--fg-4); margin-top: 1px;
+  font-size: clamp(13.0px, 0.82cqw, 15.4px); margin-top: 1px;
+  font-weight: 500; color: var(--fg-4);
 }
+.bench-row .bd-0 { color: #C0271D; }   /* Absent      4.70:1 on plate */
+.bench-row .bd-1 { color: #A34D00; }   /* Emerging    4.61:1 */
+.bench-row .bd-2 { color: #7A6200; }   /* Developing  4.67:1 */
+.bench-row .bd-3 { color: #0E7264; }   /* Established 4.62:1 */
+.bench-row .bd-4 { color: #1A743A; }   /* Leading     4.63:1 */
 .track { position: relative; height: 6px; background: rgba(0, 76, 119, 0.07); }
 .track .fill { position: absolute; inset: 0 auto 0 0; width: 0; transition: width 1.1s var(--ease-mech); }
 .track .bmark { position: absolute; top: -7px; bottom: -7px; width: 1px; background: var(--fg-3); }
@@ -1540,7 +1552,7 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
 /* beat 3 — forecast, columns divided by rules not boxes */
 /* head and content share one column, left-aligned on the same edge.
    Scoped by class, not by beat id — the beats get reordered. */
-.fc-wrap, .bench-wrap {
+.bench-wrap {
   width: min(1320px, 88cqw); margin: 0 auto;
   display: flex; flex-direction: column; gap: var(--s6);
 }
@@ -1548,27 +1560,60 @@ p.body { color: var(--fg-2); font-size: clamp(14.2px, 0.98cqw, 18.2px); line-hei
    than the shared wrap was spaced for. */
 .bench-wrap { gap: var(--s5); }
 .bench-wrap .fine-print { margin-top: 0; }
-.fc-head { text-align: left; }
-.fc-head .lede { margin-top: var(--s2); }
-/* ---------- five-year view -----------------------------------
-   One paragraph in place of the three columns. Set at reading size rather than
-   heading size: it is the argument, and the heading above it is the claim.
+/* ---------- beat 3: strategic priorities ---------------------
+   Three cards, the six pools cut two apiece. Figma 326:181: 468x248 cards
+   36px apart on the shared --card gradient, so the tokens carry it and only
+   the geometry is stated here. The head is centred on this beat and left
+   aligned on the two before it, which is the design's own call: those read as
+   prose down a column, this reads as three things side by side.
    ------------------------------------------------------------- */
-.fy-body {
-  font-size: clamp(15.4px, 1.13cqw, 21.4px); line-height: 1.62;
-  color: var(--fg); max-width: 62ch;
+.prio-wrap {
+  width: min(1476px, 78cqw); margin: 0 auto;
+  display: flex; flex-direction: column; gap: var(--s6);
 }
-.fy-body b { font-weight: 500; color: var(--blue-lift); }
-.fy-proof { max-width: 420px; }
-.fy-proof[hidden] { display: none; }
-
-.fc-proof { margin-top: var(--s4); }
-.fc-proof-label {
-  font-family: var(--label); font-weight: 600; font-size: clamp(13.0px, 0.773cqw, 14.5px);
-  letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-3);
-  margin-bottom: var(--s2);
+.prio-head { text-align: center; }
+/* The design sets this a step above the other beats' headings. */
+.prio-head .d-m { margin-top: var(--s2); font-size: clamp(30px, 2.8125cqw, 54px); }
+.prio-cards {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 1.875cqw, 36px);
+  align-items: start;
 }
-.fc-proof .tile { border-top-width: 2px; }
+.prio-card {
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  padding: clamp(19px, 1.72cqw, 33px) clamp(15px, 1.354cqw, 26px);
+  display: flex; flex-direction: column;
+}
+/* The design sets these #007CC3. At 14px on the card gradient over this plate
+   that measures about 3.9:1, and --blue-lift is only 4.34 to 4.57 across the
+   three cards — so two of the three fail the 4.5 a label this size needs. They
+   take --blue-deep, which is the same move the .label rule above already makes
+   and for the same reason: the card is a second translucent layer between the
+   type and the render, and the eyebrow tier was picked against the render
+   alone. Measures 5.6:1 or better on all three. */
+.pc-label {
+  font-family: var(--label); font-weight: 600;
+  font-size: clamp(13px, 0.729cqw, 14px);
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--blue-deep);
+}
+/* Two pool names on one line, so the short forms in data.js and not the
+   full ones. Balanced rather than left-packed: when it does take a second
+   line, two even lines look deliberate and 1 + 1 word does not. */
+.pc-pools {
+  margin-top: clamp(7px, 0.52cqw, 10px);
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(21px, 1.5625cqw, 30px); line-height: 1.4;
+  letter-spacing: -0.012em; color: var(--ink);
+  text-wrap: balance;
+}
+.pc-body {
+  margin-top: clamp(14px, 1.042cqw, 20px);
+  font-size: clamp(15px, 1.042cqw, 20px); line-height: 1.5; color: var(--ink);
+}
 
 /* three retrieval routes on the closing screen */
 .retrieve { list-style: none; margin: var(--s4) auto 0; max-width: 42ch; text-align: left; }

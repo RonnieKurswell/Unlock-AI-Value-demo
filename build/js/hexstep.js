@@ -9,10 +9,15 @@
    crisp at any --k, takes the build's own colour tokens, and the fill can
    animate. Nothing to export and keep in sync.
 
-   The fill runs clockwise from the left edge — left, upper-left, upper-right,
-   right, lower-right, lower-left — which is the order the design fills them
-   in. Each capsule is a thick round-capped line rather than a path, which is
-   what gives the stadium shape for free.
+   The fill runs clockwise from the UPPER-RIGHT edge, because that is where the
+   framework hexagon puts AI Strategy — question one. Read the label positions
+   in hexagon.js against the centre (x 960, y 519) and the six sit clockwise
+   from the top right as strategy, data, process, legacy, physical, trust,
+   which is already the order POOLS declares and therefore the order the
+   questions are asked in. The stepper used to start at the left edge, so
+   question one lit the wrong side of the hexagon and the two never agreed.
+   Each capsule is a thick round-capped line rather than a path, which is what
+   gives the stadium shape for free.
    ============================================================= */
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -24,12 +29,12 @@ const INSET = 6;       // pulled back from each vertex, so the caps do not meet
 /* Each edge as its two vertex angles, in fill order. Angles are measured with
    y pointing up, so 90 is the top vertex. */
 const EDGES = [
-  [150, 210],   // left
-  [90, 150],    // upper-left
-  [30, 90],     // upper-right
-  [330, 30],    // right
-  [270, 330],   // lower-right
-  [210, 270]    // lower-left
+  [30, 90],     // upper-right  — AI Strategy & Engineering
+  [330, 30],    // right        — Data for AI
+  [270, 330],   // lower-right  — Process AI
+  [210, 270],   // lower-left   — Agentic Legacy Modernization
+  [150, 210],   // left         — Physical AI
+  [90, 150]     // upper-left   — AI Trust
 ];
 
 const svgEl = (tag, attrs) => {
